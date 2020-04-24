@@ -20,10 +20,12 @@ NoC::NoC(const Configuration& config) :
 	BorderRelay("BorderRelay"), GRTable(config.GRTable())
 {
 	srand(config.RndGeneratorSeed());
+	//std::cout << config.Topology() << '\n';
+	//std::cout << config.GRTable() << '\n';
 
 	// Check for traffic table availability
-	if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
-		GTTable.load(GlobalParams::trace_filename.c_str());
+	if (config.TrafficDistribution() == TRAFFIC_TABLE_BASED)
+		GTTable.load(config.TraceFilename().c_str());
 
 	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
 	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
@@ -43,7 +45,7 @@ NoC::NoC(const Configuration& config) :
 
 		tile.ConfigureRotuerPower(config.RoutingAlgorithm());
 
-		if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
+		if (config.TrafficDistribution() == TRAFFIC_TABLE_BASED)
 		{
 			tile.ProcessingDevice.traffic_table = &GTTable;
 			tile.ProcessingDevice.never_transmit = GTTable.occurrencesAsSource(Tiles[id]->ProcessingDevice.local_id) == 0;

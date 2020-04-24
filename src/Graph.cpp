@@ -28,6 +28,10 @@ Graph::Graph()
 {
 }
 
+void Graph::resize(int32_t size)
+{
+	Nodes.resize(size);
+}
 void Graph::push_back(Node&& node)
 {
 	Nodes.push_back(std::move(node));

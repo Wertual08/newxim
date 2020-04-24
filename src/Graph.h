@@ -36,6 +36,7 @@ public:
 	Graph(const std::string& path);
 	Graph();
 
+	void resize(int32_t size);
 	void push_back(Node&& node);
 
 	int32_t size() const;

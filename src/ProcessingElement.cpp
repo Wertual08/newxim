@@ -95,7 +95,7 @@ bool ProcessingElement::canShot(Packet& packet)
 	double threshold;
 
 	double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-
+	
 	if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
 		if (!transmittedAtPreviousCycle) threshold = GlobalParams::packet_injection_rate;
 		else threshold = GlobalParams::probability_of_retransmission;

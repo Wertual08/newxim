@@ -200,6 +200,7 @@ void Configuration::ShowHelp(const std::string& selfname)
 
 Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 {
+	// TODO: Maybe I should make it beautiful... But later
 	bool config_found = false;
 	bool power_config_found = false;
 
@@ -302,8 +303,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 	packet_injection_rate = ReadParam<double>(config, "packet_injection_rate");
 	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
-	traffic_distribution = ReadParam<std::string>(config, "traffic_distribution");
-	traffic_table_filename = ReadParam<std::string>(config, "traffic_table_filename");
 	clock_period_ps = ReadParam<int32_t>(config, "clock_period_ps");
 	simulation_time = ReadParam<int32_t>(config, "simulation_time");
 	n_virtual_channels = ReadParam<int32_t>(config, "n_virtual_channels");
@@ -314,30 +313,80 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	dyad_threshold = ReadParam<double>(config, "dyad_threshold");
 	max_volume_to_be_drained = ReadParam<uint32_t>(config, "max_volume_to_be_drained");
 
+	traffic_distribution = ReadParam<std::string>(config, "traffic_distribution");
+	if (traffic_distribution == "TRAFFIC_TABLE_BASED") 
+		traffic_table_filename = ReadParam<std::string>(config, "traffic_table_filename");
+
 	show_buffer_stats = ReadParam<bool>(config, "show_buffer_stats");
-	use_powermanager = ReadParam<bool>(config, "use_wirxsleep");
 
 	power_configuration = power_config["Energy"].as<Power>();
 
 	std::string topology = ReadParam<std::string>(config, "topology");
 	try
 	{
+		const auto& args = config["topology_args"];
 		if (topology == "CUSTOM")
 		{
-			const auto& node = config["topology_args"];
-			for (int32_t i = 0; i < node.size(); i++)
+			for (int32_t i = 0; i < args.size(); i++)
 			{
-				const auto& branch = node[i];
+				const auto& branch = args[i];
 				Graph::Node gnode;
 				for (int32_t j = 0; j < branch.size(); j++)
 					gnode.push_back(branch[j].as<int32_t>());
 				graph.push_back(std::move(gnode));
 			}
 		}
-		else if (topology == "")
+		else if (topology == "CIRCULANT")
 		{
-
+			graph.resize(args[0].as<int32_t>());
+			for (int32_t i = 1; i < args.size(); i++)
+			{
+				int32_t l = args[i].as<int32_t>();
+				for (int32_t j = 0; j < graph.size(); j++)
+				{
+					graph[j].push_back((j + l) % graph.size());
+					graph[(j + l) % graph.size()].push_back(j);
+				}
+			}
 		}
+		else if (topology == "MESH")
+		{
+			int32_t w = args[0].as<int32_t>();
+			int32_t h = args[1].as<int32_t>();
+
+			graph.resize(w * h);
+			for (int32_t x = 0; x < w; x++)
+			{
+				for (int32_t y = 0; y < h; y++)
+				{
+					if (y + 1 < h) graph[y * w + x].push_back((y + 1) * w + x);
+					if (x - 1 >= 0) graph[y * w + x].push_back(y * w + x - 1);
+					if (y - 1 >= 0) graph[y * w + x].push_back((y - 1) * w + x);
+					if (x + 1 < w) graph[y * w + x].push_back(y * w + x + 1);
+				}
+			}
+		}//5.23956
+		else if (topology == "TORUS")
+		{
+			int32_t w = args[0].as<int32_t>();
+			int32_t h = args[1].as<int32_t>();
+
+			graph.resize(w* h);
+			for (int32_t x = 0; x < w; x++)
+			{
+				for (int32_t y = 0; y < h; y++)
+				{
+					if (y + 1 < h) graph[y * w + x].push_back((y + 1) * w + x);
+					else graph[y * w + x].push_back(x);
+					if (x - 1 >= 0) graph[y * w + x].push_back(y * w + x - 1);
+					else graph[y * w + x].push_back(y * w + w - 1);
+					if (y - 1 >= 0) graph[y * w + x].push_back((y - 1) * w + x);
+					else graph[y * w + x].push_back((h - 1) * w + x);
+					if (x + 1 < w) graph[y * w + x].push_back(y * w + x + 1);
+					else graph[y * w + x].push_back(y * w);
+				}
+			}
+		}//11.8177
 	}
 	catch (...)
 	{
@@ -349,23 +398,31 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		if (routing_algorithm == "TABLE_BASED")
 		{
 			const auto& node = config["routing_table"];
-			for (int32_t i = 0; i < node.size(); i++)
+			if (node.IsDefined())
 			{
-				const auto& branch = node[i];
-				RoutingTable::Node rnode;
-				for (int32_t j = 0; j < branch.size(); j++)
+				if (node.IsSequence())
 				{
-					if (branch[j].IsSequence())
+					for (int32_t i = 0; i < node.size(); i++)
 					{
-						rnode.push_back(std::vector<int32_t>());
-						for (int32_t k = 0; k < branch[j].size(); k++)
-							rnode[j].push_back(branch[j][k].as<int32_t>());
+						const auto& branch = node[i];
+						RoutingTable::Node rnode;
+						for (int32_t j = 0; j < branch.size(); j++)
+						{
+							if (branch[j].IsSequence())
+							{
+								rnode.push_back(std::vector<int32_t>());
+								for (int32_t k = 0; k < branch[j].size(); k++)
+									rnode[j].push_back(branch[j][k].as<int32_t>());
+							}
+							else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
+						}
+						table.push_back(std::move(rnode));
 					}
-					else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
+					table.MakeValid();
 				}
-				table.push_back(std::move(rnode));
+				else table.Load(graph, node.as<std::string>());
 			}
-			table.MakeValid();
+			else table.Load(graph);
 		}
 		else if (routing_algorithm == "")
 		{
@@ -403,7 +460,6 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 			else if (!strcmp(arg_vet[i], "-buffer")) buffer_depth = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-vc")) n_virtual_channels = (atoi(arg_vet[++i]));
 			else if (!strcmp(arg_vet[i], "-flit")) flit_size = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-wirxsleep")) use_powermanager = true;
 			else if (!strcmp(arg_vet[i], "-size"))
 			{
 				min_packet_size = atoi(arg_vet[++i]);
@@ -594,11 +650,6 @@ void Configuration::Check()
 			<< "GlobalParams.h and compile again \n";
 		exit(1);
 	}
-	if (n_virtual_channels > 1 && use_powermanager)
-	{
-		std::cerr << "Error: Power manager (-wirxsleep) option only supports a single virtual channel\n";
-		exit(1);
-	}
 }
 
 void Configuration::Show() const
@@ -742,10 +793,6 @@ uint32_t Configuration::MaxVolumeToBeDrained() const
 bool Configuration::ShowBufferStats() const
 {
 	return show_buffer_stats;
-}
-bool Configuration::UsePowermanager() const
-{
-	return use_powermanager;
 }
 const Configuration::Power& Configuration::PowerConfiguration() const
 {

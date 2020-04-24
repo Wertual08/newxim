@@ -66,7 +66,6 @@ private:
 	double dyad_threshold;
 	uint32_t max_volume_to_be_drained;
 	bool show_buffer_stats;
-	bool use_powermanager;
 	Power power_configuration;
 
 	Graph graph;
@@ -116,7 +115,6 @@ public:
 	double DyadThreshold() const;
 	uint32_t MaxVolumeToBeDrained() const;
 	bool ShowBufferStats() const;
-	bool UsePowermanager() const;
 	const Power& PowerConfiguration() const;
 
 	double TimeStamp() const;

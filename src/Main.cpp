@@ -39,8 +39,8 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	// Reset the chip
 	Network.reset.write(1);
-	cout << "Reset for " << GlobalParams::reset_time << " cycles... ";
-	sc_start(GlobalParams::reset_time, SC_NS);
+	cout << "Reset for " << Config.ResetTime() << " cycles... ";
+	sc_start(Config.ResetTime(), SC_NS);
 	Network.reset.write(0);
 	cout << " done! " << endl;
 
@@ -60,7 +60,7 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	if ((GlobalParams::max_volume_to_be_drained > 0) && 
 		(sc_time_stamp().to_double() / GlobalParams::clock_period_ps - 
-			GlobalParams::reset_time >= GlobalParams::simulation_time))
+			Config.ResetTime() >= GlobalParams::simulation_time))
 	{
 		cout << '\n'
 			<< "WARNING! the number of flits specified with -volume option\n"

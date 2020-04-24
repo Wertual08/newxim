@@ -80,8 +80,6 @@ void loadConfiguration()
 	// Initialize global configuration parameters (can be overridden with command-line arguments)
 	//GlobalParams::topology_filename = readParam<std::string>(config, "topology_filename");
 	GlobalParams::verbose_mode = readParam<std::string>(config, "verbose_mode");
-	GlobalParams::trace_mode = readParam<bool>(config, "trace_mode");
-	GlobalParams::trace_filename = readParam<std::string>(config, "trace_filename");
 
 	GlobalParams::r2r_link_length = readParam<double>(config, "r2r_link_length");
 	GlobalParams::buffer_depth = readParam<int>(config, "buffer_depth");
@@ -90,20 +88,17 @@ void loadConfiguration()
 	GlobalParams::max_packet_size = readParam<int>(config, "max_packet_size");
 	GlobalParams::packet_injection_rate = readParam<double>(config, "packet_injection_rate");
 	GlobalParams::probability_of_retransmission = readParam<double>(config, "probability_of_retransmission");
-	GlobalParams::traffic_distribution = readParam<std::string>(config, "traffic_distribution");
-	GlobalParams::traffic_table_filename = readParam<std::string>(config, "traffic_table_filename");
 	GlobalParams::clock_period_ps = readParam<int>(config, "clock_period_ps");
 	GlobalParams::simulation_time = readParam<int>(config, "simulation_time");
 	GlobalParams::n_virtual_channels = readParam<int>(config, "n_virtual_channels");
 	GlobalParams::reset_time = readParam<int>(config, "reset_time");
 	GlobalParams::stats_warm_up_time = readParam<int>(config, "stats_warm_up_time");
-	GlobalParams::rnd_generator_seed = time(0);
 	GlobalParams::detailed = readParam<bool>(config, "detailed");
 	GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
 	GlobalParams::max_volume_to_be_drained = readParam<unsigned int>(config, "max_volume_to_be_drained");
 	//GlobalParams::hotspots;
 	GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
-	GlobalParams::use_powermanager = readParam<bool>(config, "use_wirxsleep");
+	GlobalParams::traffic_distribution = readParam<std::string>(config, "traffic_distribution");
 
 	GlobalParams::power_configuration = power_config["Energy"].as<PowerConfig>();
 }
@@ -173,7 +168,6 @@ void showConfig()
 {
 	std::cout << "Using the following configuration: " << std::endl
 		<< "- verbose_mode = " << GlobalParams::verbose_mode << std::endl
-		<< "- trace_mode = " << GlobalParams::trace_mode << std::endl
 		// << "- trace_filename = " << GlobalParams::trace_filename << std::endl
 		<< "- buffer_depth = " << GlobalParams::buffer_depth << std::endl
 		<< "- n_virtual_channels = " << GlobalParams::n_virtual_channels << std::endl
@@ -183,8 +177,7 @@ void showConfig()
 		<< "- traffic_distribution = " << GlobalParams::traffic_distribution << std::endl
 		<< "- clock_period = " << GlobalParams::clock_period_ps << "ps" << std::endl
 		<< "- simulation_time = " << GlobalParams::simulation_time << std::endl
-		<< "- warm_up_time = " << GlobalParams::stats_warm_up_time << std::endl
-		<< "- rnd_generator_seed = " << GlobalParams::rnd_generator_seed << std::endl;
+		<< "- warm_up_time = " << GlobalParams::stats_warm_up_time << std::endl;
 }
 
 void checkConfiguration()
@@ -264,11 +257,6 @@ void checkConfiguration()
 			<< "GlobalParams.h and compile again " << std::endl;
 		exit(1);
 	}
-	if (GlobalParams::n_virtual_channels > 1 && GlobalParams::use_powermanager)
-	{
-		std::cerr << "Error: Power manager (-wirxsleep) option only supports a single virtual channel" << std::endl;
-		exit(1);
-	}
 }
 
 void parseCmdLine(int arg_num, char* arg_vet[])
@@ -283,21 +271,12 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 		{
 			if (!strcmp(arg_vet[i], "-verbose"))
 				GlobalParams::verbose_mode = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-trace"))
-			{
-				GlobalParams::trace_mode = true;
-				GlobalParams::trace_filename = arg_vet[++i];
-			}
 			else if (!strcmp(arg_vet[i], "-buffer"))
 				GlobalParams::buffer_depth = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-vc"))
 				GlobalParams::n_virtual_channels = (atoi(arg_vet[++i]));
 			else if (!strcmp(arg_vet[i], "-flit"))
 				GlobalParams::flit_size = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-wirxsleep"))
-			{
-				GlobalParams::use_powermanager = true;
-			}
 			else if (!strcmp(arg_vet[i], "-size"))
 			{
 				GlobalParams::min_packet_size = atoi(arg_vet[++i]);
@@ -349,11 +328,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 				else if (!strcmp(traffic, "ulocal"))
 					GlobalParams::traffic_distribution =
 					TRAFFIC_ULOCAL;
-				else if (!strcmp(traffic, "table")) {
-					GlobalParams::traffic_distribution =
-						TRAFFIC_TABLE_BASED;
-					GlobalParams::traffic_table_filename = arg_vet[++i];
-				}
 				else if (!strcmp(traffic, "local")) {
 					GlobalParams::traffic_distribution = TRAFFIC_LOCAL;
 					GlobalParams::locality = atof(arg_vet[++i]);
@@ -369,8 +343,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 			}
 			else if (!strcmp(arg_vet[i], "-warmup"))
 				GlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-seed"))
-				GlobalParams::rnd_generator_seed = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-detailed"))
 				GlobalParams::detailed = true;
 			else if (!strcmp(arg_vet[i], "-show_buf_stats"))
@@ -378,11 +350,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 			else if (!strcmp(arg_vet[i], "-volume")) GlobalParams::max_volume_to_be_drained = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-sim")) GlobalParams::simulation_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power")) i++;
-			else 
-			{
-				std::cerr << "Error: Invalid option: " << arg_vet[i] << std::endl;
-				exit(1);
-			}
 		}
 	}
 

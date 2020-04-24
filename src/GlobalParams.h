@@ -81,8 +81,6 @@ struct PowerConfig
 struct GlobalParams 
 {
 	static std::string verbose_mode;
-	static int trace_mode;
-	static std::string trace_filename;
 	static double r2r_link_length;
 	static int buffer_depth;
 	static int flit_size;
@@ -92,7 +90,6 @@ struct GlobalParams
 	static double probability_of_retransmission;
 	static double locality;
 	static std::string traffic_distribution;
-	static std::string traffic_table_filename;
 	static std::string config_filename;
 	static std::string power_config_filename;
 	static int clock_period_ps;
@@ -100,12 +97,10 @@ struct GlobalParams
 	static int n_virtual_channels;
 	static int reset_time;
 	static int stats_warm_up_time;
-	static int rnd_generator_seed;
 	static bool detailed;
 	static std::vector<std::pair<int, double>> hotspots;
 	static double dyad_threshold;
 	static unsigned int max_volume_to_be_drained;
 	static bool show_buffer_stats;
-	static bool use_powermanager;
 	static PowerConfig power_configuration;
 };
