@@ -13,6 +13,7 @@
 #include "DataStructs.h"
 #include "Graph.h"
 #include "ConfigurationManager.h"
+#include "Configuration.h"
 
 
 // need to be globally visible to allow "-volume" simulation stop
@@ -30,22 +31,11 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	cout << "Catania V., Mineo A., Monteleone S., Palesi M., and Patti D. (2016) Cycle-Accurate Network on Chip Simulation with Noxim. ACM Trans. Model. Comput. Simul. 27, 1, Article 4 (August 2016), 25 pages. DOI: https://doi.org/10.1145/2953878" << endl;
 	cout << '\n' << '\n';
-	
-	//% Total received packets : 1456
-	//% Total received flits : 23276
-	//% Received / Ideal flits Ratio : 1.01024
-	//% Global average delay(cycles) : 44.5282
-	//% Max delay(cycles) : 355
-	//% Network throughput(flits / cycle) : 2.58622
-	//% Average IP throughput(flits / cycle / IP) : 0.161639
-	//% Total energy(J) : 2.26372e-06
-	//% Dynamic energy(J) : 2.91082e-07
-	//% Static energy(J) : 1.97264e-06
 
 	configure(arg_num, arg_vet);
-	srand(GlobalParams::rnd_generator_seed);
 
-	NoC Network;
+	Configuration Config(arg_num, arg_vet);
+	NoC Network(Config);
 
 	// Reset the chip
 	Network.reset.write(1);

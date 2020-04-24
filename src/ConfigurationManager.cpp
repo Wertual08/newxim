@@ -15,6 +15,34 @@
 YAML::Node config;
 YAML::Node power_config;
 
+template <typename T>
+T readParam(YAML::Node node, std::string param, T default_value) {
+	try
+	{
+		return node[param].as<T>();
+	}
+	catch (std::exception& e)
+	{
+		/*
+		std::cerr << "WARNING: parameter " << param << " not present in YAML configuration file." << std::endl;
+		std::cerr << "Using command line value or default value " << default_value << std::endl;
+		 */
+		return default_value;
+	}
+}
+
+template <typename T>
+T readParam(YAML::Node node, std::string param) {
+	try {
+		return node[param].as<T>();
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "ERROR: Cannot read param " << param << ". " << std::endl;
+		exit(0);
+	}
+}
+
 void loadConfiguration() 
 {
 	std::cout << "Loading configuration from file \"" << GlobalParams::config_filename << "\"...";
@@ -50,7 +78,7 @@ void loadConfiguration()
 	}
 
 	// Initialize global configuration parameters (can be overridden with command-line arguments)
-	GlobalParams::topology_filename = readParam<std::string>(config, "topology_filename");
+	//GlobalParams::topology_filename = readParam<std::string>(config, "topology_filename");
 	GlobalParams::verbose_mode = readParam<std::string>(config, "verbose_mode");
 	GlobalParams::trace_mode = readParam<bool>(config, "trace_mode");
 	GlobalParams::trace_filename = readParam<std::string>(config, "trace_filename");
@@ -60,9 +88,6 @@ void loadConfiguration()
 	GlobalParams::flit_size = readParam<int>(config, "flit_size");
 	GlobalParams::min_packet_size = readParam<int>(config, "min_packet_size");
 	GlobalParams::max_packet_size = readParam<int>(config, "max_packet_size");
-	GlobalParams::routing_algorithm = readParam<std::string>(config, "routing_algorithm");
-	GlobalParams::routing_table_filename = readParam<std::string>(config, "routing_table_filename");
-	GlobalParams::selection_strategy = readParam<std::string>(config, "selection_strategy");
 	GlobalParams::packet_injection_rate = readParam<double>(config, "packet_injection_rate");
 	GlobalParams::probability_of_retransmission = readParam<double>(config, "probability_of_retransmission");
 	GlobalParams::traffic_distribution = readParam<std::string>(config, "traffic_distribution");
@@ -72,8 +97,7 @@ void loadConfiguration()
 	GlobalParams::n_virtual_channels = readParam<int>(config, "n_virtual_channels");
 	GlobalParams::reset_time = readParam<int>(config, "reset_time");
 	GlobalParams::stats_warm_up_time = readParam<int>(config, "stats_warm_up_time");
-	//GlobalParams::rnd_generator_seed = time(0);
-	GlobalParams::rnd_generator_seed = 0;
+	GlobalParams::rnd_generator_seed = time(0);
 	GlobalParams::detailed = readParam<bool>(config, "detailed");
 	GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
 	GlobalParams::max_volume_to_be_drained = readParam<unsigned int>(config, "max_volume_to_be_drained");
@@ -154,9 +178,6 @@ void showConfig()
 		<< "- buffer_depth = " << GlobalParams::buffer_depth << std::endl
 		<< "- n_virtual_channels = " << GlobalParams::n_virtual_channels << std::endl
 		<< "- max_packet_size = " << GlobalParams::max_packet_size << std::endl
-		<< "- routing_algorithm = " << GlobalParams::routing_algorithm << std::endl
-		// << "- routing_table_filename = " << GlobalParams::routing_table_filename << std::endl
-		<< "- selection_strategy = " << GlobalParams::selection_strategy << std::endl
 		<< "- packet_injection_rate = " << GlobalParams::packet_injection_rate << std::endl
 		<< "- probability_of_retransmission = " << GlobalParams::probability_of_retransmission << std::endl
 		<< "- traffic_distribution = " << GlobalParams::traffic_distribution << std::endl
@@ -187,11 +208,6 @@ void checkConfiguration()
 		GlobalParams::max_packet_size) {
 		std::cerr << "Error: min packet size must be less than max packet size"
 			<< std::endl;
-		exit(1);
-	}
-
-	if (GlobalParams::selection_strategy.compare("INVALID_SELECTION") == 0) {
-		std::cerr << "Error: invalid selection policy" << std::endl;
 		exit(1);
 	}
 
@@ -241,18 +257,6 @@ void checkConfiguration()
 		exit(1);
 	}
 
-
-	if (GlobalParams::n_virtual_channels > 1 && GlobalParams::selection_strategy.compare("NOP") == 0)
-	{
-		std::cerr << "Error: NoP selection strategy can be used only with a single virtual channel" << std::endl;
-		exit(1);
-	}
-
-	if (GlobalParams::n_virtual_channels > 1 && GlobalParams::selection_strategy.compare("BUFFER_LEVEL") == 0)
-	{
-		std::cerr << "Error: Buffer level selection strategy can be used only with a single virtual channel" << std::endl;
-		exit(1);
-	}
 	if (GlobalParams::n_virtual_channels > MAX_VIRTUAL_CHANNELS)
 	{
 		std::cerr << "Error: cannot use more than " << MAX_VIRTUAL_CHANNELS << " virtual channels." << std::endl
@@ -299,23 +303,8 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 				GlobalParams::min_packet_size = atoi(arg_vet[++i]);
 				GlobalParams::max_packet_size = atoi(arg_vet[++i]);
 			}
-			else if (!strcmp(arg_vet[i], "-routing"))
-			{
-				GlobalParams::routing_algorithm = arg_vet[++i];
-				if (GlobalParams::routing_algorithm == ROUTING_DYAD)
-					GlobalParams::dyad_threshold = atof(arg_vet[++i]);
-				else if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED)
-				{
-					GlobalParams::routing_table_filename = arg_vet[++i];
-					GlobalParams::packet_injection_rate = 0;
-				}
-			}
-			else if (!strcmp(arg_vet[i], "-sel")) {
-				GlobalParams::selection_strategy = arg_vet[++i];
-			}
 			else if (!strcmp(arg_vet[i], "-pir"))
 			{
-
 				GlobalParams::packet_injection_rate = atof(arg_vet[++i]);
 				char* distribution = arg_vet[i + 1 < arg_num ? ++i : i];
 
@@ -389,7 +378,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 			else if (!strcmp(arg_vet[i], "-volume")) GlobalParams::max_volume_to_be_drained = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-sim")) GlobalParams::simulation_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power")) i++;
-			else if (!strcmp(arg_vet[i], "-topology")) GlobalParams::topology_filename = arg_vet[++i];
 			else 
 			{
 				std::cerr << "Error: Invalid option: " << arg_vet[i] << std::endl;
@@ -399,7 +387,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 	}
 
 }
-
 
 void configure(int arg_num, char* arg_vet[]) {
 
@@ -460,29 +447,4 @@ void configure(int arg_num, char* arg_vet[]) {
 
 	// Show configuration
 	if (GlobalParams::verbose_mode > VERBOSE_OFF) showConfig();
-}
-
-template <typename T>
-T readParam(YAML::Node node, std::string param, T default_value) {
-	try {
-		return node[param].as<T>();
-	}
-	catch (std::exception& e) {
-		/*
-		std::cerr << "WARNING: parameter " << param << " not present in YAML configuration file." << std::endl;
-		std::cerr << "Using command line value or default value " << default_value << std::endl;
-		 */
-		return default_value;
-	}
-}
-
-template <typename T>
-T readParam(YAML::Node node, std::string param) {
-	try {
-		return node[param].as<T>();
-	}
-	catch (std::exception& e) {
-		std::cerr << "ERROR: Cannot read param " << param << ". " << std::endl;
-		exit(0);
-	}
 }

@@ -4,15 +4,18 @@
 # NOC & WIRED CONFIGURATION
 #
 #
-topology_filename: "graph.txt"
-# number of flits for each router buffer
-buffer_depth: 4
-# size of flits, in bits
-flit_size: 32
-# lenght in mm of router to router connection
-r2r_link_length: 1.0
-n_virtual_channels: 1
+rnd_generator_seed: 0
 
+topology: CUSTOM
+topology_args: [
+    [1, 2, 5, 6],
+    [2, 3, 6, 0],
+    [3, 4, 0, 1],
+    [4, 5, 1, 2],
+    [5, 6, 2, 3],
+    [6, 0, 3, 4],
+    [0, 1, 4, 5],
+  ]
 # Routing algorithms:
 #   XY
 #   DELTA
@@ -25,7 +28,23 @@ n_virtual_channels: 1
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
 routing_algorithm: TABLE_BASED
-routing_table_filename: "table.txt"
+routing_table: [
+    [4, 0, 1, 0, 1, 2, 3],
+    [3, 4, 0, 1, 0, 1, 2],
+    [2, 3, 4, 0, 1, 0, 1],
+    [1, 2, 3, 4, 0, 1, 0],
+    [0, 1, 2, 3, 4, 0, 1],
+    [1, 0, 1, 2, 3, 4, 0],
+    [0, 1, 0, 1, 2, 3, 4],
+  ]
+
+# number of flits for each router buffer
+buffer_depth: 4
+# size of flits, in bits
+flit_size: 32
+# lenght in mm of router to router connection
+r2r_link_length: 1.0
+n_virtual_channels: 1
 
 # Routing specific parameters
 #   dyad_threshold: double

@@ -159,10 +159,13 @@ public:
 		ProcessingDevice.buffer_full_status_tx(buffer_full_status_tx_local);
 		ProcessingDevice.free_slots_neighbor(free_slots_neighbor_local);
 
-		RouterDevice.power.configureRouter(GlobalParams::flit_size,
-			max_buffer_size, GlobalParams::flit_size,
-			GlobalParams::routing_algorithm, "default");
 		ProcessingDevice.local_id = id;
+	}
+	void ConfigureRotuerPower(const std::string& routing_algorithm)
+	{
+		RouterDevice.power.configureRouter(GlobalParams::flit_size,
+			GlobalParams::buffer_depth, GlobalParams::flit_size,
+			routing_algorithm, "default");
 	}
 
 	void Disable(int32_t relay)

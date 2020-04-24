@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <cassert>
+#include <ctime>
 #include "Buffer.h"
 
 
@@ -298,7 +299,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	min_packet_size = ReadParam<int32_t>(config, "min_packet_size");
 	max_packet_size = ReadParam<int32_t>(config, "max_packet_size");
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
-	routing_table_filename = ReadParam<std::string>(config, "routing_table_filename");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 	packet_injection_rate = ReadParam<double>(config, "packet_injection_rate");
 	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
@@ -309,7 +309,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	n_virtual_channels = ReadParam<int32_t>(config, "n_virtual_channels");
 	reset_time = ReadParam<int32_t>(config, "reset_time");
 	stats_warm_up_time = ReadParam<int32_t>(config, "stats_warm_up_time");
-	rnd_generator_seed = 0/*time(0) // TODO: FIX THIS SHIT, zero seed is for testing only*/;
+	rnd_generator_seed = ReadParam<int32_t>(config, "rnd_generator_seed", time(0));
 	detailed = ReadParam<bool>(config, "detailed");
 	dyad_threshold = ReadParam<double>(config, "dyad_threshold");
 	max_volume_to_be_drained = ReadParam<uint32_t>(config, "max_volume_to_be_drained");
@@ -318,6 +318,65 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	use_powermanager = ReadParam<bool>(config, "use_wirxsleep");
 
 	power_configuration = power_config["Energy"].as<Power>();
+
+	std::string topology = ReadParam<std::string>(config, "topology");
+	try
+	{
+		if (topology == "CUSTOM")
+		{
+			const auto& node = config["topology_args"];
+			for (int32_t i = 0; i < node.size(); i++)
+			{
+				const auto& branch = node[i];
+				Graph::Node gnode;
+				for (int32_t j = 0; j < branch.size(); j++)
+					gnode.push_back(branch[j].as<int32_t>());
+				graph.push_back(std::move(gnode));
+			}
+		}
+		else if (topology == "")
+		{
+
+		}
+	}
+	catch (...)
+	{
+		std::cerr << "ERROR: Cannot read topology. \n";
+		exit(0);
+	}
+	try
+	{
+		if (routing_algorithm == "TABLE_BASED")
+		{
+			const auto& node = config["routing_table"];
+			for (int32_t i = 0; i < node.size(); i++)
+			{
+				const auto& branch = node[i];
+				RoutingTable::Node rnode;
+				for (int32_t j = 0; j < branch.size(); j++)
+				{
+					if (branch[j].IsSequence())
+					{
+						rnode.push_back(std::vector<int32_t>());
+						for (int32_t k = 0; k < branch[j].size(); k++)
+							rnode[j].push_back(branch[j][k].as<int32_t>());
+					}
+					else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
+				}
+				table.push_back(std::move(rnode));
+			}
+			table.MakeValid();
+		}
+		else if (routing_algorithm == "")
+		{
+
+		}
+	}
+	catch (...)
+	{
+		std::cerr << "ERROR: Cannot read routing table. \n";
+		exit(0);
+	}
 
 	ParseArgs(arg_num, arg_vet);
 
@@ -356,7 +415,7 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 				//if (routing_algorithm == ROUTING_DYAD) dyad_threshold = atof(arg_vet[++i]);
 				if (routing_algorithm == ROUTING_TABLE_BASED)
 				{
-					routing_table_filename = arg_vet[++i];
+					//routing_table_filename = arg_vet[++i];
 					packet_injection_rate = 0;
 				}
 			}
@@ -553,7 +612,6 @@ void Configuration::Show() const
 		<< "- n_virtual_channels = " << n_virtual_channels << '\n'
 		<< "- max_packet_size = " << max_packet_size << '\n'
 		<< "- routing_algorithm = " << routing_algorithm << '\n'
-		<< "- routing_table_filename = " << routing_table_filename << '\n'
 		<< "- selection_strategy = " << selection_strategy << '\n'
 		<< "- packet_injection_rate = " << packet_injection_rate << '\n'
 		<< "- probability_of_retransmission = " << probability_of_retransmission << '\n'
@@ -562,6 +620,15 @@ void Configuration::Show() const
 		<< "- simulation_time = " << simulation_time << '\n'
 		<< "- warm_up_time = " << stats_warm_up_time << '\n'
 		<< "- rnd_generator_seed = " << rnd_generator_seed << '\n';
+}
+
+const Graph& Configuration::Topology() const
+{
+	return graph;
+}
+const RoutingTable& Configuration::GRTable() const
+{
+	return table;
 }
 
 const std::string& Configuration::VerboseMode() const
@@ -599,10 +666,6 @@ int32_t Configuration::MaxPacketSize() const
 const std::string& Configuration::RoutingAlgorithm() const
 {
 	return routing_algorithm;
-}
-const std::string& Configuration::RoutingTableFilename() const
-{
-	return routing_table_filename;
 }
 const std::string& Configuration::SelectionStrategy() const
 {

@@ -10,7 +10,6 @@
 
 #include "GlobalParams.h"
 
-std::string GlobalParams::topology_filename;
 std::string GlobalParams::verbose_mode;
 int GlobalParams::trace_mode;
 std::string GlobalParams::trace_filename;
@@ -20,9 +19,6 @@ int GlobalParams::buffer_depth;
 int GlobalParams::flit_size;
 int GlobalParams::min_packet_size;
 int GlobalParams::max_packet_size;
-std::string GlobalParams::routing_algorithm;
-std::string GlobalParams::routing_table_filename;
-std::string GlobalParams::selection_strategy;
 double GlobalParams::packet_injection_rate;
 double GlobalParams::probability_of_retransmission;
 double GlobalParams::locality;

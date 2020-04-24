@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "Graph.h"
+#include "RoutingTable.h"
 
 
 
@@ -33,6 +35,9 @@ public:
 	};
 
 private:
+	std::string topology;
+	std::string topology_args;
+
 	std::string verbose_mode;
 	int32_t trace_mode;
 	std::string trace_filename;
@@ -42,7 +47,6 @@ private:
 	int32_t min_packet_size;
 	int32_t max_packet_size;
 	std::string routing_algorithm;
-	std::string routing_table_filename;
 	std::string selection_strategy;
 	double packet_injection_rate;
 	double probability_of_retransmission;
@@ -65,15 +69,10 @@ private:
 	bool use_powermanager;
 	Power power_configuration;
 
-public:
-	static constexpr const char* VERBOSE_OFF = "VERBOSE_OFF";
-	static constexpr const char* VERBOSE_LOW = "VERBOSE_LOW";
-	static constexpr const char* VERBOSE_MEDIUM = "VERBOSE_MEDIUM";
-	static constexpr const char* VERBOSE_HIGH = "VERBOSE_HIGH";
-	static constexpr const char* ROUTING_TABLE_BASED = "TABLE_BASED";
-	static constexpr const char* TRAFFIC_RANDOM = "TRAFFIC_RANDOM";
-	static constexpr const char* TRAFFIC_TABLE_BASED = "TRAFFIC_TABLE_BASED";
+	Graph graph;
+	RoutingTable table;
 
+public:
 	static std::string default_config_filename;
 	static std::string default_power_config_filename;
 
@@ -85,6 +84,9 @@ public:
 
 	void Show() const;
 
+	const Graph& Topology() const;
+	const RoutingTable& GRTable() const;
+
 	const std::string& VerboseMode() const;
 	int32_t TraceMode() const;
 	const std::string& TraceFilename() const;
@@ -93,8 +95,8 @@ public:
 	int32_t FlitSize() const;
 	int32_t MinPacketSize() const;
 	int32_t MaxPacketSize() const;
+
 	const std::string& RoutingAlgorithm() const;
-	const std::string& RoutingTableFilename() const;
 	const std::string& SelectionStrategy() const;
 	double PacketInjectionRate() const;
 	double ProbabilityOfRetransmission() const;

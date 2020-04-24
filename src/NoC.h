@@ -10,6 +10,7 @@
 
 #pragma once
 #include <systemc.h>
+#include "Configuration.h"
 #include "Tile.h"
 #include "RoutingTable.h"
 #include "GlobalTrafficTable.h"
@@ -21,7 +22,6 @@ class NoC
 {
 private:
 	Tile::Relay BorderRelay;
-
 
 public:
 	sc_clock clock;
@@ -35,7 +35,7 @@ public:
 	RoutingTable GRTable;
 	GlobalTrafficTable GTTable;
 
-	NoC(/*const Configuration& config*/);
+	NoC(const Configuration& config);
 	~NoC();
 
 	// Support methods

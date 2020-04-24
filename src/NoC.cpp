@@ -15,31 +15,33 @@
 
 
 
-NoC::NoC(/*const Configuration& config*/) : clock("clock", GlobalParams::clock_period_ps, SC_PS), BorderRelay("BorderRelay")
+NoC::NoC(const Configuration& config) : 
+	clock("clock", GlobalParams::clock_period_ps, SC_PS), 
+	BorderRelay("BorderRelay"), GRTable(config.GRTable())
 {
-	Graph graph(GlobalParams::topology_filename); // TODO: Make file customizable by configuration
-
-	// Check for routing table availability
-	if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED) 
-		GRTable.Load(GlobalParams::routing_table_filename);
+	srand(config.RndGeneratorSeed());
 
 	// Check for traffic table availability
 	if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
 		GTTable.load(GlobalParams::trace_filename.c_str());
 
-	if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
-	if (GlobalParams::selection_strategy == "RANDOM") Strategy = new SelectionRandom();
+	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
+	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
 
 	// Create and configure tiles
+	auto graph = config.Topology();
 	Tiles.resize(graph.size());
 	for (int32_t id = 0; id < Tiles.size(); id++)
 	{
 		char tile_name[32];
 		sprintf(tile_name, "Tile[%002d]", id);
 		Tiles[id] = new Tile(tile_name, id, graph.size() - 1, graph[id].size(), 
-			GlobalParams::stats_warm_up_time, GlobalParams::buffer_depth, *Algorithm, *Strategy, GRTable);
-
+			GlobalParams::stats_warm_up_time, GlobalParams::buffer_depth, 
+			*Algorithm, *Strategy, GRTable);
+		
 		auto& tile = *Tiles[id];
+
+		tile.ConfigureRotuerPower(config.RoutingAlgorithm());
 
 		if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
 		{

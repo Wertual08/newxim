@@ -1,6 +1,6 @@
 #include "Graph.h"
 #include <fstream>
-#include <iostream>
+#include <iomanip>
 #include <sstream>
 
 
@@ -12,21 +12,25 @@ Graph::Graph(const std::string& path)
 	int32_t l = 0;
 	while (std::getline(fin, line))
 	{
+		if (line.empty() || line[0] == '#') continue;
 		l++;
 		std::istringstream sin(line);
 		Node node;
 		int32_t val;
-		while (!sin.eof() && sin >> val) node.Links.push_back(val);
+		while (!sin.eof() && sin >> val) node.push_back(val);
 		if (sin.fail()) throw std::runtime_error("Error reading topology[line=" + std::to_string(l) + "]: Bad graph format." );
 		Nodes.push_back(std::move(node));
 	}
 	fin.close();
+}
 
-	//for (auto& it : Nodes)
-	//{
-	//	for (auto& s : it.Links) std::cout << s << " ";
-	//	std::cout << '\n';
-	//}
+Graph::Graph()
+{
+}
+
+void Graph::push_back(Node&& node)
+{
+	Nodes.push_back(std::move(node));
 }
 
 int32_t Graph::size() const
@@ -41,4 +45,18 @@ Graph::Node& Graph::operator[](int32_t i)
 const Graph::Node& Graph::operator[](int32_t i) const
 {
 	return Nodes[i];
+}
+
+std::ostream& operator<<(std::ostream& os, const Graph& g)
+{
+	os << "[\n";
+	for (auto& n : g.Nodes)
+	{
+		os << '[';
+		for (int32_t i = 0; i < n.size() - 1; i++) os << n[i] << ", ";
+		if (n.size()) os << n[n.size() - 1];
+		os << "],\n";
+	}
+	os << "]";
+	return os;
 }

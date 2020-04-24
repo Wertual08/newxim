@@ -80,7 +80,6 @@ struct PowerConfig
 
 struct GlobalParams 
 {
-	static std::string topology_filename;
 	static std::string verbose_mode;
 	static int trace_mode;
 	static std::string trace_filename;
@@ -89,9 +88,6 @@ struct GlobalParams
 	static int flit_size;
 	static int min_packet_size;
 	static int max_packet_size;
-	static std::string routing_algorithm;
-	static std::string routing_table_filename;
-	static std::string selection_strategy;
 	static double packet_injection_rate;
 	static double probability_of_retransmission;
 	static double locality;
