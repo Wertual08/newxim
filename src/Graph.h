@@ -21,11 +21,12 @@ public:
 		int32_t size() const { return Links.size(); }
 		int32_t operator[](int32_t i) const { return Links[i]; }
 		int32_t& operator[](int32_t i) { return Links[i]; }
-		int32_t link_to(int32_t id) const 
+		std::vector<int32_t> links_to(int32_t id) const 
 		{
+			std::vector<int32_t> result;
 			for (int32_t i = 0; i < Links.size(); i++)
-				if (Links[i] == id) return i;
-			return -1;
+				if (Links[i] == id) result.push_back(i);
+			return std::move(result);
 		}
 	};
 

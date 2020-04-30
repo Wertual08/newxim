@@ -18,6 +18,14 @@ GlobalStats::GlobalStats(const NoC& _noc) : Network(_noc)
 {
 }
 
+double GlobalStats::getLastReceivedFlitTime()
+{
+	double result = 0.0;
+	for (auto t : Network.Tiles) if (t->RouterDevice.stats.getLastReceivedFlitTime() > result)
+		result = t->RouterDevice.stats.getLastReceivedFlitTime();
+	return result;
+}
+
 double GlobalStats::getAverageDelay()
 {
 	unsigned int total_packets = 0;
@@ -221,6 +229,7 @@ void GlobalStats::showStats(std::ostream& out, bool detailed)
 	out << "% Total received packets: " << getReceivedPackets() << endl;
 	out << "% Total received flits: " << getReceivedFlits() << endl;
 	out << "% Received/Ideal flits Ratio: " << getReceivedIdealFlitRatio() << endl;
+	out << "% Last time flit received: " << getLastReceivedFlitTime() << '\n';
 	out << "% Global average delay (cycles): " << getAverageDelay() << endl;
 	out << "% Max delay (cycles): " << getMaxDelay() << endl;
 	out << "% Network throughput (flits/cycle): " << getAggregatedThroughput() << endl;

@@ -29,7 +29,6 @@ private:
 	int32_t start_from_port;	// Port from which to start the reservation cycle
 	uint32_t routed_flits;
 
-	ReservationTable reservation_table;		// Switch reservation table
 	RoutingAlgorithm& Algorithm;
 	SelectionStrategy& Strategy;
 
@@ -71,6 +70,8 @@ public:
 	Relay& LocalRelay;
 	const int32_t LocalRelayID;
 	std::vector<int32_t> Neighbours;
+
+	ReservationTable reservation_table;		// Switch reservation table
 
 	// I/O Ports
 	sc_in_clk clock;			// The input clock for the router

@@ -87,15 +87,15 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
 
 void ReservationTable::print()
 {
+	std::ofstream fout("log.txt", std::ios::app);
 	for (int o = 0; o < n_outputs; o++)
 	{
-		cout << o << ": ";
+		fout << o << ": ";
 		for (std::vector<TReservation>::size_type i = 0; i < rtable[o].reservations.size(); i++)
 		{
-			cout << "<" << rtable[o].reservations[i].input << "," << rtable[o].reservations[i].vc << ">, ";
+			fout << "<" << rtable[o].reservations[i].input << "," << rtable[o].reservations[i].vc << ">, ";
 		}
-		cout << " | " << rtable[o].index;
-		cout << endl;
+		fout << " | " << rtable[o].index << '\n';
 	}
 }
 

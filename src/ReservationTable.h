@@ -65,7 +65,7 @@ public:
 	void release(const TReservation r, const int port_out);
 
 	// Returns the pairs of output port and virtual channel reserved by port_in
-	std::vector<std::pair<int, int> > getReservations(const int port_int);
+	std::vector<std::pair<int, int>> getReservations(const int port_int);
 
 	// update the index of the reservation having highest priority in the current cycle
 	void updateIndex();

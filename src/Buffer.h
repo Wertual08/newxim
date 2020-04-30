@@ -28,6 +28,8 @@ private:
 	int32_t max_buffer_size;
 
 	std::queue<Flit> buffer;
+	mutable Flit TEMP_SHITY_FLIT;
+	mutable int TEMP_SHITY_COUNTER;
 
 	uint32_t max_occupancy;
 	double hold_time, last_event, hold_time_sum;

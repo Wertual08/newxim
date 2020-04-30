@@ -11,7 +11,7 @@
 #include "NoC.h"
 #include "routingAlgorithms/RoutingTableBased.h"
 #include "selectionStrategies/SelectionRandom.h"
-
+#include "selectionStrategies/SelectionBufferLevel.h"
 
 
 
@@ -29,9 +29,10 @@ NoC::NoC(const Configuration& config) :
 
 	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
 	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
+	else if (config.SelectionStrategy() == "BUFFER_LEVEL") Strategy = new SelectionBufferLevel();
 
 	// Create and configure tiles
-	auto graph = config.Topology();
+	auto& graph = config.Topology();
 	Tiles.resize(graph.size());
 	for (int32_t id = 0; id < Tiles.size(); id++)
 	{
@@ -63,20 +64,29 @@ NoC::NoC(const Configuration& config) :
 		auto& node = graph[id];
 		for (int32_t relay = 0; relay < node.size(); relay++)
 		{
+			if (tile.Relays[relay].Bound()) continue;
 			int32_t connected_id = node[relay];
 
 			if (connected_id < 0)
 			{
-				tile.Relays[relay].Bind(BorderRelay);
+				tile.Relays[relay].SilentBind(BorderRelay);
 				tile.Disable(relay);
 			}
 			else
 			{
 				auto& connected_tile = *Tiles[connected_id];
 				auto& connected_node = graph[connected_id];
-				int32_t connected_relay = connected_node.link_to(id);
-				tile.Relays[relay].Bind(connected_tile.Relays[connected_relay]);
+				std::vector<int32_t> connected_relays = connected_node.links_to(id);
+				for (int32_t rel : connected_relays)
+				{
+					if (!connected_tile.Relays[rel].Bound())
+					{
+						tile.Relays[relay].Bind(connected_tile.Relays[rel]);
+						break;
+					}
+				}
 			}
+			if (!tile.Relays[relay].Bound()) throw std::runtime_error("NoC error: Bad graph.");
 		}
 	}
 		

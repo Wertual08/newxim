@@ -12,8 +12,7 @@
 
 int ProcessingElement::randInt(int min, int max)
 {
-	return min +
-		(int)((double)(max - min + 1) * rand() / (RAND_MAX + 1.0));
+	return min + (int)((double)(max - min + 1) * rand() / (RAND_MAX + 1.0));
 }
 
 void ProcessingElement::rxProcess()
@@ -164,6 +163,8 @@ Packet ProcessingElement::trafficRandom()
 	do
 	{
 		p.dst_id = randInt(0, MaxID);
+
+		//std::cout << p.dst_id << " ";
 
 		// check for hotspot destination
 		for (size_t i = 0; i < GlobalParams::hotspots.size(); i++)

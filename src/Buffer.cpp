@@ -43,6 +43,7 @@ Buffer::Buffer()
 	full_cycles_counter = 0;
 	last_front_flit_seq = NOT_VALID;
 	deadlock_detected = false;
+	TEMP_SHITY_COUNTER = 0;
 }
 
 void Buffer::SetMaxBufferSize(uint32_t bms)
@@ -132,23 +133,52 @@ void Buffer::ShowStats(std::ostream& out) const
 }
 void Buffer::Print() const
 {
-	std::queue<Flit> m = buffer;
-
-	std::string bstr = "";
-
-
-	char  t[] = "HBT";
-
-	cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
-	cout << label << " QUEUE *[";
-	while (!(m.empty()))
+	if (sc_time_stamp().to_double() / GlobalParams::clock_period_ps > 10990 || 1)
 	{
-		Flit f = m.front();
-		m.pop();
-		cout << bstr << t[f.flit_type] << f.sequence_no << "(" << f.dst_id << ") | ";
+		std::queue<Flit> m = buffer;
+
+		char t[] = "HBT";
+		
+		std::ofstream fout("log.txt", std::ios::app);
+		fout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
+		fout << label << " QUEUE *[";
+		while (!m.empty())
+		{
+			Flit f = m.front();
+			m.pop();
+			fout << t[f.flit_type] << f.sequence_no << "(" << f.src_id << "->" << f.dst_id<< ") | ";
+		}
+		fout << "]*\n";
+		
+		//std::queue<Flit> m = buffer;
+		//
+		//char t[] = "HBT";
+		//
+		//cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
+		//cout << label << " QUEUE *[";
+		//while (!m.empty())
+		//{
+		//	Flit f = m.front();
+		//	m.pop();
+		//	cout << t[f.flit_type] << f.sequence_no << "(" << f.dst_id << ") | ";
+		//}
+		//cout << "]*" << endl;
+		//cout << endl;
 	}
-	cout << "]*" << endl;
-	cout << endl;
+	if (!buffer.empty())
+	{
+		//if (buffer.front().dst_id == 48) exit(-1);
+		if (buffer.front() == TEMP_SHITY_FLIT) TEMP_SHITY_COUNTER++;
+		else
+		{
+			TEMP_SHITY_COUNTER = 0;
+			TEMP_SHITY_FLIT = buffer.front();
+		}
+		if (TEMP_SHITY_COUNTER > 1000)
+		{
+			//exit(-1);
+		}
+	}
 }
 
 void Buffer::SetLabel(std::string l)

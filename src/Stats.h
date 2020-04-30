@@ -33,12 +33,15 @@ private:
 	int id;
 	std::vector<CommHistory> chist;
 	double warm_up_time;
+	double last_received_flit_time;
 
 	int searchCommHistory(int src_id);
 
 public:
 	Stats() {
 	}
+
+	double getLastReceivedFlitTime() const;
 
 	void configure(const int node_id, const double _warm_up_time);
 

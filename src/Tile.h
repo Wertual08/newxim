@@ -64,32 +64,36 @@ public:
 		void Bind(Relay& r)
 		{
 			// Rebinding restriction
-			if (tx_flit.bind_count() == 0)
-			{
-				tx_flit(r.sig_flit);
-				tx_req(r.sig_req);
-				tx_ack(r.sig_ack);
-				tx_buffer_full_status(r.sig_buffer_full_status);
-				free_slots_neighbor(r.sig_free_slots);
-			}
-			if (r.tx_flit.bind_count() == 0)
-			{
-				r.tx_flit(sig_flit);
-				r.tx_req(sig_req);
-				r.tx_ack(sig_ack);
-				r.tx_buffer_full_status(sig_buffer_full_status);
-				r.free_slots_neighbor(sig_free_slots);
-			}
+			tx_flit(r.sig_flit);
+			tx_req(r.sig_req);
+			tx_ack(r.sig_ack);
+			tx_buffer_full_status(r.sig_buffer_full_status);
+			free_slots_neighbor(r.sig_free_slots);
+
+			r.tx_flit(sig_flit);
+			r.tx_req(sig_req);
+			r.tx_ack(sig_ack);
+			r.tx_buffer_full_status(sig_buffer_full_status);
+			r.free_slots_neighbor(sig_free_slots);
+		}
+		void SilentBind(Relay& r)
+		{
+			tx_flit(r.sig_flit);
+			tx_req(r.sig_req);
+			tx_ack(r.sig_ack);
+			tx_buffer_full_status(r.sig_buffer_full_status);
+			free_slots_neighbor(r.sig_free_slots);
+		}
+		bool Bound()
+		{
+			return tx_flit.bind_count();
 		}
 		void Disable()
 		{
-			if (tx_req.bind_count() > 0)
-			{
-				tx_req.write(false);
-				rx_ack.write(false);
-				free_slots.write(-1);
-			}
-			else Bind(*this);
+			SilentBind(*this);
+			tx_req.write(false);
+			rx_ack.write(false);
+			free_slots.write(-1);
 		}
 	};
 	sc_vector<Relay> Relays;

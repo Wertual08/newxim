@@ -25,6 +25,8 @@ private:
 public:
 	GlobalStats(const NoC& _noc);
 
+	double getLastReceivedFlitTime();
+
 	// Returns the aggregated average delay (cycles)
 	double getAverageDelay();
 

@@ -76,7 +76,10 @@ void Router::TXProcess()
 		{
 			int i = (start_from_port + j) % Relays.size();
 			Relay& rel = Relays[i];
-
+			if (local_id == 48 && sc_time_stamp().to_double() / GlobalParams::clock_period_ps == 1017)
+			{
+				int k = 0;
+			}
 			for (int k = 0; k < GlobalParams::n_virtual_channels; k++)
 			{
 				int vc = (rel.start_from_vc + k) % GlobalParams::n_virtual_channels;
@@ -142,7 +145,11 @@ void Router::TXProcess()
 		for (int i = 0; i < Relays.size(); i++)
 		{
 			Relay& rel = Relays[i];
-
+			// FOR DEBUG BREAKPOINT
+			if (local_id == 48 && sc_time_stamp().to_double() / GlobalParams::clock_period_ps == 1017)
+			{
+				int k = 0;
+			}
 			auto reservations = reservation_table.getReservations(i);
 
 			if (reservations.size() != 0)
@@ -300,6 +307,12 @@ void Router::RXProcess()
 }
 void Router::Update()
 {
+	if (!reset.read())
+	{
+		//for (auto& rel : Relays) rel.buffer->Print();
+		//reservation_table.print();
+	}
+
 	TXProcess();
 	RXProcess();
 	PerCycleProcess();

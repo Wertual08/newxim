@@ -365,7 +365,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 					if (x + 1 < w) graph[y * w + x].push_back(y * w + x + 1);
 				}
 			}
-		}//5.23956
+		}
 		else if (topology == "TORUS")
 		{
 			int32_t w = args[0].as<int32_t>();
@@ -386,7 +386,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 					else graph[y * w + x].push_back(y * w);
 				}
 			}
-		}//11.8177
+		}
 	}
 	catch (...)
 	{

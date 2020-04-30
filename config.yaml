@@ -24,7 +24,7 @@ topology: CIRCULANT
 #    [6, 0, 3, 4],
 #    [0, 1, 4, 5],
 #  ]
-topology_args: [16, 1]
+topology_args: [5, 1, 1]
 
 # Routing algorithms:
 #   TABLE_BASED
@@ -36,7 +36,7 @@ routing_algorithm: TABLE_BASED
 #   DIJKSTRA
 #   DIJKSTRA_MULTIPATH
 #   just table
-routing_table: DIJKSTRA
+routing_table: DIJKSTRA_MULTIPATH
 #  [
 #    [4, 0, 1, 0, 1, 2, 3],
 #    [3, 4, 0, 1, 0, 1, 2],
@@ -65,7 +65,7 @@ dyad_threshold: 0.6
 #   NOP
 # Each of the above labels should match a corresponding
 # implementation in the selectionStrategies source code directory
-selection_strategy: RANDOM
+selection_strategy: BUFFER_LEVEL
 
 # SIMULATION PARAMETERS
 #
@@ -75,7 +75,7 @@ reset_time: 1000
 # overal simulation lenght, expressed in cycles
 simulation_time: 10000
 # collect stats after a given number of cycles
-stats_warm_up_time: 1000
+stats_warm_up_time: 0
 # power breakdown, nodes communication details
 detailed: false
 # stop after a given amount of load has been processed
@@ -96,8 +96,8 @@ trace_filename: ""
 
 min_packet_size: 8
 max_packet_size: 8
-packet_injection_rate: 0.01
-probability_of_retransmission: 0.01
+packet_injection_rate: 1
+probability_of_retransmission: 1
 
 # Traffic distribution:
 #   TRAFFIC_RANDOM

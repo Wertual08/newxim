@@ -12,16 +12,22 @@
 
  // TODO: nan in averageDelay
 
+double Stats::getLastReceivedFlitTime() const
+{
+	return last_received_flit_time;
+}
+
 void Stats::configure(const int node_id, const double _warm_up_time)
 {
 	id = node_id;
 	warm_up_time = _warm_up_time;
 }
 
-void Stats::receivedFlit(const double arrival_time,
-	const Flit& flit)
+void Stats::receivedFlit(const double arrival_time, const Flit& flit)
 {
+	//if (arrival_time - GlobalParams::reset_time < 560)	return;
 	if (arrival_time - GlobalParams::reset_time < warm_up_time)	return;
+	last_received_flit_time = arrival_time - GlobalParams::reset_time;
 
 	int i = searchCommHistory(flit.src_id);
 

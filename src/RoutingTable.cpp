@@ -125,16 +125,19 @@ bool RoutingTable::LoadDijkstraMultipath(const Graph& graph)
 
 		for (int32_t j = 0; j < graph.size(); j++)
 		{
-			Nodes[j][i].push_back(0);
-			auto& current_relay = Nodes[j][i];
-
-			for (int32_t k = 1; k < graph[j].size(); k++)
+			if (j == i) Nodes[j][i].push_back(graph[i].size());
+			else
 			{
-				int32_t id = graph[j][k];
-				if (id >= 0)
+				auto& current_relay = Nodes[j][i];
+
+				for (int32_t k = 0; k < graph[j].size(); k++)
 				{
-					int32_t t = weights[j] - 1;
-					if (t == weights[id]) current_relay.push_back(k);
+					int32_t id = graph[j][k];
+					if (id >= 0)
+					{
+						int32_t t = weights[j] - 1;
+						if (t == weights[id]) current_relay.push_back(k);
+					}
 				}
 			}
 		}
@@ -233,7 +236,8 @@ std::ostream& operator<<(std::ostream& os, const RoutingTable& rt)
 				os << cell[cell.size() - 1];
 				os << "], ";
 			}
-			else os << cell[0] << ", ";
+			else if (cell.size() == 1) os << cell[0] << ", ";
+			else os << "x, ";
 		}
 		if (row.size())
 		{
@@ -242,11 +246,12 @@ std::ostream& operator<<(std::ostream& os, const RoutingTable& rt)
 			{
 				os << '[';
 				for (int32_t j = 0; j < cell.size() - 1; j++)
-					os << cell[j];
+					os << cell[j] << ", ";
 				os << cell[cell.size() - 1];
 				os << ']';
 			}
-			else os << cell[0];
+			else if (cell.size() == 1) os << cell[0];
+			else os << 'x';
 		}
 		os << "],\n";
 	}

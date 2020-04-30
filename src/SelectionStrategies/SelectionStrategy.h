@@ -5,7 +5,7 @@
 
 
 
-struct Router;
+class Router;
 class SelectionStrategy
 {
 public:
