@@ -7,10 +7,7 @@
  *
  * This file contains the declaration of the switch reservation table
  */
-
-#ifndef __NOXIMRESERVATIONTABLE_H__
-#define __NOXIMRESERVATIONTABLE_H__
-
+#pragma once
 #include <cassert>
 #include "DataStructs.h"
 #include "Utils.h"
@@ -78,4 +75,19 @@ public:
 	void print();
 };
 
-#endif
+class newReservationTable
+{
+private:
+	const int32_t PortsCount, ChannelsCount;
+	std::vector<std::pair<int32_t, int32_t>> Table;
+
+public:
+	newReservationTable(int32_t ports, int32_t channels);
+
+	void Reserve(int32_t port_in, int32_t vc_in, int32_t port_out, int32_t vc_out);
+	void Release(int32_t port_out, int32_t vc_out);
+	bool Reserved(int32_t port_out, int32_t vc_out) const;
+	std::pair<int, int> Reservation(int32_t port_in, int32_t vc_in);
+
+	friend std::ostream& operator<<(std::ostream& os, const newReservationTable& table);
+};

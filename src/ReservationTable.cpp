@@ -147,3 +147,48 @@ void ReservationTable::updateIndex()
 }
 
 
+
+newReservationTable::newReservationTable(int32_t ports, int32_t channels) :
+	PortsCount(ports), ChannelsCount(channels), Table(ports * channels, std::make_pair(-1, -1))
+{
+}
+
+void newReservationTable::Reserve(int32_t port_in, int32_t vc_in, int32_t port_out, int32_t vc_out)
+{
+	Table[port_in * ChannelsCount + vc_in] = std::make_pair(port_out, vc_out);
+}
+void newReservationTable::Release(int32_t port_out, int32_t vc_out)
+{
+	for (auto& r : Table)
+	{
+		if (r.first == port_out && r.second == vc_out)
+		{
+			r.first = -1;
+			r.second = -1;
+			break;
+		}
+	}
+}
+bool newReservationTable::Reserved(int32_t port_out, int32_t vc_out) const
+{
+	for (const auto& r : Table) if (r.first == port_out && r.second == vc_out) return true;
+	return false;
+}
+std::pair<int, int> newReservationTable::Reservation(int32_t port_in, int32_t vc_in)
+{
+	return Table[port_in * ChannelsCount + vc_in];
+}
+
+std::ostream& operator<<(std::ostream& os, const newReservationTable& table)
+{
+	for (int32_t p = 0; p < table.PortsCount; p++)
+	{
+		for (int32_t c = 0; c < table.ChannelsCount; c++)
+		{
+			const auto& r = table.Table[p * table.ChannelsCount + c];
+			os << '[' << p << ", " << c << " >> [" << r.first << ", " << r.second << "]\n";
+		}
+	}
+
+	return os;
+}

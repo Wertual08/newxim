@@ -3,7 +3,7 @@
 # NOC & WIRED CONFIGURATION
 #
 #
-rnd_generator_seed: 0
+rnd_generator_seed: 1
 
 # Supported topologies:
 #   CUSTOM:
@@ -24,10 +24,11 @@ topology: CIRCULANT
 #    [6, 0, 3, 4],
 #    [0, 1, 4, 5],
 #  ]
-topology_args: [5, 1, 1]
+topology_args: [11, 1, 2]
 
 # Routing algorithms:
 #   TABLE_BASED
+#   TABLE_BASED_ID
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
 routing_algorithm: TABLE_BASED
@@ -35,6 +36,7 @@ routing_algorithm: TABLE_BASED
 # Default routing table generators:
 #   DIJKSTRA
 #   DIJKSTRA_MULTIPATH
+#   MESH_XY
 #   just table
 routing_table: DIJKSTRA_MULTIPATH
 #  [
@@ -53,7 +55,7 @@ buffer_depth: 4
 flit_size: 32
 # lenght in mm of router to router connection
 r2r_link_length: 1.0
-n_virtual_channels: 1
+n_virtual_channels: 4
 
 # Routing specific parameters
 #   dyad_threshold: double
@@ -63,9 +65,10 @@ dyad_threshold: 0.6
 #   RANDOM
 #   BUFFER_LEVEL
 #   NOP
+#   KEEP_SPACE
 # Each of the above labels should match a corresponding
 # implementation in the selectionStrategies source code directory
-selection_strategy: BUFFER_LEVEL
+selection_strategy: RANDOM
 
 # SIMULATION PARAMETERS
 #
@@ -73,7 +76,7 @@ clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 10000
+simulation_time: 100000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
 # power breakdown, nodes communication details

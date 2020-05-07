@@ -371,7 +371,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 			int32_t w = args[0].as<int32_t>();
 			int32_t h = args[1].as<int32_t>();
 
-			graph.resize(w* h);
+			graph.resize(w * h);
 			for (int32_t x = 0; x < w; x++)
 			{
 				for (int32_t y = 0; y < h; y++)
@@ -418,11 +418,54 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 						}
 						table.push_back(std::move(rnode));
 					}
-					table.MakeValid();
 				}
-				else table.Load(graph, node.as<std::string>());
+				else
+				{
+					std::string type = node.as<std::string>();
+					if (type == "MESH_XY")
+					{
+						const auto& targs = config["topology_args"];
+						int32_t w = targs[0].as<int32_t>();
+						int32_t h = targs[1].as<int32_t>();
+						table.LoadMeshXY(graph, w, h);
+					}
+					else if (type == "TORUS_XY")
+					{
+						const auto& targs = config["topology_args"];
+						int32_t w = targs[0].as<int32_t>();
+						int32_t h = targs[1].as<int32_t>();
+						table.LoadTorusXY(graph, w, h);
+					}
+					else table.Load(graph, type);
+				}
 			}
 			else table.Load(graph);
+		}
+		else if (routing_algorithm == "TABLE_BASED_ID")
+		{
+			routing_algorithm = "TABLE_BASED";
+			const auto& node = config["routing_table"];
+			
+			for (int32_t i = 0; i < node.size(); i++)
+			{
+				const auto& branch = node[i];
+				RoutingTable::Node rnode;
+				for (int32_t j = 0; j < branch.size(); j++)
+				{
+					if (j == i) rnode.push_back(std::vector<int32_t>(1, graph[i].size()));
+					else if (branch[j].IsSequence())
+					{
+						rnode.push_back(std::vector<int32_t>());
+						for (int32_t k = 0; k < branch[j].size(); k++)
+						{
+							auto links = graph[i].links_to(branch[j][k].as<int32_t>());
+							for (int32_t l : links) rnode[j].push_back(l);
+						}
+					}
+					else rnode.push_back(graph[i].links_to(branch[j].as<int32_t>()));
+				}
+				table.push_back(std::move(rnode));
+			}
 		}
 		else if (routing_algorithm == "")
 		{

@@ -21,8 +21,8 @@ std::vector<int32_t> Router::RoutingFunction(const RouteData& route_data)
 }
 int Router::SelectionFunction(const std::vector<int32_t>& directions, const RouteData& route_data)
 {
-	// not so elegant but fast escape ;)
-	if (directions.size() == 1) return directions[0];
+	// not so elegant but fast escape ;) SHIT
+	// if (directions.size() == 1) return directions[0];
 
 	return Strategy.Apply(*this, directions, route_data);
 }
@@ -102,9 +102,11 @@ void Router::TXProcess()
 						route_data.dst_id = flit.dst_id;
 						route_data.dir_in = i;
 						route_data.vc_id = flit.vc_id;
+						route_data.sequence_length = flit.sequence_length;
 
 						// TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
-						int o = PerformRoute(route_data);
+						int32_t o = PerformRoute(route_data);
+						if (o < 0) continue;
 
 						TReservation r;
 						r.input = i;
@@ -145,11 +147,7 @@ void Router::TXProcess()
 		for (int i = 0; i < Relays.size(); i++)
 		{
 			Relay& rel = Relays[i];
-			// FOR DEBUG BREAKPOINT
-			if (local_id == 48 && sc_time_stamp().to_double() / GlobalParams::clock_period_ps == 1017)
-			{
-				int k = 0;
-			}
+			
 			auto reservations = reservation_table.getReservations(i);
 
 			if (reservations.size() != 0)
@@ -307,11 +305,11 @@ void Router::RXProcess()
 }
 void Router::Update()
 {
-	if (!reset.read())
-	{
-		//for (auto& rel : Relays) rel.buffer->Print();
-		//reservation_table.print();
-	}
+	//if (!reset.read() && sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time > 4050)
+	//{
+	//	for (auto& rel : Relays) rel.buffer->Print();
+	//	reservation_table.print();
+	//}
 
 	TXProcess();
 	RXProcess();
@@ -320,10 +318,8 @@ void Router::Update()
 
 Router::Router(sc_module_name, int32_t id, size_t relays, double warm_up_time, uint32_t max_buffer_size,
 	RoutingAlgorithm& alg, SelectionStrategy& sel, RoutingTable& grt) : Relays("RouterRelays", relays + 1), 
-	LocalRelay(Relays[relays]), 
-	LocalRelayID(relays), 
-	Algorithm(alg), 
-	Strategy(sel)
+	LocalRelay(Relays[relays]), LocalRelayID(relays), 
+	Algorithm(alg), Strategy(sel)
 {
 	if (grt.IsValid()) routing_table = grt[id];
 	SC_METHOD(Update);

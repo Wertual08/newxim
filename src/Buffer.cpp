@@ -133,38 +133,36 @@ void Buffer::ShowStats(std::ostream& out) const
 }
 void Buffer::Print() const
 {
-	if (sc_time_stamp().to_double() / GlobalParams::clock_period_ps > 10990 || 1)
-	{
-		std::queue<Flit> m = buffer;
+	std::queue<Flit> m = buffer;
 
-		char t[] = "HBT";
+	char t[] = "HBT";
 		
-		std::ofstream fout("log.txt", std::ios::app);
-		fout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
-		fout << label << " QUEUE *[";
-		while (!m.empty())
-		{
-			Flit f = m.front();
-			m.pop();
-			fout << t[f.flit_type] << f.sequence_no << "(" << f.src_id << "->" << f.dst_id<< ") | ";
-		}
-		fout << "]*\n";
-		
-		//std::queue<Flit> m = buffer;
-		//
-		//char t[] = "HBT";
-		//
-		//cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
-		//cout << label << " QUEUE *[";
-		//while (!m.empty())
-		//{
-		//	Flit f = m.front();
-		//	m.pop();
-		//	cout << t[f.flit_type] << f.sequence_no << "(" << f.dst_id << ") | ";
-		//}
-		//cout << "]*" << endl;
-		//cout << endl;
+	std::ofstream fout("log.txt", std::ios::app);
+	fout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
+	fout << label << " QUEUE *[";
+	while (!m.empty())
+	{
+		Flit f = m.front();
+		m.pop();
+		fout << t[f.flit_type] << f.sequence_no << "(" << f.src_id << "->" << f.dst_id<< ") | ";
 	}
+	fout << "]*\n";
+		
+	//std::queue<Flit> m = buffer;
+	//
+	//char t[] = "HBT";
+	//
+	//cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
+	//cout << label << " QUEUE *[";
+	//while (!m.empty())
+	//{
+	//	Flit f = m.front();
+	//	m.pop();
+	//	cout << t[f.flit_type] << f.sequence_no << "(" << f.dst_id << ") | ";
+	//}
+	//cout << "]*" << endl;
+	//cout << endl;
+
 	if (!buffer.empty())
 	{
 		//if (buffer.front().dst_id == 48) exit(-1);

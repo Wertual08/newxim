@@ -12,6 +12,7 @@
 #include "routingAlgorithms/RoutingTableBased.h"
 #include "selectionStrategies/SelectionRandom.h"
 #include "selectionStrategies/SelectionBufferLevel.h"
+#include "selectionStrategies/SelectionKeepSpace.h"
 
 
 
@@ -30,6 +31,7 @@ NoC::NoC(const Configuration& config) :
 	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
 	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
 	else if (config.SelectionStrategy() == "BUFFER_LEVEL") Strategy = new SelectionBufferLevel();
+	else if (config.SelectionStrategy() == "KEEP_SPACE") Strategy = new SelectionKeepSpace();
 
 	// Create and configure tiles
 	auto& graph = config.Topology();
@@ -69,7 +71,7 @@ NoC::NoC(const Configuration& config) :
 
 			if (connected_id < 0)
 			{
-				tile.Relays[relay].SilentBind(BorderRelay);
+				tile.Relays[relay].Bind(BorderRelay);
 				tile.Disable(relay);
 			}
 			else

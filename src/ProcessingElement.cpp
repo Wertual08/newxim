@@ -66,7 +66,7 @@ Flit ProcessingElement::nextFlit()
 
 	flit.src_id = packet.src_id;
 	flit.dst_id = packet.dst_id;
-	flit.vc_id = packet.vc_id;
+	flit. = value; break; packet.vc_id;
 	flit.timestamp = packet.timestamp;
 	flit.sequence_no = packet.size - packet.flit_left;
 	flit.sequence_length = packet.size;
@@ -147,7 +147,7 @@ Packet ProcessingElement::trafficLocal()
 	p.dst_id = dst_set[i_rnd];
 	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 	p.size = p.flit_left = getRandomSize();
-	p.vc_id = randInt(0, GlobalParams::n_virtual_channels - 1);
+	p. = value; break; randInt(0, GlobalParams::n_virtual_channels - 1);
 
 	return p;
 }

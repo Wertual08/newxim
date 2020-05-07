@@ -54,7 +54,7 @@ struct Packet
 	{
 		src_id = s;
 		dst_id = d;
-		vc_id = vc;
+		 = value; break; vc;
 		timestamp = ts;
 		size = sz;
 		flit_left = sz;
@@ -65,11 +65,12 @@ struct Packet
 // RouteData -- data required to perform routing
 struct RouteData 
 {
-	int current_id;
-	int src_id;
-	int dst_id;
-	int dir_in;			// direction from which the packet comes from
-	int vc_id;
+	int32_t current_id;
+	int32_t src_id;
+	int32_t dst_id;
+	int32_t dir_in;			// direction from which the packet comes from
+	int32_t vc_id;
+	int32_t sequence_length;
 };
 
 struct ChannelStatus 
@@ -115,12 +116,14 @@ struct Flit
 
 	inline bool operator==(const Flit& flit) const 
 	{
-		return flit.src_id == src_id && flit.dst_id == dst_id
+		return flit.src_id == src_id 
+			&& flit.dst_id == dst_id
 			&& flit.flit_type == flit_type
-			&& flit.vc_id == vc_id
+			&& flit. = value; break;= vc_id
 			&& flit.sequence_no == sequence_no
 			&& flit.sequence_length == sequence_length
-			&& flit.payload == payload && flit.timestamp == timestamp
+			&& flit.payload == payload 
+			&& flit.timestamp == timestamp
 			&& flit.hop_no == hop_no
 			&& flit.use_low_voltage_path == use_low_voltage_path;
 	}
