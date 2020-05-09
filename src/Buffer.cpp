@@ -131,53 +131,6 @@ void Buffer::ShowStats(std::ostream& out) const
 	if (true_buffer) out << "\t" << mean_occupancy << "\t" << max_occupancy;
 	else out << "\t\t";
 }
-void Buffer::Print() const
-{
-	std::queue<Flit> m = buffer;
-
-	char t[] = "HBT";
-		
-	std::ofstream fout("log.txt", std::ios::app);
-	fout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
-	fout << label << " QUEUE *[";
-	while (!m.empty())
-	{
-		Flit f = m.front();
-		m.pop();
-		fout << t[f.flit_type] << f.sequence_no << "(" << f.src_id << "->" << f.dst_id<< ") | ";
-	}
-	fout << "]*\n";
-		
-	//std::queue<Flit> m = buffer;
-	//
-	//char t[] = "HBT";
-	//
-	//cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
-	//cout << label << " QUEUE *[";
-	//while (!m.empty())
-	//{
-	//	Flit f = m.front();
-	//	m.pop();
-	//	cout << t[f.flit_type] << f.sequence_no << "(" << f.dst_id << ") | ";
-	//}
-	//cout << "]*" << endl;
-	//cout << endl;
-
-	if (!buffer.empty())
-	{
-		//if (buffer.front().dst_id == 48) exit(-1);
-		if (buffer.front() == TEMP_SHITY_FLIT) TEMP_SHITY_COUNTER++;
-		else
-		{
-			TEMP_SHITY_COUNTER = 0;
-			TEMP_SHITY_FLIT = buffer.front();
-		}
-		if (TEMP_SHITY_COUNTER > 1000)
-		{
-			//exit(-1);
-		}
-	}
-}
 
 void Buffer::SetLabel(std::string l)
 {
@@ -186,4 +139,21 @@ void Buffer::SetLabel(std::string l)
 std::string Buffer::GetLabel() const
 {
 	return label;
+}
+
+std::ostream& operator<<(std::ostream& os, const Buffer& b)
+{
+	std::queue<Flit> m = b.buffer;
+
+	char t[] = "HBT";
+
+	os << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
+	os << b.label << " QUEUE *[";
+	while (!m.empty())
+	{
+		Flit f = m.front();
+		m.pop();
+		os << t[f.flit_type] << f.sequence_no << "(" << f.src_id << "->" << f.dst_id << ") | ";
+	}
+	return os << "]*\n";
 }

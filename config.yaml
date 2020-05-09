@@ -14,17 +14,17 @@ rnd_generator_seed: 1
 #     topology_args: [width, height]
 #   TORUS:
 #     topology_args: [width, height]
-topology: CIRCULANT
+topology: TORUS
 #  [
 #    [1, 2, 5, 6],
-#    [2, 3, 6, 0],
-#    [3, 4, 0, 1],
+#    [2, 3, 6,  ],
+#    [3, 4,  , 1],
 #    [4, 5, 1, 2],  
 #    [5, 6, 2, 3],
-#    [6, 0, 3, 4],
+#    [6,  , 3, 4],
 #    [0, 1, 4, 5],
 #  ]
-topology_args: [11, 1, 2]
+topology_args: [2, 2]
 
 # Routing algorithms:
 #   TABLE_BASED
@@ -39,15 +39,6 @@ routing_algorithm: TABLE_BASED
 #   MESH_XY
 #   just table
 routing_table: DIJKSTRA_MULTIPATH
-#  [
-#    [4, 0, 1, 0, 1, 2, 3],
-#    [3, 4, 0, 1, 0, 1, 2],
-#    [2, 3, 4, 0, 1, 0, 1],
-#    [1, 2, 3, 4, 0, 1, 0],
-#    [0, 1, 2, 3, 4, 0, 1],
-#    [1, 0, 1, 2, 3, 4, 0],
-#    [0, 1, 0, 1, 2, 3, 4],
-#  ]
 
 # number of flits for each router buffer
 buffer_depth: 4
@@ -55,7 +46,7 @@ buffer_depth: 4
 flit_size: 32
 # lenght in mm of router to router connection
 r2r_link_length: 1.0
-n_virtual_channels: 4
+n_virtual_channels: 2
 
 # Routing specific parameters
 #   dyad_threshold: double
@@ -68,7 +59,7 @@ dyad_threshold: 0.6
 #   KEEP_SPACE
 # Each of the above labels should match a corresponding
 # implementation in the selectionStrategies source code directory
-selection_strategy: RANDOM
+selection_strategy: BUFFER_LEVEL
 
 # SIMULATION PARAMETERS
 #
@@ -76,7 +67,7 @@ clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 100000
+simulation_time: 10000000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
 # power breakdown, nodes communication details

@@ -25,12 +25,12 @@ private:
 	sc_signal<Flit> flit_rx_local;
 	sc_signal<bool> req_rx_local;
 	sc_signal<bool> ack_rx_local;
-	sc_signal<TBufferFullStatus> buffer_full_status_rx_local;
+	sc_signal<bool> buffer_full_status_rx_local;
 
 	sc_signal<Flit> flit_tx_local;
 	sc_signal<bool> req_tx_local;
 	sc_signal<bool> ack_tx_local;
-	sc_signal<TBufferFullStatus> buffer_full_status_tx_local;
+	sc_signal<bool> buffer_full_status_tx_local;
 
 public:
 	struct Relay : sc_module
@@ -38,19 +38,19 @@ public:
 		sc_in<Flit>					rx_flit;				// The input channels
 		sc_in<bool>					rx_req;					// The requests associated with the input channels
 		sc_out<bool>				rx_ack;					// The outgoing ack signals associated with the input channels
-		sc_out<TBufferFullStatus>	rx_buffer_full_status;
+		sc_out<bool>	rx_buffer_full_status;
 		sc_out<int>					free_slots;
 
 		sc_out<Flit>				tx_flit;				// The output channels
 		sc_out<bool>				tx_req;					// The requests associated with the output channels
 		sc_in<bool>					tx_ack;					// The outgoing ack signals associated with the output channels
-		sc_in<TBufferFullStatus>	tx_buffer_full_status;
+		sc_in<bool>	tx_buffer_full_status;
 		sc_in<int>					free_slots_neighbor;
 
 		sc_signal<Flit>				sig_flit;				// The input channels
 		sc_signal<bool>				sig_req;				// The requests associated with the input channels
 		sc_signal<bool>				sig_ack;				// The outgoing ack signals associated with the input channels
-		sc_signal<TBufferFullStatus>sig_buffer_full_status;
+		sc_signal<bool>sig_buffer_full_status;
 		sc_signal<int>				sig_free_slots;
 
 		Relay(sc_module_name)
@@ -167,7 +167,6 @@ public:
 
 	void Disable(int32_t relay)
 	{
-		for (int vc = 0; vc < GlobalParams::n_virtual_channels; vc++)
-			RouterDevice.Relays[relay].buffer[vc].Disable();
+		RouterDevice.Relays[relay].buffer.Disable();
 	}
 };

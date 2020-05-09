@@ -11,37 +11,20 @@
 
 
 
-std::vector<int32_t> Router::RoutingFunction(const RouteData& route_data)
-{
-	// TODO: fix all the deprecated verbose mode logs
-	if (GlobalParams::verbose_mode > VERBOSE_OFF)
-		LOG << "Wired routing for dst = " << route_data.dst_id << endl;
-
-	return Algorithm.Route(*this, route_data);
-}
-int Router::SelectionFunction(const std::vector<int32_t>& directions, const RouteData& route_data)
-{
-	// not so elegant but fast escape ;) SHIT
-	// if (directions.size() == 1) return directions[0];
-
-	return Strategy.Apply(*this, directions, route_data);
-}
 int32_t Router::PerformRoute(const RouteData& route_data)
 {
 	if (route_data.dst_id == local_id) return LocalRelayID;
 
 	power.routing();
-	std::vector<int> candidate_channels = RoutingFunction(route_data);
-
 	power.selection();
-	return SelectionFunction(candidate_channels, route_data);
+	return Strategy.Apply(*this, Algorithm.Route(*this, route_data), route_data);
 }
 void Router::PerCycleProcess()
 {
 	if (reset.read()) 
 	{
 		for (size_t i = 0; i < Relays.size(); i++)
-			Relays[i].free_slots.write(Relays[i].buffer[DEFAULT_VC].GetMaxBufferSize());
+			Relays[i].free_slots.write(Relays[i].buffer.GetMaxBufferSize());
 	}
 	else 
 	{
@@ -50,11 +33,8 @@ void Router::PerCycleProcess()
 		power.leakageRouter();
 		for (int i = 0; i < Relays.size(); i++)
 		{
-			for (int vc = 0; vc < GlobalParams::n_virtual_channels; vc++)
-			{
-				power.leakageBufferRouter();
-				power.leakageLinkRouter2Router();
-			}
+			power.leakageBufferRouter();
+			power.leakageLinkRouter2Router();
 		}
 	}
 }
@@ -76,175 +56,101 @@ void Router::TXProcess()
 		{
 			int i = (start_from_port + j) % Relays.size();
 			Relay& rel = Relays[i];
-			if (local_id == 48 && sc_time_stamp().to_double() / GlobalParams::clock_period_ps == 1017)
-			{
-				int k = 0;
-			}
-			for (int k = 0; k < GlobalParams::n_virtual_channels; k++)
-			{
-				int vc = (rel.start_from_vc + k) % GlobalParams::n_virtual_channels;
 
-				// Uncomment to enable deadlock checking on buffers. 
-				// Please also set the appropriate threshold.
-				// buffer[i].deadlockCheck();
-				if (!rel.buffer[vc].IsEmpty())
+			// Uncomment to enable deadlock checking on buffers. 
+			// Please also set the appropriate threshold.
+			// buffer[i].deadlockCheck();
+			if (!rel.buffer.IsEmpty())
+			{
+				Flit flit = rel.buffer.Front();
+				power.bufferRouterFront();
+
+				if (flit.flit_type == FLIT_TYPE_HEAD)
 				{
-					Flit flit = rel.buffer[vc].Front();
-					power.bufferRouterFront();
+					// prepare data for routing
+					RouteData route_data;
+					route_data.hop_no = flit.hop_no;
+					route_data.current_id = local_id;
+					route_data.src_id = flit.src_id;
+					route_data.dst_id = flit.dst_id;
+					route_data.dir_in = i;
+					route_data.sequence_length = flit.sequence_length;
+				
+					// TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
+					int32_t out = PerformRoute(route_data);
+					if (out < 0) continue;
 
-					if (flit.flit_type == FLIT_TYPE_HEAD)
-					{
-						// prepare data for routing
-						RouteData route_data;
-						route_data.current_id = local_id;
-						//LOG<< "current_id= "<< route_data.current_id <<" for sending " << flit << endl;
-						route_data.src_id = flit.src_id;
-						route_data.dst_id = flit.dst_id;
-						route_data.dir_in = i;
-						route_data.vc_id = flit.vc_id;
-						route_data.sequence_length = flit.sequence_length;
-
-						// TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
-						int32_t o = PerformRoute(route_data);
-						if (o < 0) continue;
-
-						TReservation r;
-						r.input = i;
-						r.vc = vc;
-
-						LOG << " checking availability of Output[" << o << "] for Input[" << i << "][" << vc << "] flit " << flit << endl;
-
-						int rt_status = reservation_table.checkReservation(r, o);
-
-						if (rt_status == ReservationTable::Available)
-						{
-							LOG << " reserving direction " << o << " for flit " << flit << endl;
-							reservation_table.reserve(r, o);
-						}
-						else if (rt_status == ReservationTable::AlreadySame)
-						{
-							LOG << " ReservationTable::AlreadySame reserved direction " << o << " for flit " << flit << endl;
-						}
-						else if (rt_status == ReservationTable::OutVCBusy)
-						{
-							LOG << " ReservationTable::OutVCBusy reservation direction " << o << " for flit " << flit << endl;
-						}
-						else if (rt_status == ReservationTable::AlreadyOtherOut)
-						{
-							LOG << "ReservationTable::AlreadyOtherOut: another output previously reserved for the same flit " << endl;
-						}
-						else assert(false); // no meaningful status here
-					}
+					if (!reservation_table.Reserved(out))
+						reservation_table.Reserve(i, out);
 				}
 			}
-			rel.start_from_vc = (rel.start_from_vc + 1) % GlobalParams::n_virtual_channels;
 		}
 
 		start_from_port = (start_from_port + 1) % Relays.size();
 
 		// 2nd phase: Forwarding
 		//if (local_id==6) LOG<<"*TX*****local_id="<<local_id<<"__ack_tx[0]= "<<ack_tx[0].read()<<endl;
-		for (int i = 0; i < Relays.size(); i++)
+		for (int32_t i = 0; i < Relays.size(); i++)
 		{
 			Relay& rel = Relays[i];
-			
-			auto reservations = reservation_table.getReservations(i);
 
-			if (reservations.size() != 0)
+			if (!rel.buffer.IsEmpty())
 			{
-				int rnd_idx = rand() % reservations.size();
+				int32_t res = reservation_table.Reservation(i);
+				if (res < 0) continue;
 
-				int o = reservations[rnd_idx].first;
-				Relay& orel = Relays[o];
+				int32_t out_port = res;
+				Relay& out_rel = Relays[out_port];
 
-				int vc = reservations[rnd_idx].second;
-				// LOG<< "found reservation from input= " << i << "_to output= "<<o<<endl;
-				 // can happen
-				if (!rel.buffer[vc].IsEmpty())
+				Flit flit = rel.buffer.Front();
+
+				bool buf_stat = out_rel.tx_buffer_full_status.read();
+
+				if ((out_rel.tx_current_level == out_rel.tx_ack.read()) && (buf_stat == false))
 				{
-					// power contribution already computed in 1st phase
-					Flit flit = rel.buffer[vc].Front();
-					//LOG<< "*****TX***Direction= "<<i<< "************"<<endl;
-					//LOG<<"_cl_tx="<<current_level_tx[o]<<"req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
+					out_rel.tx_flit.write(flit);
+					out_rel.tx_current_level = 1 - out_rel.tx_current_level;
+					out_rel.tx_req.write(out_rel.tx_current_level);
+					rel.buffer.Pop();
 
-					auto buf_stat = orel.tx_buffer_full_status.read();
-					if ((orel.tx_current_level == orel.tx_ack.read()) &&
-						(buf_stat.mask[vc] == false))
+					if (flit.flit_type == FLIT_TYPE_TAIL)
+						reservation_table.Release(i);
+
+					/* Power & Stats ------------------------------------------------- */
+					power.r2rLink();
+
+					power.bufferRouterPop();
+					power.crossBar();
+
+					if (out_port == LocalRelayID)
 					{
-						//if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-						LOG << "Input[" << i << "][" << vc << "] forwarded to Output[" << o << "], flit: " << flit << endl;
-
-						orel.tx_flit.write(flit);
-						orel.tx_current_level = 1 - orel.tx_current_level;
-						orel.tx_req.write(orel.tx_current_level);
-						rel.buffer[vc].Pop();
-
-						if (flit.flit_type == FLIT_TYPE_TAIL)
+						power.networkInterface();
+						LOG << "Consumed flit " << flit << endl;
+						stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
+						if (GlobalParams::max_volume_to_be_drained)
 						{
-							TReservation r;
-							r.input = i;
-							r.vc = vc;
-							reservation_table.release(r, o);
+							if (drained_volume >= GlobalParams::max_volume_to_be_drained) sc_stop();
+							else drained_volume++;
 						}
-
-						/* Power & Stats ------------------------------------------------- */
-						power.r2rLink();
-
-						power.bufferRouterPop();
-						power.crossBar();
-
-						if (o == LocalRelayID)
-						{
-							power.networkInterface();
-							LOG << "Consumed flit " << flit << endl;
-							stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
-							if (GlobalParams::max_volume_to_be_drained)
-							{
-								if (drained_volume >= GlobalParams::max_volume_to_be_drained)
-									sc_stop();
-								else
-								{
-									drained_volume++;
-								}
-							}
-						}
-						else if (i != LocalRelayID) // not generated locally
-							routed_flits++;
-						/* End Power & Stats ------------------------------------------------- */
-					   //LOG<<"END_OK_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 					}
-					else
-					{
-						LOG << " Cannot forward Input[" << i << "][" << vc << "] to Output[" << o << "], flit: " << flit << endl;
-						//LOG << " **DEBUG APB: current_level_tx: " << current_level_tx[o] << " ack_tx: " << ack_tx[o].read() << endl;
-						LOG << " **DEBUG buffer_full_status_tx " << orel.tx_buffer_full_status.read().mask[vc] << endl;
-
-						//LOG<<"END_NO_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
-						  /*
-						  if (flit.flit_type == FLIT_TYPE_HEAD)
-						  reservation_table.release(i,flit.vc_id,o);
-						  */
-					}
+					else if (i != LocalRelayID) routed_flits++;
+					/* End Power & Stats ------------------------------------------------- */
+				   //LOG<<"END_OK_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 				}
-			} // if not reserved 
-		   // else LOG << "we have no reservation for direction " << i << endl;
+			}
 		} // for loop directions
-
-		if ((int)(sc_time_stamp().to_double() / GlobalParams::clock_period_ps) % 2 == 0)
-			reservation_table.updateIndex();
 	}
 }
 void Router::RXProcess()
 {
 	if (reset.read()) 
 	{
-		TBufferFullStatus bfs;
 		// Clear outputs and indexes of receiving protocol
 		for (size_t i = 0; i < Relays.size(); i++)
 		{
 			Relays[i].rx_ack.write(0);
 			Relays[i].rx_current_level = 0;
-			Relays[i].rx_buffer_full_status.write(bfs);
+			Relays[i].rx_buffer_full_status.write(false);
 		}
 
 		routed_flits = 0;
@@ -265,14 +171,13 @@ void Router::RXProcess()
 			if (rel.rx_req.read() == 1 - rel.rx_current_level)
 			{
 				Flit received_flit = rel.rx_flit.read();
-				//LOG<<"request opposite to the current_level, reading flit "<<received_flit<<endl;
 
 				int vc = received_flit.vc_id;
 
-				if (!rel.buffer[vc].IsFull())
+				if (!rel.buffer.IsFull())
 				{
 					// Store the incoming flit in the circular buffer
-					rel.buffer[vc].Push(received_flit);
+					rel.buffer.Push(received_flit);
 					LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc << "]" << endl;
 
 					power.bufferRouterPush();
@@ -296,20 +201,19 @@ void Router::RXProcess()
 			}
 			rel.rx_ack.write(rel.rx_current_level);
 			// updates the mask of VCs to prevent incoming data on full buffers
-			TBufferFullStatus bfs;
-			for (int vc = 0; vc < GlobalParams::n_virtual_channels; vc++)
-				bfs.mask[vc] = rel.buffer[vc].IsFull();
+			bool bfs = rel.buffer.IsFull();
 			rel.rx_buffer_full_status.write(bfs);
 		}
 	}
 }
 void Router::Update()
 {
-	//if (!reset.read() && sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time > 4050)
-	//{
-	//	for (auto& rel : Relays) rel.buffer->Print();
-	//	reservation_table.print();
-	//}
+	 //if (!reset.read()/* && sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time > 4050*/)
+	 //{
+	 //	std::ofstream fout("log.txt", std::ios::app);
+	 //	for (auto& rel : Relays) fout << rel.buffer;
+	 //	fout << reservation_table;
+	 //}
 
 	TXProcess();
 	RXProcess();
@@ -318,8 +222,8 @@ void Router::Update()
 
 Router::Router(sc_module_name, int32_t id, size_t relays, double warm_up_time, uint32_t max_buffer_size,
 	RoutingAlgorithm& alg, SelectionStrategy& sel, RoutingTable& grt) : Relays("RouterRelays", relays + 1), 
-	LocalRelay(Relays[relays]), LocalRelayID(relays), 
-	Algorithm(alg), Strategy(sel)
+	LocalRelay(Relays[relays]), LocalRelayID(relays), Algorithm(alg), Strategy(sel), 
+	reservation_table(Relays.size())
 {
 	if (grt.IsValid()) routing_table = grt[id];
 	SC_METHOD(Update);
@@ -330,16 +234,10 @@ Router::Router(sc_module_name, int32_t id, size_t relays, double warm_up_time, u
 
 	start_from_port = LocalRelayID;
 
-	reservation_table.setSize(Relays.size());
-
 	for (size_t i = 0; i < Relays.size(); i++)
 	{
-		for (int vc = 0; vc < GlobalParams::n_virtual_channels; vc++)
-		{
-			Relays[i].buffer[vc].SetMaxBufferSize(max_buffer_size);
-			Relays[i].buffer[vc].SetLabel(std::string(name()) + "->buffer[" + i_to_string(i) + "]");
-		}
-		Relays[i].start_from_vc = 0;
+		Relays[i].buffer.SetMaxBufferSize(max_buffer_size);
+		Relays[i].buffer.SetLabel(std::string(name()) + "->buffer[" + i_to_string(i) + "]");
 	}
 }
 
@@ -362,6 +260,5 @@ bool Router::InCongestion() const
 void Router::ShowBuffersStats(std::ostream& out) const
 {
 	for (int i = 0; i < Relays.size(); i++)
-		for (int vc = 0; vc < GlobalParams::n_virtual_channels; vc++)
-			Relays[i].buffer[vc].ShowStats(out);
+			Relays[i].buffer.ShowStats(out);
 }

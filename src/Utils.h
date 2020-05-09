@@ -109,16 +109,6 @@ inline ostream& operator<<(ostream& os, const ChannelStatus& status)
 	return os;
 }
 
-inline ostream& operator<<(ostream& os, const TBufferFullStatus& bfs)
-{
-	os << "[";
-	for (int j = 0; j < GlobalParams::n_virtual_channels; j++)
-		os << bfs.mask[j] << " ";
-
-	os << "]" << endl;
-	return os;
-}
-
 // Trace overloading
 
 inline void sc_trace(sc_trace_file*& tf, const Flit& flit, std::string& name)
@@ -128,11 +118,6 @@ inline void sc_trace(sc_trace_file*& tf, const Flit& flit, std::string& name)
 	sc_trace(tf, flit.sequence_no, name + ".sequence_no");
 	sc_trace(tf, flit.timestamp, name + ".timestamp");
 	sc_trace(tf, flit.hop_no, name + ".hop_no");
-}
-inline void sc_trace(sc_trace_file*& tf, const TBufferFullStatus& bfs, std::string& name)
-{
-	for (int j = 0; j < GlobalParams::n_virtual_channels; j++)
-		sc_trace(tf, bfs.mask[j], name + "VC " + std::to_string(j));
 }
 
 inline void sc_trace(sc_trace_file*& tf, const ChannelStatus& bs, std::string& name)

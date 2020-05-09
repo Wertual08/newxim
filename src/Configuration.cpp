@@ -305,7 +305,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
 	clock_period_ps = ReadParam<int32_t>(config, "clock_period_ps");
 	simulation_time = ReadParam<int32_t>(config, "simulation_time");
-	n_virtual_channels = ReadParam<int32_t>(config, "n_virtual_channels");
 	reset_time = ReadParam<int32_t>(config, "reset_time");
 	stats_warm_up_time = ReadParam<int32_t>(config, "stats_warm_up_time");
 	rnd_generator_seed = ReadParam<int32_t>(config, "rnd_generator_seed", time(0));
@@ -351,39 +350,39 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		}
 		else if (topology == "MESH")
 		{
-			int32_t w = args[0].as<int32_t>();
-			int32_t h = args[1].as<int32_t>();
+			dim_x = args[0].as<int32_t>();
+			dim_y = args[1].as<int32_t>();
 
-			graph.resize(w * h);
-			for (int32_t x = 0; x < w; x++)
+			graph.resize(dim_x * dim_y);
+			for (int32_t x = 0; x < dim_x; x++)
 			{
-				for (int32_t y = 0; y < h; y++)
+				for (int32_t y = 0; y < dim_y; y++)
 				{
-					if (y + 1 < h) graph[y * w + x].push_back((y + 1) * w + x);
-					if (x - 1 >= 0) graph[y * w + x].push_back(y * w + x - 1);
-					if (y - 1 >= 0) graph[y * w + x].push_back((y - 1) * w + x);
-					if (x + 1 < w) graph[y * w + x].push_back(y * w + x + 1);
+					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x);
+					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1);
+					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x);
+					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1);
 				}
 			}
 		}
 		else if (topology == "TORUS")
 		{
-			int32_t w = args[0].as<int32_t>();
-			int32_t h = args[1].as<int32_t>();
+			dim_x = args[0].as<int32_t>();
+			dim_y = args[1].as<int32_t>();
 
-			graph.resize(w * h);
-			for (int32_t x = 0; x < w; x++)
+			graph.resize(dim_x * dim_y);
+			for (int32_t x = 0; x < dim_x; x++)
 			{
-				for (int32_t y = 0; y < h; y++)
+				for (int32_t y = 0; y < dim_y; y++)
 				{
-					if (y + 1 < h) graph[y * w + x].push_back((y + 1) * w + x);
-					else graph[y * w + x].push_back(x);
-					if (x - 1 >= 0) graph[y * w + x].push_back(y * w + x - 1);
-					else graph[y * w + x].push_back(y * w + w - 1);
-					if (y - 1 >= 0) graph[y * w + x].push_back((y - 1) * w + x);
-					else graph[y * w + x].push_back((h - 1) * w + x);
-					if (x + 1 < w) graph[y * w + x].push_back(y * w + x + 1);
-					else graph[y * w + x].push_back(y * w);
+					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x);
+					else graph[y * dim_x + x].push_back(x);
+					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1);
+					else graph[y * dim_x + x].push_back(y * dim_x + dim_x - 1);
+					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x);
+					else graph[y * dim_x + x].push_back((dim_y - 1) * dim_x + x);
+					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1);
+					else graph[y * dim_x + x].push_back(y * dim_x);
 				}
 			}
 		}
@@ -425,16 +424,12 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 					if (type == "MESH_XY")
 					{
 						const auto& targs = config["topology_args"];
-						int32_t w = targs[0].as<int32_t>();
-						int32_t h = targs[1].as<int32_t>();
-						table.LoadMeshXY(graph, w, h);
+						table.LoadMeshXY(graph, dim_x, dim_y);
 					}
 					else if (type == "TORUS_XY")
 					{
 						const auto& targs = config["topology_args"];
-						int32_t w = targs[0].as<int32_t>();
-						int32_t h = targs[1].as<int32_t>();
-						table.LoadTorusXY(graph, w, h);
+						table.LoadTorusXY(graph, dim_x, dim_y);
 					}
 					else table.Load(graph, type);
 				}
@@ -501,7 +496,6 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 				trace_filename = arg_vet[++i];
 			}
 			else if (!strcmp(arg_vet[i], "-buffer")) buffer_depth = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-vc")) n_virtual_channels = (atoi(arg_vet[++i]));
 			else if (!strcmp(arg_vet[i], "-flit")) flit_size = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-size"))
 			{
@@ -563,13 +557,6 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 				//}
 				else assert(false);
 			}
-			else if (!strcmp(arg_vet[i], "-hs"))
-			{
-				int32_t node = atoi(arg_vet[++i]);
-				double percentage = atof(arg_vet[++i]);
-				std::pair<int32_t, double> t(node, percentage);
-				hotspots.push_back(t);
-			}
 			else if (!strcmp(arg_vet[i], "-warmup")) stats_warm_up_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-seed")) rnd_generator_seed = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-detailed")) detailed = true;
@@ -621,30 +608,6 @@ void Configuration::Check()
 		exit(1);
 	}
 
-	for (unsigned int i = 0; i < hotspots.size(); i++) 
-	{
-		//if (topology == TOPOLOGY_MESH) {
-		//	if (hotspots[i].first >=
-		//		mesh_dim_x *
-		//		mesh_dim_y) {
-		//		std::cerr << "Error: hotspot node " << hotspots[i].first << " is invalid (out of range)\n";
-		//		exit(1);
-		//	}
-		//}
-		//else {
-		//	if (hotspots[i].first >= n_delta_tiles) {
-		//		std::cerr << "Error: hotspot node " << hotspots[i].first << " is invalid (out of range)\n";
-		//		exit(1);
-		//	}
-		//}
-
-		if (hotspots[i].second < 0.0 && hotspots[i].second > 1.0) 
-		{
-			std::cerr << "Error: hotspot percentage must be in the interval [0,1]\n";
-			exit(1);
-		}
-	}
-
 	if (stats_warm_up_time < 0) 
 	{
 		std::cerr << "Error: warm-up time must be positive\n";
@@ -654,11 +617,6 @@ void Configuration::Check()
 	if (simulation_time < 0)
 	{
 		std::cerr << "Error: simulation time must be positive\n";
-		exit(1);
-	}
-	if (n_virtual_channels > MAX_VIRTUAL_CHANNELS) 
-	{
-		std::cerr << "Error: number of virtual channels must be less than " << MAX_VIRTUAL_CHANNELS << endl;
 		exit(1);
 	}
 
@@ -673,26 +631,6 @@ void Configuration::Check()
 		std::cerr << "Error: traffic locality must be in the range 0..1\n";
 		exit(1);
 	}
-
-
-	if (n_virtual_channels > 1 && selection_strategy.compare("NOP") == 0)
-	{
-		std::cerr << "Error: NoP selection strategy can be used only with a single virtual channel\n";
-		exit(1);
-	}
-
-	if (n_virtual_channels > 1 && selection_strategy.compare("BUFFER_LEVEL") == 0)
-	{
-		std::cerr << "Error: Buffer level selection strategy can be used only with a single virtual channel\n";
-		exit(1);
-	}
-	if (n_virtual_channels > MAX_VIRTUAL_CHANNELS)
-	{
-		std::cerr << "Error: cannot use more than " << MAX_VIRTUAL_CHANNELS << " virtual channels.\n"
-			<< "If you need more vc please modify the MAX_VIRTUAL_CHANNELS definition in \n"
-			<< "GlobalParams.h and compile again \n";
-		exit(1);
-	}
 }
 
 void Configuration::Show() const
@@ -703,7 +641,6 @@ void Configuration::Show() const
 		<< "- trace_mode = " << trace_mode << '\n'
 		// << "- trace_filename = " << trace_filename << '\n'
 		<< "- buffer_depth = " << buffer_depth << '\n'
-		<< "- n_virtual_channels = " << n_virtual_channels << '\n'
 		<< "- max_packet_size = " << max_packet_size << '\n'
 		<< "- routing_algorithm = " << routing_algorithm << '\n'
 		<< "- selection_strategy = " << selection_strategy << '\n'
@@ -801,10 +738,6 @@ int32_t Configuration::SimulationTime() const
 {
 	return simulation_time;
 }
-int32_t Configuration::NVirtualChannels() const
-{
-	return n_virtual_channels;
-}
 int32_t Configuration::ResetTime() const
 {
 	return reset_time;
@@ -821,10 +754,6 @@ bool Configuration::Detailed() const
 {
 	return detailed;
 }
-std::vector<std::pair<int32_t, double>> Configuration::Hotspots() const
-{
-	return hotspots;
-}
 double Configuration::DyadThreshold() const
 {
 	return dyad_threshold;
@@ -840,6 +769,15 @@ bool Configuration::ShowBufferStats() const
 const Configuration::Power& Configuration::PowerConfiguration() const
 {
 	return power_configuration;
+}
+
+int32_t Configuration::DimX() const
+{
+	return dim_x;
+}
+int32_t Configuration::DimY() const
+{
+	return dim_y;
 }
 
 double Configuration::TimeStamp() const

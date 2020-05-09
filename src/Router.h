@@ -15,8 +15,8 @@
 #include "RoutingTable.h"
 #include "ReservationTable.h"
 #include "Utils.h"
-#include "routingAlgorithms/RoutingAlgorithm.h"
-#include "selectionStrategies/SelectionStrategy.h"
+#include "RoutingSelection/RoutingAlgorithm.h"
+#include "RoutingSelection/SelectionStrategy.h"
 
 
 
@@ -32,8 +32,6 @@ private:
 	RoutingAlgorithm& Algorithm;
 	SelectionStrategy& Strategy;
 
-	int32_t SelectionFunction(const std::vector<int32_t>& directions, const RouteData& route_data);
-	std::vector<int32_t> RoutingFunction(const RouteData& route_data);
 	int32_t PerformRoute(const RouteData& route_data);
 	void PerCycleProcess();
 	void TXProcess();			// The transmitting process
@@ -46,20 +44,19 @@ public:
 		sc_in<Flit>					rx_flit;				// The input channels 
 		sc_in<bool>					rx_req;					// The requests associated with the input channels
 		sc_out<bool>				rx_ack;					// The outgoing ack signals associated with the input channels
-		sc_out<TBufferFullStatus>	rx_buffer_full_status;
+		sc_out<bool>				rx_buffer_full_status;
 
 		sc_out<Flit>				tx_flit;				// The output channels
 		sc_out<bool>				tx_req;					// The requests associated with the output channels
 		sc_in<bool>					tx_ack;					// The outgoing ack signals associated with the output channels
-		sc_in<TBufferFullStatus>	tx_buffer_full_status;
+		sc_in<bool>					tx_buffer_full_status;
 
 		sc_out<int> free_slots;
 		sc_in<int> free_slots_neighbor;
 
-		BufferBank buffer;									// buffer[direction][virtual_channel] 
+		Buffer buffer;										// buffer[direction][virtual_channel] 
 		bool rx_current_level;								// Current level for Alternating Bit Protocol (ABP)
 		bool tx_current_level;								// Current level for Alternating Bit Protocol (ABP)
-		int start_from_vc;									// VC from which to start the reservation cycle for the specific port
 
 		Relay(sc_module_name)
 		{
@@ -69,7 +66,6 @@ public:
 
 	Relay& LocalRelay;
 	const int32_t LocalRelayID;
-	std::vector<int32_t> Neighbours;
 
 	ReservationTable reservation_table;		// Switch reservation table
 

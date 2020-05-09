@@ -14,6 +14,7 @@
 #include "Graph.h"
 #include "ConfigurationManager.h"
 #include "Configuration.h"
+#include "ProgressBar.h"
 
 
 // need to be globally visible to allow "-volume" simulation stop
@@ -36,6 +37,8 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	Configuration Config(arg_num, arg_vet);
 	NoC Network(Config);
+	ProgressBar Bar(std::cout, Config.ResetTime(), Config.SimulationTime(), Config.ClockPeriodPS(), 20);
+	Bar.clock(Network.clock);
 
 	// Reset the chip
 	Network.reset.write(1);
@@ -46,8 +49,10 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	// Run the simulation
 	cout << " Now running for " << GlobalParams::simulation_time << " cycles..." << endl;
+	std::cout << " Progress: ";
 	sc_start(GlobalParams::simulation_time, SC_NS);
-
+	std::cout << '\n';
+	
 	// Close the simulation
 	cout << "Noxim simulation completed.";
 	cout << " (" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)\n";

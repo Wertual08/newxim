@@ -66,7 +66,7 @@ Flit ProcessingElement::nextFlit()
 
 	flit.src_id = packet.src_id;
 	flit.dst_id = packet.dst_id;
-	flit. = value; break; packet.vc_id;
+	flit.vc_id = packet.vc_id;
 	flit.timestamp = packet.timestamp;
 	flit.sequence_no = packet.size - packet.flit_left;
 	flit.sequence_length = packet.size;
@@ -123,7 +123,7 @@ bool ProcessingElement::canShot(Packet& packet)
 		if (shot) {
 			for (unsigned int i = 0; i < dst_prob.size(); i++) {
 				if (prob < dst_prob[i].second) {
-					int vc = randInt(0, GlobalParams::n_virtual_channels - 1);
+					int vc = 0;
 					packet.make(local_id, dst_prob[i].first, vc, now, getRandomSize());
 					break;
 				}
@@ -147,7 +147,7 @@ Packet ProcessingElement::trafficLocal()
 	p.dst_id = dst_set[i_rnd];
 	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 	p.size = p.flit_left = getRandomSize();
-	p. = value; break; randInt(0, GlobalParams::n_virtual_channels - 1);
+	p.vc_id = 0;
 
 	return p;
 }
@@ -160,31 +160,11 @@ Packet ProcessingElement::trafficRandom()
 	double range_start = 0.0;
 
 	// Random destination distribution
-	do
-	{
-		p.dst_id = randInt(0, MaxID);
-
-		//std::cout << p.dst_id << " ";
-
-		// check for hotspot destination
-		for (size_t i = 0; i < GlobalParams::hotspots.size(); i++)
-		{
-
-			if (rnd >= range_start && rnd < range_start + GlobalParams::hotspots[i].second)
-			{
-				if (local_id != GlobalParams::hotspots[i].first)
-				{
-					p.dst_id = GlobalParams::hotspots[i].first;
-				}
-				break;
-			}
-			else range_start += GlobalParams::hotspots[i].second;	// try next
-		}
-	} while (p.dst_id == p.src_id);
+	while ((p.dst_id = randInt(0, MaxID)) == p.src_id);
 
 	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 	p.size = p.flit_left = getRandomSize();
-	p.vc_id = randInt(0, GlobalParams::n_virtual_channels - 1);
+	p.vc_id = 0;
 
 	return p;
 }
@@ -197,7 +177,7 @@ Packet ProcessingElement::trafficTest()
 
 	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 	p.size = p.flit_left = getRandomSize();
-	p.vc_id = randInt(0, GlobalParams::n_virtual_channels - 1);
+	p.vc_id = 0;
 
 	return p;
 }

@@ -94,11 +94,9 @@ struct GlobalParams
 	static std::string power_config_filename;
 	static int clock_period_ps;
 	static int simulation_time;
-	static int n_virtual_channels;
 	static int reset_time;
 	static int stats_warm_up_time;
 	static bool detailed;
-	static std::vector<std::pair<int, double>> hotspots;
 	static double dyad_threshold;
 	static unsigned int max_volume_to_be_drained;
 	static bool show_buffer_stats;

@@ -1,13 +1,3 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the declaration of the buffer
- */
-
 #pragma once
 #include <queue>
 #include "DataStructs.h"
@@ -65,8 +55,6 @@ public:
 
 	void SetLabel(std::string);
 	std::string GetLabel() const;
-};
 
-#define DEFAULT_VC 				0
-#define MAX_VIRTUAL_CHANNELS	8
-using BufferBank = Buffer[MAX_VIRTUAL_CHANNELS];
+	friend std::ostream& operator<<(std::ostream& os, const Buffer& b);
+};

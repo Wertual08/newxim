@@ -1,93 +1,22 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the declaration of the switch reservation table
- */
 #pragma once
-#include <cassert>
-#include "DataStructs.h"
-#include "Utils.h"
+#include <vector>
+#include <ostream>
 
 
 
-struct TReservation
-{
-	int input;
-	int vc;
-	inline bool operator ==(const TReservation& r) const
-	{
-		return (r.input == input && r.vc == vc);
-	}
-};
-
-typedef struct RTEntry
-{
-	std::vector<TReservation> reservations;
-	std::vector<TReservation>::size_type index;
-} TRTEntry;
-
-class ReservationTable 
+class ReservationTable
 {
 private:
-	TRTEntry* rtable;	// reservation vector: rtable[i] gives a RTEntry containing the set of input/VC 
-		   // which reserved output port
-
-	int n_outputs;
+	const int32_t PortsCount;
+	std::vector<int32_t> Table;
 
 public:
-	enum Status
-	{
-		Available = 1,
-		AlreadySame = -1,
-		AlreadyOtherOut = -2,
-		OutVCBusy = -3,
-	};
+	ReservationTable(int32_t ports);
 
-	ReservationTable();
+	void Reserve(int32_t port_in, int32_t port_out);
+	void Release(int32_t port_in);
+	bool Reserved(int32_t port_out) const;
+	int32_t Reservation(int32_t port_in);
 
-	inline std::string name() const { return "ReservationTable"; };
-
-	// check if the input/vc/output is a
-	int checkReservation(const TReservation r, const int port_out);
-
-	// Connects port_in with port_out. Asserts if port_out is reserved
-	void reserve(const TReservation r, const int port_out);
-
-	// Releases port_out connection. 
-	// Asserts if port_out is not reserved or not valid
-	void release(const TReservation r, const int port_out);
-
-	// Returns the pairs of output port and virtual channel reserved by port_in
-	std::vector<std::pair<int, int>> getReservations(const int port_int);
-
-	// update the index of the reservation having highest priority in the current cycle
-	void updateIndex();
-
-	// check whether port_out has no reservations
-	bool isNotReserved(const int port_out);
-
-	void setSize(const int n_outputs);
-
-	void print();
-};
-
-class newReservationTable
-{
-private:
-	const int32_t PortsCount, ChannelsCount;
-	std::vector<std::pair<int32_t, int32_t>> Table;
-
-public:
-	newReservationTable(int32_t ports, int32_t channels);
-
-	void Reserve(int32_t port_in, int32_t vc_in, int32_t port_out, int32_t vc_out);
-	void Release(int32_t port_out, int32_t vc_out);
-	bool Reserved(int32_t port_out, int32_t vc_out) const;
-	std::pair<int, int> Reservation(int32_t port_in, int32_t vc_in);
-
-	friend std::ostream& operator<<(std::ostream& os, const newReservationTable& table);
+	friend std::ostream& operator<<(std::ostream& os, const ReservationTable& table);
 };

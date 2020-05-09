@@ -90,13 +90,11 @@ void loadConfiguration()
 	GlobalParams::probability_of_retransmission = readParam<double>(config, "probability_of_retransmission");
 	GlobalParams::clock_period_ps = readParam<int>(config, "clock_period_ps");
 	GlobalParams::simulation_time = readParam<int>(config, "simulation_time");
-	GlobalParams::n_virtual_channels = readParam<int>(config, "n_virtual_channels");
 	GlobalParams::reset_time = readParam<int>(config, "reset_time");
 	GlobalParams::stats_warm_up_time = readParam<int>(config, "stats_warm_up_time");
 	GlobalParams::detailed = readParam<bool>(config, "detailed");
 	GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
 	GlobalParams::max_volume_to_be_drained = readParam<unsigned int>(config, "max_volume_to_be_drained");
-	//GlobalParams::hotspots;
 	GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
 	GlobalParams::traffic_distribution = readParam<std::string>(config, "traffic_distribution");
 
@@ -170,7 +168,6 @@ void showConfig()
 		<< "- verbose_mode = " << GlobalParams::verbose_mode << std::endl
 		// << "- trace_filename = " << GlobalParams::trace_filename << std::endl
 		<< "- buffer_depth = " << GlobalParams::buffer_depth << std::endl
-		<< "- n_virtual_channels = " << GlobalParams::n_virtual_channels << std::endl
 		<< "- max_packet_size = " << GlobalParams::max_packet_size << std::endl
 		<< "- packet_injection_rate = " << GlobalParams::packet_injection_rate << std::endl
 		<< "- probability_of_retransmission = " << GlobalParams::probability_of_retransmission << std::endl
@@ -212,17 +209,6 @@ void checkConfiguration()
 		exit(1);
 	}
 
-	for (unsigned int i = 0; i < GlobalParams::hotspots.size(); i++)
-	{
-		if (GlobalParams::hotspots[i].second < 0.0 && GlobalParams::hotspots[i].second > 1.0)
-		{
-			std::cerr <<
-				"Error: hotspot percentage must be in the interval [0,1]"
-				<< std::endl;
-			exit(1);
-		}
-	}
-
 	if (GlobalParams::stats_warm_up_time < 0) {
 		std::cerr << "Error: warm-up time must be positive" << std::endl;
 		exit(1);
@@ -230,10 +216,6 @@ void checkConfiguration()
 
 	if (GlobalParams::simulation_time < 0) {
 		std::cerr << "Error: simulation time must be positive" << std::endl;
-		exit(1);
-	}
-	if (GlobalParams::n_virtual_channels > MAX_VIRTUAL_CHANNELS) {
-		std::cerr << "Error: number of virtual channels must be less than " << MAX_VIRTUAL_CHANNELS << std::endl;
 		exit(1);
 	}
 
@@ -247,14 +229,6 @@ void checkConfiguration()
 	if (GlobalParams::locality < 0 || GlobalParams::locality>1)
 	{
 		std::cerr << "Error: traffic locality must be in the range 0..1" << std::endl;
-		exit(1);
-	}
-
-	if (GlobalParams::n_virtual_channels > MAX_VIRTUAL_CHANNELS)
-	{
-		std::cerr << "Error: cannot use more than " << MAX_VIRTUAL_CHANNELS << " virtual channels." << std::endl
-			<< "If you need more vc please modify the MAX_VIRTUAL_CHANNELS definition in " << std::endl
-			<< "GlobalParams.h and compile again " << std::endl;
 		exit(1);
 	}
 }
@@ -273,8 +247,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 				GlobalParams::verbose_mode = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-buffer"))
 				GlobalParams::buffer_depth = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-vc"))
-				GlobalParams::n_virtual_channels = (atoi(arg_vet[++i]));
 			else if (!strcmp(arg_vet[i], "-flit"))
 				GlobalParams::flit_size = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-size"))
@@ -333,13 +305,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 					GlobalParams::locality = atof(arg_vet[++i]);
 				}
 				else assert(false);
-			}
-			else if (!strcmp(arg_vet[i], "-hs"))
-			{
-				int node = atoi(arg_vet[++i]);
-				double percentage = atof(arg_vet[++i]);
-				std::pair<int, double> t(node, percentage);
-				GlobalParams::hotspots.push_back(t);
 			}
 			else if (!strcmp(arg_vet[i], "-warmup"))
 				GlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);

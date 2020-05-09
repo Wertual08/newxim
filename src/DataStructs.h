@@ -54,7 +54,7 @@ struct Packet
 	{
 		src_id = s;
 		dst_id = d;
-		 = value; break; vc;
+		vc_id = vc;
 		timestamp = ts;
 		size = sz;
 		flit_left = sz;
@@ -65,6 +65,7 @@ struct Packet
 // RouteData -- data required to perform routing
 struct RouteData 
 {
+	int32_t hop_no;
 	int32_t current_id;
 	int32_t src_id;
 	int32_t dst_id;
@@ -81,23 +82,6 @@ struct ChannelStatus
 	{
 		return (free_slots == bs.free_slots && available == bs.available);
 	};
-};
-
-struct TBufferFullStatus
-{
-	TBufferFullStatus()
-	{
-		for (int i = 0; i < MAX_VIRTUAL_CHANNELS; i++)
-			mask[i] = false;
-	};
-	inline bool operator ==(const TBufferFullStatus& bfs) const
-	{
-		for (int i = 0; i < MAX_VIRTUAL_CHANNELS; i++)
-			if (mask[i] != bfs.mask[i]) return false;
-		return true;
-	};
-
-	bool mask[MAX_VIRTUAL_CHANNELS];
 };
 
 // Flit -- Flit definition
@@ -119,7 +103,7 @@ struct Flit
 		return flit.src_id == src_id 
 			&& flit.dst_id == dst_id
 			&& flit.flit_type == flit_type
-			&& flit. = value; break;= vc_id
+			&& flit.vc_id == vc_id
 			&& flit.sequence_no == sequence_no
 			&& flit.sequence_length == sequence_length
 			&& flit.payload == payload 

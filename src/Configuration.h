@@ -57,16 +57,15 @@ private:
 	std::string power_config_filename;
 	int32_t clock_period_ps;
 	int32_t simulation_time;
-	int32_t n_virtual_channels;
 	int32_t reset_time;
 	int32_t stats_warm_up_time;
 	int32_t rnd_generator_seed;
 	bool detailed;
-	std::vector<std::pair<int, double>> hotspots;
 	double dyad_threshold;
 	uint32_t max_volume_to_be_drained;
 	bool show_buffer_stats;
 	Power power_configuration;
+	int32_t dim_x, dim_y;
 
 	Graph graph;
 	RoutingTable table;
@@ -106,7 +105,6 @@ public:
 	const std::string& PowerConfigFilename() const;
 	int32_t ClockPeriodPS() const;
 	int32_t SimulationTime() const;
-	int32_t NVirtualChannels() const;
 	int32_t ResetTime() const;
 	int32_t StatsWarmUpTime() const;
 	int32_t RndGeneratorSeed() const;
@@ -116,6 +114,9 @@ public:
 	uint32_t MaxVolumeToBeDrained() const;
 	bool ShowBufferStats() const;
 	const Power& PowerConfiguration() const;
+
+	int32_t DimX() const;
+	int32_t DimY() const;
 
 	double TimeStamp() const;
 };

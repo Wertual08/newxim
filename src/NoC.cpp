@@ -9,10 +9,11 @@
  */
 
 #include "NoC.h"
-#include "routingAlgorithms/RoutingTableBased.h"
-#include "selectionStrategies/SelectionRandom.h"
-#include "selectionStrategies/SelectionBufferLevel.h"
-#include "selectionStrategies/SelectionKeepSpace.h"
+#include "RoutingSelection/RoutingTableBased.h"
+#include "RoutingSelection/SelectionRandom.h"
+#include "RoutingSelection/SelectionBufferLevel.h"
+#include "RoutingSelection/SelectionKeepSpace.h"
+#include "RoutingSelection/RoutingTorusAdaptive.h"
 
 
 
@@ -21,14 +22,15 @@ NoC::NoC(const Configuration& config) :
 	BorderRelay("BorderRelay"), GRTable(config.GRTable())
 {
 	srand(config.RndGeneratorSeed());
-	//std::cout << config.Topology() << '\n';
-	//std::cout << config.GRTable() << '\n';
+	std::cout << config.Topology() << '\n';
+	std::cout << config.GRTable() << '\n';
 
 	// Check for traffic table availability
 	if (config.TrafficDistribution() == TRAFFIC_TABLE_BASED)
 		GTTable.load(config.TraceFilename().c_str());
 
 	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
+	if (config.RoutingAlgorithm() == "TORUS_ADAPTIVE") Algorithm = new RoutingTorusAdaptive(config.DimX(), config.DimY(), config.Topology());
 	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
 	else if (config.SelectionStrategy() == "BUFFER_LEVEL") Strategy = new SelectionBufferLevel();
 	else if (config.SelectionStrategy() == "KEEP_SPACE") Strategy = new SelectionKeepSpace();
