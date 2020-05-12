@@ -92,10 +92,8 @@ void loadConfiguration()
 	GlobalParams::simulation_time = readParam<int>(config, "simulation_time");
 	GlobalParams::reset_time = readParam<int>(config, "reset_time");
 	GlobalParams::stats_warm_up_time = readParam<int>(config, "stats_warm_up_time");
-	GlobalParams::detailed = readParam<bool>(config, "detailed");
 	GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
 	GlobalParams::max_volume_to_be_drained = readParam<unsigned int>(config, "max_volume_to_be_drained");
-	GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
 	GlobalParams::traffic_distribution = readParam<std::string>(config, "traffic_distribution");
 
 	GlobalParams::power_configuration = power_config["Energy"].as<PowerConfig>();
@@ -308,10 +306,6 @@ void parseCmdLine(int arg_num, char* arg_vet[])
 			}
 			else if (!strcmp(arg_vet[i], "-warmup"))
 				GlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-detailed"))
-				GlobalParams::detailed = true;
-			else if (!strcmp(arg_vet[i], "-show_buf_stats"))
-				GlobalParams::show_buffer_stats = true;
 			else if (!strcmp(arg_vet[i], "-volume")) GlobalParams::max_volume_to_be_drained = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-sim")) GlobalParams::simulation_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power")) i++;

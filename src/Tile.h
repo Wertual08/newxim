@@ -164,9 +164,4 @@ public:
 			GlobalParams::buffer_depth, GlobalParams::flit_size,
 			routing_algorithm, "default");
 	}
-
-	void Disable(int32_t relay)
-	{
-		RouterDevice.Relays[relay].buffer.Disable();
-	}
 };

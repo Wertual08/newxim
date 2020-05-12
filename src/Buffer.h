@@ -7,27 +7,11 @@
 class Buffer 
 {
 private:
-	bool true_buffer;
-	bool deadlock_detected;
-
-	int32_t full_cycles_counter;
-	int32_t last_front_flit_seq;
-
 	std::string label;
 
 	int32_t max_buffer_size;
 
 	std::queue<Flit> buffer;
-	mutable Flit TEMP_SHITY_FLIT;
-	mutable int TEMP_SHITY_COUNTER;
-
-	uint32_t max_occupancy;
-	double hold_time, last_event, hold_time_sum;
-	double mean_occupancy;
-	int32_t previous_occupancy;
-
-	void SaveOccupancyAndTime();
-	void UpdateMeanOccupancy();
 
 public:
 	Buffer();
@@ -50,8 +34,8 @@ public:
 	Flit Front() const;								// Return a copy of the first flit in the buffer
 	uint32_t Size() const;
 
-	void ShowStats(std::ostream& out) const;
-	void Print() const;
+	double GetOldest() const;
+	double GetLoad() const;
 
 	void SetLabel(std::string);
 	std::string GetLabel() const;

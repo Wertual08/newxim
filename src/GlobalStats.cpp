@@ -14,8 +14,36 @@
 
 
 
-GlobalStats::GlobalStats(const NoC& _noc) : Network(_noc)
+GlobalStats::GlobalStats(const NoC& _noc, int32_t channels_count) : Network(_noc), ChannelsCount(channels_count)
 {
+}
+
+double GlobalStats::GetMaxBufferStuckDelay() const
+{
+	double max_delay = 0.0;
+	for (auto t : Network.Tiles)
+	{
+		double min_pop_time = t->RouterDevice.stats.GetMinBufferPopOrEmptyTime();
+
+		if (GlobalParams::simulation_time + GlobalParams::reset_time - min_pop_time > max_delay)
+			max_delay = GlobalParams::simulation_time + GlobalParams::reset_time - min_pop_time;
+	}
+	return max_delay;
+}
+
+double GlobalStats::GetAverageBufferLoad(int32_t channel) const
+{
+	double sum = 0.0;
+	for (auto t : Network.Tiles)
+		sum += t->RouterDevice.stats.GetAVGBufferLoad(channel, ChannelsCount);
+	return sum / Network.Tiles.size();
+}
+double GlobalStats::GetAverageBufferLoad() const
+{
+	double sum = 0.0;
+	for (int i = 0; i < ChannelsCount; i++)
+		sum += GetAverageBufferLoad(i);
+	return sum / ChannelsCount;
 }
 
 double GlobalStats::getLastReceivedFlitTime()
@@ -50,7 +78,7 @@ double GlobalStats::getAverageDelay()
 
 double GlobalStats::getAverageDelay(int src_id, int dst_id)
 {
-	return Network.SearchNode(dst_id).RouterDevice.stats.getAverageDelay(src_id);
+	return Network.Tiles[dst_id]->RouterDevice.stats.getAverageDelay(src_id);
 }
 
 double GlobalStats::getMaxDelay()
@@ -75,12 +103,12 @@ double GlobalStats::getMaxDelay(int32_t node_id)
 
 double GlobalStats::getMaxDelay(int src_id, int dst_id)
 {
-	return Network.SearchNode(dst_id).RouterDevice.stats.getMaxDelay(src_id);
+	return Network.Tiles[dst_id]->RouterDevice.stats.getMaxDelay(src_id);
 }
 
 double GlobalStats::getAverageThroughput(int src_id, int dst_id)
 {
-	return Network.SearchNode(dst_id).RouterDevice.stats.getAverageThroughput(src_id);
+	return Network.Tiles[dst_id]->RouterDevice.stats.getAverageThroughput(src_id);
 }
 
 /*
@@ -107,11 +135,15 @@ double GlobalStats::getAverageThroughput()
 }
 */
 
-double GlobalStats::getAggregatedThroughput()
+double GlobalStats::getAggregatedThroughput() const
 {
 	int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
-
 	return (double)getReceivedFlits() / (double)(total_cycles);
+}
+double GlobalStats::getAggregatedAcceptance() const
+{
+	int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
+	return (double)getAcceptedFlits() / (double)(total_cycles);
 }
 
 unsigned int GlobalStats::getReceivedPackets()
@@ -124,11 +156,16 @@ unsigned int GlobalStats::getReceivedPackets()
 	return n;
 }
 
-unsigned int GlobalStats::getReceivedFlits()
+unsigned int GlobalStats::getReceivedFlits() const
 {
-	unsigned int n = 0;
+	uint32_t n = 0;
 	for (auto t : Network.Tiles) n += t->RouterDevice.stats.getReceivedFlits();
-
+	return n;
+}
+unsigned int GlobalStats::getAcceptedFlits() const
+{
+	uint32_t n = 0;
+	for (auto t : Network.Tiles) n += t->RouterDevice.stats.GetAcceptedFlits();
 	return n;
 }
 
@@ -179,68 +216,30 @@ double GlobalStats::getStaticPower()
 	return power;
 }
 
-void GlobalStats::showStats(std::ostream& out, bool detailed)
+void GlobalStats::showStats(std::ostream& out)
 {
-	//if (detailed)
-	//{
-	//	assert(GlobalParams::topology == TOPOLOGY_MESH);
-	//	out << endl << "detailed = [" << endl;
-
-	//	//for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	//	//	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-	//	//		Network.t[x][y]->RouterDevice.stats.showStats(y * GlobalParams::mesh_dim_x + x, out, true);
-	//	for (int32_t i = 0; i < Network.Tiles.size(); i++)
-	//	{
-	//		Network.Tiles[i]->RouterDevice.stats.showStats(i, out, true);
-	//	}
-	//	out << "];" << endl;
-
-	//	// show MaxDelay matrix
-	//	vector < vector < double > > md_mtx = getMaxDelayMtx();
-
-	//	out << endl << "max_delay = [" << endl;
-	//	for (unsigned int y = 0; y < md_mtx.size(); y++)
-	//	{
-	//		out << "   ";
-	//		for (unsigned int x = 0; x < md_mtx[y].size(); x++)
-	//			out << setw(6) << md_mtx[y][x];
-	//		out << endl;
-	//	}
-	//	out << "];" << endl;
-
-	//	// show RoutedFlits matrix
-	//	vector<vector<unsigned long>> rf_mtx = getRoutedFlitsMtx();
-
-	//	out << endl << "routed_flits = [" << endl;
-	//	for (unsigned int y = 0; y < rf_mtx.size(); y++)
-	//	{
-	//		out << "   ";
-	//		for (unsigned int x = 0; x < rf_mtx[y].size(); x++)
-	//			out << setw(10) << rf_mtx[y][x];
-	//		out << endl;
-	//	}
-	//	out << "];" << endl;
-
-	//	showPowerBreakDown(out);
-	//	showPowerManagerStats(out);
-	//}
-
-	//int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
-	out << "% Total received packets: " << getReceivedPackets() << endl;
-	out << "% Total received flits: " << getReceivedFlits() << endl;
-	out << "% Received/Ideal flits Ratio: " << getReceivedIdealFlitRatio() << endl;
-	out << "% Last time flit received: " << (int32_t)getLastReceivedFlitTime() << '\n';
-	out << "% Global average delay (cycles): " << getAverageDelay() << endl;
-	out << "% Max delay (cycles): " << getMaxDelay() << endl;
-	out << "% Network throughput (flits/cycle): " << getAggregatedThroughput() << endl;
-	out << "% Average IP throughput (flits/cycle/IP): " << getThroughput() << endl;
-	out << "% Total energy (J): " << getTotalPower() << endl;
-	out << "% Dynamic energy (J): " << getDynamicPower() << endl;
-	out << "% Static energy (J): " << getStaticPower() << endl;
-
-	if (GlobalParams::show_buffer_stats)
-		showBufferStats(out);
-
+	out << "% Total received packets: " << getReceivedPackets() << '\n';
+	out << "% Total received flits: " << getReceivedFlits() << '\n';
+	out << "% Total accepted flits: " << getAcceptedFlits() << '\n';
+	out << "% Received/Ideal flits Ratio: " << getReceivedIdealFlitRatio() << '\n';
+	out << "% Last time flit received: " << static_cast<int32_t>(getLastReceivedFlitTime()) << '\n';
+	out << "% Max buffer stuck delay: " << static_cast<int32_t>(GetMaxBufferStuckDelay()) << '\n';
+	out << "% Global average delay (cycles): " << getAverageDelay() << '\n';
+	out << "% Max delay (cycles): " << getMaxDelay() << '\n';
+	out << "% Network throughput (flits/cycle): " << getAggregatedThroughput() << '\n';
+	out << "% Network acceptance (flits/cycle): " << getAggregatedAcceptance() << '\n';
+	out << "% Average IP throughput (flits/cycle/IP): " << getThroughput() << '\n';
+	out << "% Average buffer utilization: " << GetAverageBufferLoad() << '\n';
+	if (ChannelsCount > 1)
+	{
+		for (int32_t i = 0; i < ChannelsCount; i++)
+		{
+			out << "% Average channel " << i << " utilization: " << GetAverageBufferLoad(i) << '\n';
+		}
+	}
+	out << "% Total energy (J): " << getTotalPower() << '\n';
+	out << "% Dynamic energy (J): " << getDynamicPower() << '\n';
+	out << "% Static energy (J): " << getStaticPower() << '\n';
 }
 
 void GlobalStats::updatePowerBreakDown(std::map<std::string, double>& dst, PowerBreakdown* src)
@@ -273,19 +272,6 @@ void GlobalStats::showPowerBreakDown(std::ostream& out)
 	}
 	printMap("power_dynamic", power_dynamic, out);
 	printMap("power_static", power_static, out);
-}
-
-void GlobalStats::showBufferStats(std::ostream& out)
-{
-	out << "Router id\tBuffer N\t\tBuffer E\t\tBuffer S\t\tBuffer W\t\tBuffer L" << endl;
-	out << "         \tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax" << endl;
-
-	for (auto t : Network.Tiles)
-	{
-		out << t->RouterDevice.local_id;
-		t->RouterDevice.ShowBuffersStats(out);
-		out << endl;
-	}
 }
 
 double GlobalStats::getReceivedIdealFlitRatio()

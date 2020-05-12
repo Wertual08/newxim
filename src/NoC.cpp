@@ -13,24 +13,28 @@
 #include "RoutingSelection/SelectionRandom.h"
 #include "RoutingSelection/SelectionBufferLevel.h"
 #include "RoutingSelection/SelectionKeepSpace.h"
-#include "RoutingSelection/RoutingTorusAdaptive.h"
+#include "RoutingSelection/RoutingMeshXY.h"
+#include "RoutingSelection/RoutingTorusXY.h"
+#include "RoutingSelection/RoutingChannelIndexStep.h"
 
 
 
-NoC::NoC(const Configuration& config) : 
+NoC::NoC(const Configuration& config, sc_module_name) :
 	clock("clock", GlobalParams::clock_period_ps, SC_PS), 
-	BorderRelay("BorderRelay"), GRTable(config.GRTable())
+	GRTable(config.GRTable())
 {
 	srand(config.RndGeneratorSeed());
-	std::cout << config.Topology() << '\n';
-	std::cout << config.GRTable() << '\n';
+	//std::cout << config.Topology() << '\n';
+	//std::cout << config.GRTable() << '\n';
 
 	// Check for traffic table availability
 	if (config.TrafficDistribution() == TRAFFIC_TABLE_BASED)
-		GTTable.load(config.TraceFilename().c_str());
+		GTTable.load(config.TrafficTableFilename().c_str());
 
 	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
-	if (config.RoutingAlgorithm() == "TORUS_ADAPTIVE") Algorithm = new RoutingTorusAdaptive(config.DimX(), config.DimY(), config.Topology());
+	else if (config.RoutingAlgorithm() == "MESH_XY") Algorithm = new RoutingMeshXY(config.DimX(), config.DimY(), config.Topology());
+	else if (config.RoutingAlgorithm() == "TORUS_XY") Algorithm = new RoutingTorusXY(config.DimX(), config.DimY(), config.Topology());
+	else if (config.RoutingAlgorithm() == "ROUTING_CHANNEL_INDEX_STEP") Algorithm = new RoutingChannelIndexStep(config.Topology());
 	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
 	else if (config.SelectionStrategy() == "BUFFER_LEVEL") Strategy = new SelectionBufferLevel();
 	else if (config.SelectionStrategy() == "KEEP_SPACE") Strategy = new SelectionKeepSpace();
@@ -71,31 +75,22 @@ NoC::NoC(const Configuration& config) :
 			if (tile.Relays[relay].Bound()) continue;
 			int32_t connected_id = node[relay];
 
-			if (connected_id < 0)
+			auto& connected_tile = *Tiles[connected_id];
+			auto& connected_node = graph[connected_id];
+			std::vector<int32_t> connected_relays = connected_node.links_to(id);
+			for (int32_t rel : connected_relays)
 			{
-				tile.Relays[relay].Bind(BorderRelay);
-				tile.Disable(relay);
-			}
-			else
-			{
-				auto& connected_tile = *Tiles[connected_id];
-				auto& connected_node = graph[connected_id];
-				std::vector<int32_t> connected_relays = connected_node.links_to(id);
-				for (int32_t rel : connected_relays)
+				if (!connected_tile.Relays[rel].Bound())
 				{
-					if (!connected_tile.Relays[rel].Bound())
-					{
-						tile.Relays[relay].Bind(connected_tile.Relays[rel]);
-						break;
-					}
+					tile.Relays[relay].Bind(connected_tile.Relays[rel]);
+					break;
 				}
 			}
-			if (!tile.Relays[relay].Bound()) throw std::runtime_error("NoC error: Bad graph.");
 		}
 	}
-		
-	// Reset border relay
-	BorderRelay.Disable();
+
+	SC_METHOD(Update);
+	sensitive << reset << clock.value_changed_event();
 }
 NoC::~NoC()
 {
@@ -104,7 +99,11 @@ NoC::~NoC()
 	delete Strategy;
 }
 
-Tile& NoC::SearchNode(int32_t id) const
+void NoC::Update()
 {
-	return *Tiles[id];
+}
+
+std::ostream& operator<<(std::ostream& os, const NoC& network)
+{
+	return os;
 }

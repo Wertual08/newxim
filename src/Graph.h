@@ -17,7 +17,7 @@ public:
 		std::vector<int32_t> Links;
 
 	public:
-		void push_back(int32_t id) { Links.push_back(id); }
+		void push_back(int32_t id, int32_t ch = 1) { while (ch--) Links.push_back(id); }
 		int32_t size() const { return Links.size(); }
 		int32_t operator[](int32_t i) const { return Links[i]; }
 		int32_t& operator[](int32_t i) { return Links[i]; }

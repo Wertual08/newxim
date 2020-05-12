@@ -39,8 +39,6 @@ private:
 	std::string topology_args;
 
 	std::string verbose_mode;
-	int32_t trace_mode;
-	std::string trace_filename;
 	double r2r_link_length;
 	int32_t buffer_depth;
 	int32_t flit_size;
@@ -60,12 +58,11 @@ private:
 	int32_t reset_time;
 	int32_t stats_warm_up_time;
 	int32_t rnd_generator_seed;
-	bool detailed;
 	double dyad_threshold;
 	uint32_t max_volume_to_be_drained;
-	bool show_buffer_stats;
 	Power power_configuration;
 	int32_t dim_x, dim_y;
+	int32_t channels_count;
 
 	Graph graph;
 	RoutingTable table;
@@ -86,8 +83,6 @@ public:
 	const RoutingTable& GRTable() const;
 
 	const std::string& VerboseMode() const;
-	int32_t TraceMode() const;
-	const std::string& TraceFilename() const;
 	double R2RLinkLength() const;
 	int32_t BufferDepth() const;
 	int32_t FlitSize() const;
@@ -108,15 +103,14 @@ public:
 	int32_t ResetTime() const;
 	int32_t StatsWarmUpTime() const;
 	int32_t RndGeneratorSeed() const;
-	bool Detailed() const;
 	std::vector<std::pair<int, double>> Hotspots() const;
 	double DyadThreshold() const;
 	uint32_t MaxVolumeToBeDrained() const;
-	bool ShowBufferStats() const;
 	const Power& PowerConfiguration() const;
 
 	int32_t DimX() const;
 	int32_t DimY() const;
+	int32_t ChannelsCount() const;
 
 	double TimeStamp() const;
 };

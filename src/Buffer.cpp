@@ -13,37 +13,9 @@
 
 
 
-void Buffer::SaveOccupancyAndTime()
-{
-	previous_occupancy = buffer.size();
-	hold_time = (sc_time_stamp().to_double() / GlobalParams::clock_period_ps) - last_event;
-	last_event = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-}
-void Buffer::UpdateMeanOccupancy()
-{
-	double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-	if (current_time - GlobalParams::reset_time < GlobalParams::stats_warm_up_time) return;
-
-	mean_occupancy = mean_occupancy * (hold_time_sum / (hold_time_sum + hold_time)) +
-		(1.0 / (hold_time_sum + hold_time)) * hold_time * buffer.size();
-
-	hold_time_sum += hold_time;
-}
-
 Buffer::Buffer()
 {
 	SetMaxBufferSize(GlobalParams::buffer_depth);
-	max_occupancy = 0;
-	hold_time = 0.0;
-	last_event = 0.0;
-	hold_time_sum = 0.0;
-	previous_occupancy = 0;
-	mean_occupancy = 0.0;
-	true_buffer = true;
-	full_cycles_counter = 0;
-	last_front_flit_seq = NOT_VALID;
-	deadlock_detected = false;
-	TEMP_SHITY_COUNTER = 0;
 }
 
 void Buffer::SetMaxBufferSize(uint32_t bms)
@@ -78,28 +50,15 @@ void Buffer::Empty() const
 {
 	assert(false);
 }
-void Buffer::Disable()
-{
-	true_buffer = false;
-}
 
 void Buffer::Push(const Flit& flit)
 {
-	SaveOccupancyAndTime();
-
 	if (IsFull()) Drop(flit);
 	else buffer.push(flit);
-
-	UpdateMeanOccupancy();
-
-	if (max_occupancy < buffer.size())
-		max_occupancy = buffer.size();
 }
 Flit Buffer::Pop()
 {
 	Flit f;
-
-	SaveOccupancyAndTime();
 
 	if (IsEmpty()) Empty();
 	else 
@@ -107,8 +66,6 @@ Flit Buffer::Pop()
 		f = buffer.front();
 		buffer.pop();
 	}
-
-	UpdateMeanOccupancy();
 
 	return f;
 }
@@ -126,10 +83,21 @@ uint32_t Buffer::Size() const
 	return buffer.size();
 }
 
-void Buffer::ShowStats(std::ostream& out) const
+double Buffer::GetOldest() const
 {
-	if (true_buffer) out << "\t" << mean_occupancy << "\t" << max_occupancy;
-	else out << "\t\t";
+	auto copy = buffer;
+	double result = copy.front().timestamp;
+	copy.pop();
+	while (!copy.empty())
+	{
+		if (copy.front().timestamp < result) result = copy.front().timestamp;
+		copy.pop();
+	}
+	return result;
+}
+double Buffer::GetLoad() const
+{
+	return (double)Size() / (double)GetMaxBufferSize();
 }
 
 void Buffer::SetLabel(std::string l)

@@ -17,12 +17,15 @@ int ProcessingElement::randInt(int min, int max)
 
 void ProcessingElement::rxProcess()
 {
-	if (reset.read()) {
+	if (reset.read()) 
+	{
 		ack_rx.write(0);
 		current_level_rx = 0;
 	}
-	else {
-		if (req_rx.read() == 1 - current_level_rx) {
+	else 
+	{
+		if (req_rx.read() == 1 - current_level_rx) 
+		{
 			Flit flit_tmp = flit_rx.read();
 			current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
 		}
@@ -32,24 +35,28 @@ void ProcessingElement::rxProcess()
 
 void ProcessingElement::txProcess()
 {
-	if (reset.read()) {
+	if (reset.read()) 
+	{
 		req_tx.write(0);
 		current_level_tx = 0;
 		transmittedAtPreviousCycle = false;
 	}
-	else {
+	else 
+	{
 		Packet packet;
 
-		if (canShot(packet)) {
+		if (canShot(packet))
+		{
 			packet_queue.push(packet);
 			transmittedAtPreviousCycle = true;
 		}
-		else
-			transmittedAtPreviousCycle = false;
+		else transmittedAtPreviousCycle = false;
 
 
-		if (ack_tx.read() == current_level_tx) {
-			if (!packet_queue.empty()) {
+		if (ack_tx.read() == current_level_tx) 
+		{
+			if (!packet_queue.empty()) 
+			{
 				Flit flit = nextFlit();	// Generate a new flit
 				flit_tx->write(flit);	// Send the generated flit
 				current_level_tx = 1 - current_level_tx;	// Negate the old value for Alternating Bit Protocol (ABP)
@@ -77,8 +84,7 @@ Flit ProcessingElement::nextFlit()
 		flit.flit_type = FLIT_TYPE_HEAD;
 	else if (packet.flit_left == 1)
 		flit.flit_type = FLIT_TYPE_TAIL;
-	else
-		flit.flit_type = FLIT_TYPE_BODY;
+	else flit.flit_type = FLIT_TYPE_BODY;
 
 	packet_queue.front().flit_left--;
 	if (packet_queue.front().flit_left == 0)
@@ -94,16 +100,16 @@ bool ProcessingElement::canShot(Packet& packet)
 	double threshold;
 
 	double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-	
+
 	if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
 		if (!transmittedAtPreviousCycle) threshold = GlobalParams::packet_injection_rate;
 		else threshold = GlobalParams::probability_of_retransmission;
 
 		shot = (((double)rand()) / RAND_MAX < threshold);
-		if (shot) 
+		if (shot)
 		{
 			if (GlobalParams::traffic_distribution == TRAFFIC_RANDOM) packet = trafficRandom();
-			else 
+			else
 			{
 				cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
 				exit(-1);
@@ -114,7 +120,7 @@ bool ProcessingElement::canShot(Packet& packet)
 		if (never_transmit) return false;
 
 		bool use_pir = (transmittedAtPreviousCycle == false);
-		std::vector<std::pair<int,double>> dst_prob;
+		std::vector<std::pair<int, double>> dst_prob;
 		double threshold =
 			traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
 

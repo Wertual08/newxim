@@ -291,8 +291,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 
 	// Initialize global configuration parameters (can be overridden with command-line arguments)
 	verbose_mode = ReadParam<std::string>(config, "verbose_mode");
-	trace_mode = ReadParam<bool>(config, "trace_mode");
-	trace_filename = ReadParam<std::string>(config, "trace_filename");
 
 	r2r_link_length = ReadParam<double>(config, "r2r_link_length");
 	buffer_depth = ReadParam<int32_t>(config, "buffer_depth");
@@ -308,7 +306,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	reset_time = ReadParam<int32_t>(config, "reset_time");
 	stats_warm_up_time = ReadParam<int32_t>(config, "stats_warm_up_time");
 	rnd_generator_seed = ReadParam<int32_t>(config, "rnd_generator_seed", time(0));
-	detailed = ReadParam<bool>(config, "detailed");
 	dyad_threshold = ReadParam<double>(config, "dyad_threshold");
 	max_volume_to_be_drained = ReadParam<uint32_t>(config, "max_volume_to_be_drained");
 
@@ -316,11 +313,10 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	if (traffic_distribution == "TRAFFIC_TABLE_BASED") 
 		traffic_table_filename = ReadParam<std::string>(config, "traffic_table_filename");
 
-	show_buffer_stats = ReadParam<bool>(config, "show_buffer_stats");
-
 	power_configuration = power_config["Energy"].as<Power>();
 
 	std::string topology = ReadParam<std::string>(config, "topology");
+	channels_count = ReadParam<int32_t>(config, "topology_channels", 1);
 	try
 	{
 		const auto& args = config["topology_args"];
@@ -343,8 +339,8 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 				int32_t l = args[i].as<int32_t>();
 				for (int32_t j = 0; j < graph.size(); j++)
 				{
-					graph[j].push_back((j + l) % graph.size());
-					graph[(j + l) % graph.size()].push_back(j);
+					graph[j].push_back((j + l) % graph.size(), channels_count);
+					graph[(j + l) % graph.size()].push_back(j, channels_count);
 				}
 			}
 		}
@@ -358,10 +354,10 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 			{
 				for (int32_t y = 0; y < dim_y; y++)
 				{
-					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x);
-					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1);
-					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x);
-					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1);
+					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
+					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1, channels_count);
+					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x, channels_count);
+					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1, channels_count);
 				}
 			}
 		}
@@ -375,14 +371,14 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 			{
 				for (int32_t y = 0; y < dim_y; y++)
 				{
-					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x);
-					else graph[y * dim_x + x].push_back(x);
-					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1);
-					else graph[y * dim_x + x].push_back(y * dim_x + dim_x - 1);
-					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x);
-					else graph[y * dim_x + x].push_back((dim_y - 1) * dim_x + x);
-					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1);
-					else graph[y * dim_x + x].push_back(y * dim_x);
+					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
+					else graph[y * dim_x + x].push_back(x, channels_count);
+					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1, channels_count);
+					else graph[y * dim_x + x].push_back(y * dim_x + dim_x - 1, channels_count);
+					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x, channels_count);
+					else graph[y * dim_x + x].push_back((dim_y - 1) * dim_x + x, channels_count);
+					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1, channels_count);
+					else graph[y * dim_x + x].push_back(y * dim_x, channels_count);
 				}
 			}
 		}
@@ -394,78 +390,45 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	}
 	try
 	{
-		if (routing_algorithm == "TABLE_BASED")
+		const auto& node = config["routing_table"];
+		if (node.IsDefined())
 		{
-			const auto& node = config["routing_table"];
-			if (node.IsDefined())
+			if (node.IsSequence())
 			{
-				if (node.IsSequence())
+				for (int32_t i = 0; i < node.size(); i++)
 				{
-					for (int32_t i = 0; i < node.size(); i++)
+					const auto& branch = node[i];
+					RoutingTable::Node rnode;
+					for (int32_t j = 0; j < branch.size(); j++)
 					{
-						const auto& branch = node[i];
-						RoutingTable::Node rnode;
-						for (int32_t j = 0; j < branch.size(); j++)
+						if (branch[j].IsSequence())
 						{
-							if (branch[j].IsSequence())
-							{
-								rnode.push_back(std::vector<int32_t>());
-								for (int32_t k = 0; k < branch[j].size(); k++)
-									rnode[j].push_back(branch[j][k].as<int32_t>());
-							}
-							else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
+							rnode.push_back(std::vector<int32_t>());
+							for (int32_t k = 0; k < branch[j].size(); k++)
+								rnode[j].push_back(branch[j][k].as<int32_t>());
 						}
-						table.push_back(std::move(rnode));
+						else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
 					}
-				}
-				else
-				{
-					std::string type = node.as<std::string>();
-					if (type == "MESH_XY")
-					{
-						const auto& targs = config["topology_args"];
-						table.LoadMeshXY(graph, dim_x, dim_y);
-					}
-					else if (type == "TORUS_XY")
-					{
-						const auto& targs = config["topology_args"];
-						table.LoadTorusXY(graph, dim_x, dim_y);
-					}
-					else table.Load(graph, type);
+					table.push_back(std::move(rnode));
 				}
 			}
-			else table.Load(graph);
-		}
-		else if (routing_algorithm == "TABLE_BASED_ID")
-		{
-			routing_algorithm = "TABLE_BASED";
-			const auto& node = config["routing_table"];
-			
-			for (int32_t i = 0; i < node.size(); i++)
+			else
 			{
-				const auto& branch = node[i];
-				RoutingTable::Node rnode;
-				for (int32_t j = 0; j < branch.size(); j++)
+				std::string type = node.as<std::string>();
+				if (type == "MESH_XY")
 				{
-					if (j == i) rnode.push_back(std::vector<int32_t>(1, graph[i].size()));
-					else if (branch[j].IsSequence())
-					{
-						rnode.push_back(std::vector<int32_t>());
-						for (int32_t k = 0; k < branch[j].size(); k++)
-						{
-							auto links = graph[i].links_to(branch[j][k].as<int32_t>());
-							for (int32_t l : links) rnode[j].push_back(l);
-						}
-					}
-					else rnode.push_back(graph[i].links_to(branch[j].as<int32_t>()));
+					const auto& targs = config["topology_args"];
+					table.LoadMeshXY(graph, dim_x, dim_y);
 				}
-				table.push_back(std::move(rnode));
+				else if (type == "TORUS_XY")
+				{
+					const auto& targs = config["topology_args"];
+					table.LoadTorusXY(graph, dim_x, dim_y);
+				}
+				else table.Load(graph, type);
 			}
 		}
-		else if (routing_algorithm == "")
-		{
-
-		}
+		else table.Load(graph);
 	}
 	catch (...)
 	{
@@ -490,11 +453,6 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 		{
 			if (!strcmp(arg_vet[i], "-verbose"))
 				verbose_mode = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-trace"))
-			{
-				trace_mode = true;
-				trace_filename = arg_vet[++i];
-			}
 			else if (!strcmp(arg_vet[i], "-buffer")) buffer_depth = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-flit")) flit_size = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-size"))
@@ -559,8 +517,6 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 			}
 			else if (!strcmp(arg_vet[i], "-warmup")) stats_warm_up_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-seed")) rnd_generator_seed = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-detailed")) detailed = true;
-			else if (!strcmp(arg_vet[i], "-show_buf_stats")) show_buffer_stats = true;
 			else if (!strcmp(arg_vet[i], "-volume")) max_volume_to_be_drained = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-sim")) simulation_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power")) i++;
@@ -638,7 +594,6 @@ void Configuration::Show() const
 	std::cout 
 		<< "Using the following configuration: \n"
 		<< "- verbose_mode = " << verbose_mode << '\n'
-		<< "- trace_mode = " << trace_mode << '\n'
 		// << "- trace_filename = " << trace_filename << '\n'
 		<< "- buffer_depth = " << buffer_depth << '\n'
 		<< "- max_packet_size = " << max_packet_size << '\n'
@@ -665,14 +620,6 @@ const RoutingTable& Configuration::GRTable() const
 const std::string& Configuration::VerboseMode() const
 {
 	return verbose_mode;
-}
-int32_t Configuration::TraceMode() const
-{
-	return trace_mode;
-}
-const std::string& Configuration::TraceFilename() const
-{
-	return trace_filename;
 }
 double Configuration::R2RLinkLength() const
 {
@@ -750,10 +697,6 @@ int32_t Configuration::RndGeneratorSeed() const
 {
 	return rnd_generator_seed;
 }
-bool Configuration::Detailed() const
-{
-	return detailed;
-}
 double Configuration::DyadThreshold() const
 {
 	return dyad_threshold;
@@ -761,10 +704,6 @@ double Configuration::DyadThreshold() const
 uint32_t Configuration::MaxVolumeToBeDrained() const
 {
 	return max_volume_to_be_drained;
-}
-bool Configuration::ShowBufferStats() const
-{
-	return show_buffer_stats;
 }
 const Configuration::Power& Configuration::PowerConfiguration() const
 {
@@ -778,6 +717,10 @@ int32_t Configuration::DimX() const
 int32_t Configuration::DimY() const
 {
 	return dim_y;
+}
+int32_t Configuration::ChannelsCount() const
+{
+	return channels_count;
 }
 
 double Configuration::TimeStamp() const

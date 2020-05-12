@@ -1,16 +1,4 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the declaration of the statistics
- */
-
-#ifndef __NOXIMSTATS_H__
-#define __NOXIMSTATS_H__
-
+#pragma once
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -21,50 +9,60 @@
 
 struct CommHistory 
 {
-	int src_id;
+	int32_t src_id;
 	std::vector<double> delays;
-	unsigned int total_received_flits;
+	uint32_t total_received_flits;
 	double last_received_flit_time;
 };
 
 class Stats 
 {
 private:
-	int id;
+	int32_t id;
 	std::vector<CommHistory> chist;
 	double warm_up_time;
 	double last_received_flit_time;
+	int32_t total_flits_accepted;
+
+	std::vector<std::pair<double, double>> AVGBufferLoad;
+	std::vector<double> LastBufferPopOrEmptyTime;
 
 	int searchCommHistory(int src_id);
 
 public:
-	Stats() {
-	}
+	Stats(int32_t node_id, double warm_up, int32_t buffers);
+
+	void UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time);
+	double GetMinBufferPopOrEmptyTime() const;
+
+	void AcceptFlit(double arrival_time);
+	int32_t GetAcceptedFlits() const;
+
+	void UpdateBufferLoad(double time, int32_t buffer, double load);
+	double GetAVGBufferLoad(int32_t channel, int32_t channels_count);
 
 	double getLastReceivedFlitTime() const;
 
-	void configure(const int node_id, const double _warm_up_time);
-
 	// Access point for stats update
-	void receivedFlit(const double arrival_time, const Flit& flit);
+	void receivedFlit(double arrival_time, const Flit& flit);
 
 	// Returns the average delay (cycles) for the current node as
 	// regards to the communication whose source is src_id
-	double getAverageDelay(const int src_id);
+	double getAverageDelay(int src_id);
 
 	// Returns the average delay (cycles) for the current node
 	double getAverageDelay();
 
 	// Returns the max delay for the current node as regards the
 	// communication whose source node is src_id
-	double getMaxDelay(const int src_id);
+	double getMaxDelay(int src_id);
 
 	// Returns the max delay (cycles) for the current node
 	double getMaxDelay();
 
 	// Returns the average throughput (flits/cycle) for the current node
 	// and for the communication whose source is src_id
-	double getAverageThroughput(const int src_id);
+	double getAverageThroughput(int src_id);
 
 	// Returns the average throughput (flits/cycle) for the current node
 	double getAverageThroughput();
@@ -88,5 +86,3 @@ public:
 	// Shows statistics for the current node
 	void showStats(int curr_node, std::ostream& out = std::cout, bool header = false);
 };
-
-#endif

@@ -96,9 +96,7 @@ struct GlobalParams
 	static int simulation_time;
 	static int reset_time;
 	static int stats_warm_up_time;
-	static bool detailed;
 	static double dyad_threshold;
 	static unsigned int max_volume_to_be_drained;
-	static bool show_buffer_stats;
 	static PowerConfig power_configuration;
 };

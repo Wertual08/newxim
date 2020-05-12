@@ -27,8 +27,6 @@ int GlobalParams::clock_period_ps;
 int GlobalParams::simulation_time;
 int GlobalParams::reset_time;
 int GlobalParams::stats_warm_up_time;
-bool GlobalParams::detailed;
 double GlobalParams::dyad_threshold;
 unsigned int GlobalParams::max_volume_to_be_drained;
-bool GlobalParams::show_buffer_stats;
 PowerConfig GlobalParams::power_configuration;

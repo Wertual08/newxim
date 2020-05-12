@@ -35,6 +35,7 @@ void Router::PerCycleProcess()
 		{
 			power.leakageBufferRouter();
 			power.leakageLinkRouter2Router();
+			stats.UpdateBufferLoad(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, i, Relays[i].buffer.GetLoad());
 		}
 	}
 }
@@ -89,7 +90,6 @@ void Router::TXProcess()
 		start_from_port = (start_from_port + 1) % Relays.size();
 
 		// 2nd phase: Forwarding
-		//if (local_id==6) LOG<<"*TX*****local_id="<<local_id<<"__ack_tx[0]= "<<ack_tx[0].read()<<endl;
 		for (int32_t i = 0; i < Relays.size(); i++)
 		{
 			Relay& rel = Relays[i];
@@ -117,6 +117,8 @@ void Router::TXProcess()
 						reservation_table.Release(i);
 
 					/* Power & Stats ------------------------------------------------- */
+					stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+
 					power.r2rLink();
 
 					power.bufferRouterPop();
@@ -125,7 +127,7 @@ void Router::TXProcess()
 					if (out_port == LocalRelayID)
 					{
 						power.networkInterface();
-						LOG << "Consumed flit " << flit << endl;
+						//LOG << "Consumed flit " << flit << endl;
 						stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
 						if (GlobalParams::max_volume_to_be_drained)
 						{
@@ -135,9 +137,9 @@ void Router::TXProcess()
 					}
 					else if (i != LocalRelayID) routed_flits++;
 					/* End Power & Stats ------------------------------------------------- */
-				   //LOG<<"END_OK_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 				}
 			}
+			else stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
 		} // for loop directions
 	}
 }
@@ -166,7 +168,6 @@ void Router::RXProcess()
 			// To accept a new flit, the following conditions must match:
 			// 1) there is an incoming request
 			// 2) there is a free slot in the input buffer of direction i
-			//LOG<<"****RX****DIRECTION ="<<i<<  endl;
 
 			if (rel.rx_req.read() == 1 - rel.rx_current_level)
 			{
@@ -178,23 +179,25 @@ void Router::RXProcess()
 				{
 					// Store the incoming flit in the circular buffer
 					rel.buffer.Push(received_flit);
-					LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc << "]" << endl;
+					//LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc << "]" << endl;
 
 					power.bufferRouterPush();
 
 					// Negate the old value for Alternating Bit Protocol (ABP)
-					//LOG<<"INVERTING CL FROM "<< current_level_rx[i]<< " TO "<<  1 - current_level_rx[i]<<endl;
 					rel.rx_current_level = 1 - rel.rx_current_level;
 
 					// if a new flit is injected from local PE
 					if (received_flit.src_id == local_id)
+					{
+						stats.AcceptFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
 						power.networkInterface();
+					}
 				}
 				else  // buffer full
 				{
 					// should not happen with the new TBufferFullStatus control signals    
 					// except for flit coming from local PE, which don't use it 
-					LOG << " Flit " << received_flit << " buffer full Input[" << i << "][" << vc << "]" << endl;
+					//LOG << " Flit " << received_flit << " buffer full Input[" << i << "][" << vc << "]" << endl;
 					assert(i == LocalRelayID);
 				}
 
@@ -208,13 +211,6 @@ void Router::RXProcess()
 }
 void Router::Update()
 {
-	 //if (!reset.read()/* && sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time > 4050*/)
-	 //{
-	 //	std::ofstream fout("log.txt", std::ios::app);
-	 //	for (auto& rel : Relays) fout << rel.buffer;
-	 //	fout << reservation_table;
-	 //}
-
 	TXProcess();
 	RXProcess();
 	PerCycleProcess();
@@ -223,14 +219,13 @@ void Router::Update()
 Router::Router(sc_module_name, int32_t id, size_t relays, double warm_up_time, uint32_t max_buffer_size,
 	RoutingAlgorithm& alg, SelectionStrategy& sel, RoutingTable& grt) : Relays("RouterRelays", relays + 1), 
 	LocalRelay(Relays[relays]), LocalRelayID(relays), Algorithm(alg), Strategy(sel), 
-	reservation_table(Relays.size())
+	reservation_table(Relays.size()), stats(id, warm_up_time, Relays.size())
 {
 	if (grt.IsValid()) routing_table = grt[id];
 	SC_METHOD(Update);
 	sensitive << reset << clock.pos();
 
 	local_id = id;
-	stats.configure(id, warm_up_time);
 
 	start_from_port = LocalRelayID;
 
@@ -256,9 +251,4 @@ bool Router::InCongestion() const
 	}
 
 	return false;
-}
-void Router::ShowBuffersStats(std::ostream& out) const
-{
-	for (int i = 0; i < Relays.size(); i++)
-			Relays[i].buffer.ShowStats(out);
 }

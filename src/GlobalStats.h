@@ -12,7 +12,6 @@
 #include <vector>
 #include <map>
 #include "NoC.h"
-#include "Tile.h"
 
 
 
@@ -20,10 +19,16 @@ class GlobalStats
 {
 private:
 	const NoC& Network;
+	const int32_t ChannelsCount;
 	void updatePowerBreakDown(std::map<std::string, double>& dst, PowerBreakdown* src);
 
 public:
-	GlobalStats(const NoC& _noc);
+	GlobalStats(const NoC& _noc, int32_t channels_count);
+
+	double GetMaxBufferStuckDelay() const;
+
+	double GetAverageBufferLoad(int32_t channel) const;
+	double GetAverageBufferLoad() const;
 
 	double getLastReceivedFlitTime();
 
@@ -45,7 +50,8 @@ public:
 	double getMaxDelay(int src_id, int dst_id);
 
 	// Returns the aggregated average throughput (flits/cycles)
-	double getAggregatedThroughput();
+	double getAggregatedThroughput() const; 
+	double getAggregatedAcceptance() const;
 
 	// Returns the average throughput per IP (flit/cycles/IP)
 	double getThroughput();
@@ -61,7 +67,8 @@ public:
 	unsigned int getReceivedPackets();
 
 	// Returns the total number of received flits
-	unsigned int getReceivedFlits();
+	unsigned int getReceivedFlits() const;
+	unsigned int getAcceptedFlits() const;
 
 	// Returns the total dyamic power
 	double getDynamicPower();
@@ -72,9 +79,7 @@ public:
 	double getTotalPower() { return getDynamicPower() + getStaticPower(); }
 
 	// Shows global statistics
-	void showStats(std::ostream& out = std::cout, bool detailed = false);
-
-	void showBufferStats(std::ostream& out);
+	void showStats(std::ostream& out = std::cout);
 
 	void showPowerBreakDown(std::ostream& out);
 

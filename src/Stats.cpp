@@ -1,33 +1,68 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the implementation of the statistics
- */
-
 #include "Stats.h"
 
- // TODO: nan in averageDelay
+
+
+Stats::Stats(int32_t node_id, double warm_up, int32_t buffers) :
+	AVGBufferLoad(buffers, std::make_pair(0.0, 0.0)),
+	LastBufferPopOrEmptyTime(buffers, -1.0)
+{
+	id = node_id;
+	warm_up_time = warm_up;
+	total_flits_accepted = 0;
+}
+
+void Stats::UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time)
+{
+	if (pop_time - GlobalParams::reset_time < warm_up_time)	return;
+	LastBufferPopOrEmptyTime[buffer] = pop_time;
+}
+
+double Stats::GetMinBufferPopOrEmptyTime() const
+{
+	double min = LastBufferPopOrEmptyTime[0];
+	for (int32_t i = 1; i < LastBufferPopOrEmptyTime.size(); i++)
+		if (min > LastBufferPopOrEmptyTime[i]) min = LastBufferPopOrEmptyTime[i];
+	return min;
+}
+
+void Stats::AcceptFlit(double arrival_time)
+{
+	if (arrival_time - GlobalParams::reset_time < warm_up_time)	return;
+	total_flits_accepted++;
+}
+int32_t Stats::GetAcceptedFlits() const
+{
+	return total_flits_accepted;
+}
+
+void Stats::UpdateBufferLoad(double time, int32_t buffer, double load)
+{
+	if (time - GlobalParams::reset_time < warm_up_time)	return;
+	AVGBufferLoad[buffer].first += 1.0;
+	AVGBufferLoad[buffer].second += load;
+}
+double Stats::GetAVGBufferLoad(int32_t channel, int32_t channels_count)
+{
+	auto load = std::make_pair(0.0, 0.0);
+	for (int i = 0; i < (AVGBufferLoad.size() - 1) / channels_count; i++)
+	{
+		auto cl = AVGBufferLoad[channel + i * channels_count];
+		load.first += cl.first;
+		load.second += cl.second;
+	}
+	return load.second / load.first;
+}
 
 double Stats::getLastReceivedFlitTime() const
 {
 	return last_received_flit_time;
 }
 
-void Stats::configure(const int node_id, const double _warm_up_time)
-{
-	id = node_id;
-	warm_up_time = _warm_up_time;
-}
-
-void Stats::receivedFlit(const double arrival_time, const Flit& flit)
+void Stats::receivedFlit(double arrival_time, const Flit& flit)
 {
 	//if (arrival_time - GlobalParams::reset_time < 560)	return;
-	last_received_flit_time = arrival_time - GlobalParams::reset_time;
 	if (arrival_time - GlobalParams::reset_time < warm_up_time)	return;
+	last_received_flit_time = arrival_time - GlobalParams::reset_time;
 
 	int i = searchCommHistory(flit.src_id);
 

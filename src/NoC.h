@@ -18,26 +18,25 @@
 
 
 
-class NoC
+class NoC : sc_module
 {
+	SC_HAS_PROCESS(NoC);
 private:
-	Tile::Relay BorderRelay;
+	RoutingAlgorithm* Algorithm;
+	SelectionStrategy* Strategy;
 
 public:
 	sc_clock clock;
 	sc_signal<bool> reset;
-
-	RoutingAlgorithm* Algorithm;
-	SelectionStrategy* Strategy;
 	std::vector<Tile*> Tiles;
 
 	// Global tables
 	RoutingTable GRTable;
 	GlobalTrafficTable GTTable;
 
-	NoC(const Configuration& config);
+	NoC(const Configuration& config, sc_module_name = "NoC");
 	~NoC();
 
-	// Support methods
-	Tile& SearchNode(int32_t id) const;
+	void Update();
+	friend std::ostream& operator<<(std::ostream& os, const NoC& network);
 };

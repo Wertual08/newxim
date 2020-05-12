@@ -85,5 +85,4 @@ public:
 
 	uint32_t GetRoutedFlits() const;	// Returns the number of routed flits 
 	bool InCongestion() const;
-	void ShowBuffersStats(std::ostream& out) const;
 };

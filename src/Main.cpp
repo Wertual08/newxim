@@ -24,11 +24,12 @@ int sc_main(int arg_num, char* arg_vet[])
 {
 	// TEMP
 	drained_volume = 0;
+	// TODO: channel utilization / buffer utilization / oldest flit
 
-	cout << "\t--------------------------------------------" << endl;
-	cout << "\t\tNoxim - the NoC Simulator" << endl;
-	cout << "\t\t(C) University of Catania" << endl;
-	cout << "\t--------------------------------------------" << endl;
+	cout << "\t--------------------------------------------\n";
+	cout << "\t\tNoxim - the NoC Simulator\n";
+	cout << "\t\t(C) University of Catania\n";
+	cout << "\t--------------------------------------------\n";
 
 	cout << "Catania V., Mineo A., Monteleone S., Palesi M., and Patti D. (2016) Cycle-Accurate Network on Chip Simulation with Noxim. ACM Trans. Model. Comput. Simul. 27, 1, Article 4 (August 2016), 25 pages. DOI: https://doi.org/10.1145/2953878" << endl;
 	cout << '\n' << '\n';
@@ -55,12 +56,12 @@ int sc_main(int arg_num, char* arg_vet[])
 	
 	// Close the simulation
 	cout << "Noxim simulation completed.";
-	cout << " (" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)\n";
-	cout << endl;
+	cout << " (" << static_cast<int32_t>(sc_time_stamp().to_double() / GlobalParams::clock_period_ps) << " cycles executed)\n";
+	cout << '\n';
 
 	// Show statistics
-	GlobalStats gs(Network);
-	gs.showStats(std::cout, GlobalParams::detailed);
+	GlobalStats gs(Network, Config.ChannelsCount());
+	gs.showStats(std::cout);
 
 
 	if ((GlobalParams::max_volume_to_be_drained > 0) && 
