@@ -51,64 +51,6 @@ static onullstream LOG;
 
 #endif
 
-// Output overloading
-
-inline ostream& operator <<(ostream& os, const Flit& flit)
-{
-	if (GlobalParams::verbose_mode == VERBOSE_HIGH) 
-	{
-		os << "### FLIT ###" << endl;
-		os << "Source Tile[" << flit.src_id << "]" << endl;
-		os << "Destination Tile[" << flit.dst_id << "]" << endl;
-		switch (flit.flit_type) {
-		case FLIT_TYPE_HEAD:
-			os << "Flit Type is HEAD" << endl;
-			break;
-		case FLIT_TYPE_BODY:
-			os << "Flit Type is BODY" << endl;
-			break;
-		case FLIT_TYPE_TAIL:
-			os << "Flit Type is TAIL" << endl;
-			break;
-		}
-		os << "Sequence no. " << flit.sequence_no << endl;
-		os << "Payload printing not implemented (yet)." << endl;
-		os << "Unix timestamp at packet generation " << flit.
-			timestamp << endl;
-		os << "Total number of hops from source to destination is " <<
-			flit.hop_no << endl;
-	}
-	else {
-		os << "(";
-		switch (flit.flit_type) {
-		case FLIT_TYPE_HEAD:
-			os << "H";
-			break;
-		case FLIT_TYPE_BODY:
-			os << "B";
-			break;
-		case FLIT_TYPE_TAIL:
-			os << "T";
-			break;
-		}
-
-		os << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ")";
-	}
-
-	return os;
-}
-
-inline ostream& operator<<(ostream& os, const ChannelStatus& status)
-{
-	char msg;
-	if (status.available)
-		msg = 'A';
-	else
-		msg = 'N';
-	os << msg << "(" << status.free_slots << ")";
-	return os;
-}
-
 // Trace overloading
 
 inline void sc_trace(sc_trace_file*& tf, const Flit& flit, std::string& name)
@@ -118,12 +60,6 @@ inline void sc_trace(sc_trace_file*& tf, const Flit& flit, std::string& name)
 	sc_trace(tf, flit.sequence_no, name + ".sequence_no");
 	sc_trace(tf, flit.timestamp, name + ".timestamp");
 	sc_trace(tf, flit.hop_no, name + ".hop_no");
-}
-
-inline void sc_trace(sc_trace_file*& tf, const ChannelStatus& bs, std::string& name)
-{
-	sc_trace(tf, bs.free_slots, name + ".free_slots");
-	sc_trace(tf, bs.available, name + ".available");
 }
 
 // Misc common functions

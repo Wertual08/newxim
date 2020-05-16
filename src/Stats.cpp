@@ -13,8 +13,13 @@ Stats::Stats(int32_t node_id, double warm_up, int32_t buffers) :
 
 void Stats::UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time)
 {
-	if (pop_time - GlobalParams::reset_time < warm_up_time)	return;
+	//if (pop_time - GlobalParams::reset_time < warm_up_time)	return;
 	LastBufferPopOrEmptyTime[buffer] = pop_time;
+}
+
+double Stats::GetBufferPopOrEmptyTime(int32_t buffer) const
+{
+	return LastBufferPopOrEmptyTime[buffer];
 }
 
 double Stats::GetMinBufferPopOrEmptyTime() const

@@ -74,16 +74,6 @@ struct RouteData
 	int32_t sequence_length;
 };
 
-struct ChannelStatus 
-{
-	int free_slots;		// occupied buffer slots
-	bool available;		// 
-	inline bool operator ==(const ChannelStatus& bs) const 
-	{
-		return (free_slots == bs.free_slots && available == bs.available);
-	};
-};
-
 // Flit -- Flit definition
 struct Flit 
 {
@@ -112,6 +102,18 @@ struct Flit
 			&& flit.use_low_voltage_path == use_low_voltage_path;
 	}
 };
+
+inline ostream& operator <<(ostream& os, const Flit& flit)
+{
+	os << '(';
+	switch (flit.flit_type) {
+	case FLIT_TYPE_HEAD: os << 'H'; break;
+	case FLIT_TYPE_BODY: os << 'B'; break;
+	case FLIT_TYPE_TAIL: os << 'T'; break;
+	}
+
+	return os << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ")";
+}
 
 
 struct PowerBreakdownEntry

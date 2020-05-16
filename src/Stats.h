@@ -33,6 +33,7 @@ public:
 	Stats(int32_t node_id, double warm_up, int32_t buffers);
 
 	void UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time);
+	double GetBufferPopOrEmptyTime(int32_t buffer) const;
 	double GetMinBufferPopOrEmptyTime() const;
 
 	void AcceptFlit(double arrival_time);

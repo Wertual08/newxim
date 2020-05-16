@@ -38,7 +38,6 @@ private:
 	std::string topology;
 	std::string topology_args;
 
-	std::string verbose_mode;
 	double r2r_link_length;
 	int32_t buffer_depth;
 	int32_t flit_size;
@@ -59,10 +58,10 @@ private:
 	int32_t stats_warm_up_time;
 	int32_t rnd_generator_seed;
 	double dyad_threshold;
-	uint32_t max_volume_to_be_drained;
 	Power power_configuration;
 	int32_t dim_x, dim_y;
 	int32_t channels_count;
+	bool report_buffers;
 
 	Graph graph;
 	RoutingTable table;
@@ -82,7 +81,6 @@ public:
 	const Graph& Topology() const;
 	const RoutingTable& GRTable() const;
 
-	const std::string& VerboseMode() const;
 	double R2RLinkLength() const;
 	int32_t BufferDepth() const;
 	int32_t FlitSize() const;
@@ -103,10 +101,10 @@ public:
 	int32_t ResetTime() const;
 	int32_t StatsWarmUpTime() const;
 	int32_t RndGeneratorSeed() const;
-	std::vector<std::pair<int, double>> Hotspots() const;
+	std::vector<std::pair<int32_t, double>> Hotspots() const;
 	double DyadThreshold() const;
-	uint32_t MaxVolumeToBeDrained() const;
 	const Power& PowerConfiguration() const;
+	bool ReportBuffers() const;
 
 	int32_t DimX() const;
 	int32_t DimY() const;

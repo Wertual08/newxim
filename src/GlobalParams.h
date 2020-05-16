@@ -80,7 +80,6 @@ struct PowerConfig
 
 struct GlobalParams 
 {
-	static std::string verbose_mode;
 	static double r2r_link_length;
 	static int buffer_depth;
 	static int flit_size;

@@ -15,20 +15,19 @@
 
 Buffer::Buffer()
 {
-	SetMaxBufferSize(GlobalParams::buffer_depth);
 }
 
-void Buffer::SetMaxBufferSize(uint32_t bms)
+void Buffer::SetMaxBufferSize(int32_t bms)
 {
 	assert(bms > 0);
 
 	max_buffer_size = bms;
 }
-uint32_t Buffer::GetMaxBufferSize() const
+int32_t Buffer::GetMaxBufferSize() const
 {
 	return max_buffer_size;
 }
-uint32_t Buffer::GetCurrentFreeSlots() const
+int32_t Buffer::GetCurrentFreeSlots() const
 {
 	return (GetMaxBufferSize() - Size());
 }
@@ -78,7 +77,7 @@ Flit Buffer::Front() const
 
 	return f;
 }
-uint32_t Buffer::Size() const
+int32_t Buffer::Size() const
 {
 	return buffer.size();
 }
@@ -100,28 +99,23 @@ double Buffer::GetLoad() const
 	return (double)Size() / (double)GetMaxBufferSize();
 }
 
-void Buffer::SetLabel(std::string l)
-{
-	label = l;
-}
-std::string Buffer::GetLabel() const
-{
-	return label;
-}
-
 std::ostream& operator<<(std::ostream& os, const Buffer& b)
 {
 	std::queue<Flit> m = b.buffer;
 
 	char t[] = "HBT";
 
-	os << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
-	os << b.label << " QUEUE *[";
-	while (!m.empty())
+	os << '[';
+	while (m.size() > 1)
 	{
 		Flit f = m.front();
 		m.pop();
-		os << t[f.flit_type] << f.sequence_no << "(" << f.src_id << "->" << f.dst_id << ") | ";
+		os << t[f.flit_type] << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << ") | ";
 	}
-	return os << "]*\n";
+	if (!m.empty())
+	{
+		Flit f = m.front();
+		os << t[f.flit_type] << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << ')';
+	}
+	return os << ']';
 }

@@ -11,6 +11,7 @@
 #pragma once
 #include <vector>
 #include <map>
+#include "Configuration.h"
 #include "NoC.h"
 
 
@@ -18,72 +19,58 @@
 class GlobalStats
 {
 private:
+	const Configuration& Config;
 	const NoC& Network;
-	const int32_t ChannelsCount;
-	void updatePowerBreakDown(std::map<std::string, double>& dst, PowerBreakdown* src);
+	void updatePowerBreakDown(std::map<std::string, double>& dst, PowerBreakdown* src) const;
 
-public:
-	GlobalStats(const NoC& _noc, int32_t channels_count);
-
-	double GetMaxBufferStuckDelay() const;
-
+	int32_t GetMaxBufferStuckDelay() const;
 	double GetAverageBufferLoad(int32_t channel) const;
 	double GetAverageBufferLoad() const;
-
-	double getLastReceivedFlitTime();
-
+	int32_t getLastReceivedFlitTime() const;
 	// Returns the aggregated average delay (cycles)
-	double getAverageDelay();
-
+	double getAverageDelay() const;
 	// Returns the aggragated average delay (cycles) for communication src_id->dst_id
-	double getAverageDelay(int src_id, int dst_id);
-
+	double getAverageDelay(int src_id, int dst_id) const;
 	// Returns the max delay
-	double getMaxDelay();
-
+	double getMaxDelay() const;
 	// Returns the max delay (cycles) experimented by destination
 	// node_id. Returns -1 if node_id is not destination of any
 	// communication
-	double getMaxDelay(int32_t node_id);
-
+	double getMaxDelay(int32_t node_id) const;
 	// Returns the max delay (cycles) for communication src_id->dst_id
-	double getMaxDelay(int src_id, int dst_id);
-
+	double getMaxDelay(int src_id, int dst_id) const;
 	// Returns the aggregated average throughput (flits/cycles)
-	double getAggregatedThroughput() const; 
+	double getAggregatedThroughput() const;
 	double getAggregatedAcceptance() const;
-
 	// Returns the average throughput per IP (flit/cycles/IP)
-	double getThroughput();
-
+	double getThroughput() const;
 	// Returns the average throughput considering only a active IP (flit/cycles/IP)
-	double getActiveThroughput();
-
+	double getActiveThroughput() const;
 	// Returns the aggregated average throughput (flits/cycles) for
 	// communication src_id->dst_id
 	double getAverageThroughput(int src_id, int dst_id);
-
 	// Returns the total number of received packets
-	unsigned int getReceivedPackets();
-
+	unsigned int getReceivedPackets() const;
 	// Returns the total number of received flits
 	unsigned int getReceivedFlits() const;
 	unsigned int getAcceptedFlits() const;
-
 	// Returns the total dyamic power
-	double getDynamicPower();
+	double getDynamicPower() const;
 	// Returns the total static power
-	double getStaticPower();
-
+	double getStaticPower() const;
 	// Returns the total power
-	double getTotalPower() { return getDynamicPower() + getStaticPower(); }
+	double getTotalPower() const { return getDynamicPower() + getStaticPower(); }
+	double getReceivedIdealFlitRatio() const;
 
-	// Shows global statistics
-	void showStats(std::ostream& out = std::cout);
+	int32_t GetTotalFlitsGenerated() const;
+
+	void ShowBuffers(std::ostream& out) const;
+
+public:
+	GlobalStats(const NoC& network, const Configuration& config);
 
 	void showPowerBreakDown(std::ostream& out);
 
-	void showPowerManagerStats(std::ostream& out);
-
-	double getReceivedIdealFlitRatio();
+	// Shows global statistics
+	friend std::ostream& operator<<(std::ostream& out, const GlobalStats& gs);
 };

@@ -32,11 +32,11 @@ void ProcessingElement::rxProcess()
 		ack_rx.write(current_level_rx);
 	}
 }
-
 void ProcessingElement::txProcess()
 {
 	if (reset.read()) 
 	{
+		TotalFlitsGenerated = 0;
 		req_tx.write(0);
 		current_level_tx = 0;
 		transmittedAtPreviousCycle = false;
@@ -47,6 +47,8 @@ void ProcessingElement::txProcess()
 
 		if (canShot(packet))
 		{
+			if (sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time > 
+				GlobalParams::stats_warm_up_time) TotalFlitsGenerated += packet.size;
 			packet_queue.push(packet);
 			transmittedAtPreviousCycle = true;
 		}
@@ -140,7 +142,6 @@ bool ProcessingElement::canShot(Packet& packet)
 	return shot;
 }
 
-
 Packet ProcessingElement::trafficLocal()
 {
 	Packet p;
@@ -174,33 +175,6 @@ Packet ProcessingElement::trafficRandom()
 
 	return p;
 }
-// TODO: for testing only
-Packet ProcessingElement::trafficTest()
-{
-	Packet p;
-	p.src_id = local_id;
-	p.dst_id = 10;
-
-	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-	p.size = p.flit_left = getRandomSize();
-	p.vc_id = 0;
-
-	return p;
-}
-
-void ProcessingElement::setBit(int& x, int w, int v)
-{
-	int mask = 1 << w;
-
-	if (v == 1) x = x | mask;
-	else if (v == 0) x = x & ~mask;
-	else assert(false);
-}
-
-int ProcessingElement::getBit(int x, int w)
-{
-	return (x >> w) & 1;
-}
 
 int ProcessingElement::getRandomSize()
 {
@@ -210,5 +184,10 @@ int ProcessingElement::getRandomSize()
 unsigned int ProcessingElement::getQueueSize() const
 {
 	return packet_queue.size();
+}
+
+int32_t ProcessingElement::GetTotalFlitsGenerated() const
+{
+	return TotalFlitsGenerated;
 }
 

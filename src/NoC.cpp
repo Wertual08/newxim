@@ -16,6 +16,7 @@
 #include "RoutingSelection/RoutingMeshXY.h"
 #include "RoutingSelection/RoutingTorusXY.h"
 #include "RoutingSelection/RoutingChannelIndexStep.h"
+#include "RoutingSelection/RoutingTests.h"
 
 
 
@@ -34,7 +35,7 @@ NoC::NoC(const Configuration& config, sc_module_name) :
 	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
 	else if (config.RoutingAlgorithm() == "MESH_XY") Algorithm = new RoutingMeshXY(config.DimX(), config.DimY(), config.Topology());
 	else if (config.RoutingAlgorithm() == "TORUS_XY") Algorithm = new RoutingTorusXY(config.DimX(), config.DimY(), config.Topology());
-	else if (config.RoutingAlgorithm() == "ROUTING_CHANNEL_INDEX_STEP") Algorithm = new RoutingChannelIndexStep(config.Topology());
+	else Algorithm = FindTestRouting(config.RoutingAlgorithm(), config);
 	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
 	else if (config.SelectionStrategy() == "BUFFER_LEVEL") Strategy = new SelectionBufferLevel();
 	else if (config.SelectionStrategy() == "KEEP_SPACE") Strategy = new SelectionKeepSpace();

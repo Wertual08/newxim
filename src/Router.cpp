@@ -25,18 +25,17 @@ void Router::PerCycleProcess()
 	{
 		for (size_t i = 0; i < Relays.size(); i++)
 			Relays[i].free_slots.write(Relays[i].buffer.GetMaxBufferSize());
+		return;
 	}
-	else 
-	{
-		Strategy.PerCycleProcess(*this);
 
-		power.leakageRouter();
-		for (int i = 0; i < Relays.size(); i++)
-		{
-			power.leakageBufferRouter();
-			power.leakageLinkRouter2Router();
-			stats.UpdateBufferLoad(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, i, Relays[i].buffer.GetLoad());
-		}
+	Strategy.PerCycleProcess(*this);
+
+	power.leakageRouter();
+	for (int i = 0; i < Relays.size(); i++)
+	{
+		power.leakageBufferRouter();
+		power.leakageLinkRouter2Router();
+		stats.UpdateBufferLoad(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, i, Relays[i].buffer.GetLoad());
 	}
 }
 void Router::TXProcess()
@@ -49,99 +48,89 @@ void Router::TXProcess()
 			Relays[i].tx_req.write(0);
 			Relays[i].tx_current_level = 0;
 		}
+		return;
 	}
-	else
+	// 1st phase: Reservation
+	for (int32_t j = 0; j < Relays.size(); j++)
 	{
-		// 1st phase: Reservation
-		for (int j = 0; j < Relays.size(); j++)
+		int32_t i = (start_from_port + j) % Relays.size();
+		Relay& rel = Relays[i];
+
+		if (!rel.buffer.IsEmpty())
 		{
-			int i = (start_from_port + j) % Relays.size();
-			Relay& rel = Relays[i];
+			Flit flit = rel.buffer.Front();
+			power.bufferRouterFront();
 
-			// Uncomment to enable deadlock checking on buffers. 
-			// Please also set the appropriate threshold.
-			// buffer[i].deadlockCheck();
-			if (!rel.buffer.IsEmpty())
+			if (flit.flit_type == FLIT_TYPE_HEAD)
 			{
-				Flit flit = rel.buffer.Front();
-				power.bufferRouterFront();
-
-				if (flit.flit_type == FLIT_TYPE_HEAD)
-				{
-					// prepare data for routing
-					RouteData route_data;
-					route_data.hop_no = flit.hop_no;
-					route_data.current_id = local_id;
-					route_data.src_id = flit.src_id;
-					route_data.dst_id = flit.dst_id;
-					route_data.dir_in = i;
-					route_data.sequence_length = flit.sequence_length;
+				// prepare data for routing
+				RouteData route_data;
+				route_data.hop_no = flit.hop_no;
+				route_data.current_id = local_id;
+				route_data.src_id = flit.src_id;
+				route_data.dst_id = flit.dst_id;
+				route_data.dir_in = i;
+				route_data.sequence_length = flit.sequence_length;
 				
-					// TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
-					int32_t out = PerformRoute(route_data);
-					if (out < 0) continue;
+				// TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
+				int32_t out = PerformRoute(route_data);
+				if (out < 0) continue;
 
-					if (!reservation_table.Reserved(out))
-						reservation_table.Reserve(i, out);
-				}
+				if (!reservation_table.Reserved(out))
+					reservation_table.Reserve(i, out);
 			}
 		}
-
-		start_from_port = (start_from_port + 1) % Relays.size();
-
-		// 2nd phase: Forwarding
-		for (int32_t i = 0; i < Relays.size(); i++)
-		{
-			Relay& rel = Relays[i];
-
-			if (!rel.buffer.IsEmpty())
-			{
-				int32_t res = reservation_table.Reservation(i);
-				if (res < 0) continue;
-
-				int32_t out_port = res;
-				Relay& out_rel = Relays[out_port];
-
-				Flit flit = rel.buffer.Front();
-
-				bool buf_stat = out_rel.tx_buffer_full_status.read();
-
-				if ((out_rel.tx_current_level == out_rel.tx_ack.read()) && (buf_stat == false))
-				{
-					out_rel.tx_flit.write(flit);
-					out_rel.tx_current_level = 1 - out_rel.tx_current_level;
-					out_rel.tx_req.write(out_rel.tx_current_level);
-					rel.buffer.Pop();
-
-					if (flit.flit_type == FLIT_TYPE_TAIL)
-						reservation_table.Release(i);
-
-					/* Power & Stats ------------------------------------------------- */
-					stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
-
-					power.r2rLink();
-
-					power.bufferRouterPop();
-					power.crossBar();
-
-					if (out_port == LocalRelayID)
-					{
-						power.networkInterface();
-						//LOG << "Consumed flit " << flit << endl;
-						stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
-						if (GlobalParams::max_volume_to_be_drained)
-						{
-							if (drained_volume >= GlobalParams::max_volume_to_be_drained) sc_stop();
-							else drained_volume++;
-						}
-					}
-					else if (i != LocalRelayID) routed_flits++;
-					/* End Power & Stats ------------------------------------------------- */
-				}
-			}
-			else stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
-		} // for loop directions
 	}
+
+	start_from_port = (start_from_port + 1) % Relays.size();
+
+	// 2nd phase: Forwarding
+	for (int32_t i = 0; i < Relays.size(); i++)
+	{
+		Relay& rel = Relays[i];
+
+		if (!rel.buffer.IsEmpty())
+		{
+			int32_t res = reservation_table.Reservation(i);
+			if (res < 0) continue;
+
+			int32_t out_port = res;
+			Relay& out_rel = Relays[out_port];
+
+			bool buf_stat = out_rel.tx_buffer_full_status.read();
+
+			if ((out_rel.tx_current_level == out_rel.tx_ack.read()) && !buf_stat)
+			{
+
+				Flit flit = rel.buffer.Pop();
+				flit.hop_no++;
+				out_rel.tx_flit.write(flit);
+				out_rel.tx_current_level = 1 - out_rel.tx_current_level;
+				out_rel.tx_req.write(out_rel.tx_current_level);
+					
+
+				if (flit.flit_type == FLIT_TYPE_TAIL)
+					reservation_table.Release(i);
+
+				/* Power & Stats ------------------------------------------------- */
+				stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+
+				power.r2rLink();
+
+				power.bufferRouterPop();
+				power.crossBar();
+
+				if (out_port == LocalRelayID)
+				{
+					power.networkInterface();
+					//LOG << "Consumed flit " << flit << endl;
+					stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
+				}
+				/* End Power & Stats ------------------------------------------------- */
+			}
+		}
+		else stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+	} // for loop directions
 }
 void Router::RXProcess()
 {
@@ -154,63 +143,65 @@ void Router::RXProcess()
 			Relays[i].rx_current_level = 0;
 			Relays[i].rx_buffer_full_status.write(false);
 		}
-
-		routed_flits = 0;
+		return;
 	}
-	else
+
+	// This process simply sees a flow of incoming flits. All arbitration
+	// and wormhole related issues are addressed in the txProcess()
+	//assert(false);
+	for (size_t i = 0; i < Relays.size(); i++)
 	{
-		// This process simply sees a flow of incoming flits. All arbitration
-		// and wormhole related issues are addressed in the txProcess()
-		//assert(false);
-		for (size_t i = 0; i < Relays.size(); i++)
+		Relay& rel = Relays[i];
+		// To accept a new flit, the following conditions must match:
+		// 1) there is an incoming request
+		// 2) there is a free slot in the input buffer of direction i
+
+		if (rel.rx_req.read() == 1 - rel.rx_current_level)
 		{
-			Relay& rel = Relays[i];
-			// To accept a new flit, the following conditions must match:
-			// 1) there is an incoming request
-			// 2) there is a free slot in the input buffer of direction i
+			Flit received_flit = rel.rx_flit.read();
 
-			if (rel.rx_req.read() == 1 - rel.rx_current_level)
+			int vc = received_flit.vc_id;
+
+			if (!rel.buffer.IsFull())
 			{
-				Flit received_flit = rel.rx_flit.read();
+				// Store the incoming flit in the circular buffer
+				rel.buffer.Push(received_flit);
+				//LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc << "]" << endl;
 
-				int vc = received_flit.vc_id;
+				power.bufferRouterPush();
 
-				if (!rel.buffer.IsFull())
+				// Negate the old value for Alternating Bit Protocol (ABP)
+				rel.rx_current_level = 1 - rel.rx_current_level;
+
+				// if a new flit is injected from local PE
+				if (received_flit.src_id == local_id)
 				{
-					// Store the incoming flit in the circular buffer
-					rel.buffer.Push(received_flit);
-					//LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc << "]" << endl;
-
-					power.bufferRouterPush();
-
-					// Negate the old value for Alternating Bit Protocol (ABP)
-					rel.rx_current_level = 1 - rel.rx_current_level;
-
-					// if a new flit is injected from local PE
-					if (received_flit.src_id == local_id)
-					{
-						stats.AcceptFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
-						power.networkInterface();
-					}
+					stats.AcceptFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+					power.networkInterface();
 				}
-				else  // buffer full
-				{
-					// should not happen with the new TBufferFullStatus control signals    
-					// except for flit coming from local PE, which don't use it 
-					//LOG << " Flit " << received_flit << " buffer full Input[" << i << "][" << vc << "]" << endl;
-					assert(i == LocalRelayID);
-				}
-
 			}
-			rel.rx_ack.write(rel.rx_current_level);
-			// updates the mask of VCs to prevent incoming data on full buffers
-			bool bfs = rel.buffer.IsFull();
-			rel.rx_buffer_full_status.write(bfs);
+			else  // buffer full
+			{
+				// should not happen with the new TBufferFullStatus control signals    
+				// except for flit coming from local PE, which don't use it 
+				//LOG << " Flit " << received_flit << " buffer full Input[" << i << "][" << vc << "]" << endl;
+				assert(i == LocalRelayID);
+			}
+
 		}
+		rel.rx_ack.write(rel.rx_current_level);
+		// updates the mask of VCs to prevent incoming data on full buffers
+		rel.rx_buffer_full_status.write(rel.buffer.IsFull());
 	}
 }
 void Router::Update()
 {
+	if (!reset.read() && 0)
+	{
+		std::ofstream fout("log.txt", std::ios::app);
+		for (auto& rel : Relays) fout << rel.buffer;
+		fout << reservation_table;
+	}
 	TXProcess();
 	RXProcess();
 	PerCycleProcess();
@@ -230,16 +221,9 @@ Router::Router(sc_module_name, int32_t id, size_t relays, double warm_up_time, u
 	start_from_port = LocalRelayID;
 
 	for (size_t i = 0; i < Relays.size(); i++)
-	{
 		Relays[i].buffer.SetMaxBufferSize(max_buffer_size);
-		Relays[i].buffer.SetLabel(std::string(name()) + "->buffer[" + i_to_string(i) + "]");
-	}
 }
 
-uint32_t Router::GetRoutedFlits() const
-{
-	return routed_flits;
-}
 bool Router::InCongestion() const
 {
 	for (size_t i = 0; i < Relays.size() - 1; i++)

@@ -21,6 +21,7 @@ class ProcessingElement : public sc_module
 {
 	SC_HAS_PROCESS(ProcessingElement);
 private:
+	int32_t TotalFlitsGenerated;
 	int32_t MaxID;
 
 public:
@@ -52,7 +53,6 @@ public:
 	void txProcess();				// The transmitting process
 	bool canShot(Packet& packet);	// True when the packet must be shot
 	Flit nextFlit();				// Take the next flit of the current packet
-	Packet trafficTest();			// used for testing traffic
 	Packet trafficRandom();			// Random destination distribution
 	Packet trafficLocal();			// Random with locality
 
@@ -62,8 +62,6 @@ public:
 
 	int randInt(int min, int max);		// Extracts a random integer number between min and max
 	int getRandomSize();				// Returns a random size in flits for the packet
-	void setBit(int& x, int w, int v);
-	int getBit(int x, int w);
 
 	unsigned int getQueueSize() const;
 
@@ -72,8 +70,9 @@ public:
 	{
 		SC_METHOD(rxProcess);
 		sensitive << reset << clock.pos();
-
 		SC_METHOD(txProcess);
 		sensitive << reset << clock.pos();
 	}
+
+	int32_t GetTotalFlitsGenerated() const;
 };

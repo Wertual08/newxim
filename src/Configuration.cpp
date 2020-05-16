@@ -288,9 +288,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		std::cerr << "ERROR at line " << pe.mark.line + 1 << " column " << pe.mark.column + 1 << ": " << pe.msg << ". Please check identation.\n";
 		exit(0);
 	}
-
-	// Initialize global configuration parameters (can be overridden with command-line arguments)
-	verbose_mode = ReadParam<std::string>(config, "verbose_mode");
+	
 
 	r2r_link_length = ReadParam<double>(config, "r2r_link_length");
 	buffer_depth = ReadParam<int32_t>(config, "buffer_depth");
@@ -307,7 +305,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	stats_warm_up_time = ReadParam<int32_t>(config, "stats_warm_up_time");
 	rnd_generator_seed = ReadParam<int32_t>(config, "rnd_generator_seed", time(0));
 	dyad_threshold = ReadParam<double>(config, "dyad_threshold");
-	max_volume_to_be_drained = ReadParam<uint32_t>(config, "max_volume_to_be_drained");
+	report_buffers = ReadParam<bool>(config, "report_buffers", false);
 
 	traffic_distribution = ReadParam<std::string>(config, "traffic_distribution");
 	if (traffic_distribution == "TRAFFIC_TABLE_BASED") 
@@ -382,6 +380,22 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 				}
 			}
 		}
+		else if (topology == "TREE")
+		{
+			int32_t nodes_count = args[0].as<int32_t>();
+			int32_t subnodes_count = args[1].as<int32_t>();
+			graph.resize(nodes_count);
+			for (int32_t i = 0; i < graph.size(); i++)
+			{
+				if (i * subnodes_count + 1 >= graph.size()) break;
+				for (int32_t j = 1; j <= subnodes_count; j++)
+				{
+					if (i * subnodes_count + j >= graph.size()) break;
+					graph[i].push_back(i * subnodes_count + j, channels_count);
+					graph[i * subnodes_count + j].push_back(i, channels_count);
+				}
+			}
+		}
 	}
 	catch (...)
 	{
@@ -390,26 +404,56 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	}
 	try
 	{
+
 		const auto& node = config["routing_table"];
 		if (node.IsDefined())
 		{
 			if (node.IsSequence())
 			{
-				for (int32_t i = 0; i < node.size(); i++)
+				bool id_based = false;
+				if (config["routing_table_id_based"].IsDefined()) 
+					id_based = config["routing_table_id_based"].as<bool>();
+				if (id_based)
 				{
-					const auto& branch = node[i];
-					RoutingTable::Node rnode;
-					for (int32_t j = 0; j < branch.size(); j++)
+					for (int32_t i = 0; i < node.size(); i++)
 					{
-						if (branch[j].IsSequence())
+						const auto& branch = node[i];
+						RoutingTable::Node rnode;
+						for (int32_t j = 0; j < branch.size(); j++)
 						{
-							rnode.push_back(std::vector<int32_t>());
-							for (int32_t k = 0; k < branch[j].size(); k++)
-								rnode[j].push_back(branch[j][k].as<int32_t>());
+							if (j == i) rnode.push_back(std::vector<int32_t>(1, graph[i].size()));
+							else if (branch[j].IsSequence())
+							{
+								rnode.push_back(std::vector<int32_t>());
+								for (int32_t k = 0; k < branch[j].size(); k++)
+								{
+									auto links = graph[i].links_to(branch[j][k].as<int32_t>());
+									for (int32_t l : links) rnode[j].push_back(l);
+								}
+							}
+							else rnode.push_back(graph[i].links_to(branch[j].as<int32_t>()));
 						}
-						else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
+						table.push_back(std::move(rnode));
 					}
-					table.push_back(std::move(rnode));
+				}
+				else
+				{
+					for (int32_t i = 0; i < node.size(); i++)
+					{
+						const auto& branch = node[i];
+						RoutingTable::Node rnode;
+						for (int32_t j = 0; j < branch.size(); j++)
+						{
+							if (branch[j].IsSequence())
+							{
+								rnode.push_back(std::vector<int32_t>());
+								for (int32_t k = 0; k < branch[j].size(); k++)
+									rnode[j].push_back(branch[j][k].as<int32_t>());
+							}
+							else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
+						}
+						table.push_back(std::move(rnode));
+					}
 				}
 			}
 			else
@@ -441,7 +485,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	Check();
 
 	// Show configuration
-	if (verbose_mode > VERBOSE_OFF) Show();
+	// Show();
 }
 void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 {
@@ -451,9 +495,7 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 	{
 		for (int32_t i = 1; i < arg_num; i++)
 		{
-			if (!strcmp(arg_vet[i], "-verbose"))
-				verbose_mode = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-buffer")) buffer_depth = atoi(arg_vet[++i]);
+			if (!strcmp(arg_vet[i], "-buffer")) buffer_depth = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-flit")) flit_size = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-size"))
 			{
@@ -517,7 +559,6 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 			}
 			else if (!strcmp(arg_vet[i], "-warmup")) stats_warm_up_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-seed")) rnd_generator_seed = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-volume")) max_volume_to_be_drained = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-sim")) simulation_time = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power")) i++;
 			else {
@@ -558,7 +599,7 @@ void Configuration::Check()
 		exit(1);
 	}
 
-	if (packet_injection_rate <= 0.0 || packet_injection_rate > 1.0) 
+	if (packet_injection_rate < 0.0 || packet_injection_rate > 1.0) 
 	{
 		std::cerr << "Error: packet injection rate mmust be in the interval ]0,1]\n";
 		exit(1);
@@ -593,8 +634,6 @@ void Configuration::Show() const
 {
 	std::cout 
 		<< "Using the following configuration: \n"
-		<< "- verbose_mode = " << verbose_mode << '\n'
-		// << "- trace_filename = " << trace_filename << '\n'
 		<< "- buffer_depth = " << buffer_depth << '\n'
 		<< "- max_packet_size = " << max_packet_size << '\n'
 		<< "- routing_algorithm = " << routing_algorithm << '\n'
@@ -617,10 +656,6 @@ const RoutingTable& Configuration::GRTable() const
 	return table;
 }
 
-const std::string& Configuration::VerboseMode() const
-{
-	return verbose_mode;
-}
 double Configuration::R2RLinkLength() const
 {
 	return r2r_link_length;
@@ -701,13 +736,13 @@ double Configuration::DyadThreshold() const
 {
 	return dyad_threshold;
 }
-uint32_t Configuration::MaxVolumeToBeDrained() const
-{
-	return max_volume_to_be_drained;
-}
 const Configuration::Power& Configuration::PowerConfiguration() const
 {
 	return power_configuration;
+}
+bool Configuration::ReportBuffers() const
+{
+	return report_buffers;
 }
 
 int32_t Configuration::DimX() const
@@ -725,5 +760,5 @@ int32_t Configuration::ChannelsCount() const
 
 double Configuration::TimeStamp() const
 {
-	return sc_time_stamp().to_double() / clock_period_ps;
+	return sc_time_stamp().to_double() / clock_period_ps - reset_time;
 }

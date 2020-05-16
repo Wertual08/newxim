@@ -24,6 +24,7 @@ public:
 		std::vector<int32_t> links_to(int32_t id) const 
 		{
 			std::vector<int32_t> result;
+			result.reserve(2);
 			for (int32_t i = 0; i < Links.size(); i++)
 				if (Links[i] == id) result.push_back(i);
 			return std::move(result);

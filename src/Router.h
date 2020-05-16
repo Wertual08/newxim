@@ -20,14 +20,11 @@
 
 
 
-extern unsigned int drained_volume;
-
 class Router : public sc_module
 {
 	SC_HAS_PROCESS(Router);
 private:
 	int32_t start_from_port;	// Port from which to start the reservation cycle
-	uint32_t routed_flits;
 
 	RoutingAlgorithm& Algorithm;
 	SelectionStrategy& Strategy;
@@ -83,6 +80,5 @@ public:
 	Router(sc_module_name, int32_t id, size_t relays, double warm_up_time, uint32_t max_buffer_size,
 		RoutingAlgorithm& alg, SelectionStrategy& sel, RoutingTable& grt);
 
-	uint32_t GetRoutedFlits() const;	// Returns the number of routed flits 
 	bool InCongestion() const;
 };

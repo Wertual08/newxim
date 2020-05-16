@@ -10,8 +10,6 @@
 
 #include "GlobalParams.h"
 
-std::string GlobalParams::verbose_mode;
-
 double GlobalParams::r2r_link_length;
 int GlobalParams::buffer_depth;
 int GlobalParams::flit_size;
@@ -28,5 +26,4 @@ int GlobalParams::simulation_time;
 int GlobalParams::reset_time;
 int GlobalParams::stats_warm_up_time;
 double GlobalParams::dyad_threshold;
-unsigned int GlobalParams::max_volume_to_be_drained;
 PowerConfig GlobalParams::power_configuration;
