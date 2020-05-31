@@ -43,6 +43,7 @@ private:
 	int32_t flit_size;
 	int32_t min_packet_size;
 	int32_t max_packet_size;
+	std::string router_type;
 	std::string routing_algorithm;
 	std::string selection_strategy;
 	double packet_injection_rate;
@@ -87,6 +88,7 @@ public:
 	int32_t MinPacketSize() const;
 	int32_t MaxPacketSize() const;
 
+	const std::string& RouterType() const;
 	const std::string& RoutingAlgorithm() const;
 	const std::string& SelectionStrategy() const;
 	double PacketInjectionRate() const;

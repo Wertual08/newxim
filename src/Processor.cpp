@@ -8,14 +8,14 @@
  * This file contains the implementation of the processing element
  */
 
-#include "ProcessingElement.h"
+#include "Processor.h"
 
-int ProcessingElement::randInt(int min, int max)
+int Processor::randInt(int min, int max)
 {
 	return min + (int)((double)(max - min + 1) * rand() / (RAND_MAX + 1.0));
 }
 
-void ProcessingElement::rxProcess()
+void Processor::rxProcess()
 {
 	if (reset.read()) 
 	{
@@ -32,7 +32,7 @@ void ProcessingElement::rxProcess()
 		ack_rx.write(current_level_rx);
 	}
 }
-void ProcessingElement::txProcess()
+void Processor::txProcess()
 {
 	if (reset.read()) 
 	{
@@ -68,7 +68,7 @@ void ProcessingElement::txProcess()
 	}
 }
 
-Flit ProcessingElement::nextFlit()
+Flit Processor::nextFlit()
 {
 	Flit flit;
 	Packet packet = packet_queue.front();
@@ -95,7 +95,7 @@ Flit ProcessingElement::nextFlit()
 	return flit;
 }
 
-bool ProcessingElement::canShot(Packet& packet)
+bool Processor::canShot(Packet& packet)
 {
 	if (never_transmit) return false;
 	bool shot;
@@ -142,7 +142,7 @@ bool ProcessingElement::canShot(Packet& packet)
 	return shot;
 }
 
-Packet ProcessingElement::trafficLocal()
+Packet Processor::trafficLocal()
 {
 	Packet p;
 	p.src_id = local_id;
@@ -159,7 +159,7 @@ Packet ProcessingElement::trafficLocal()
 	return p;
 }
 
-Packet ProcessingElement::trafficRandom()
+Packet Processor::trafficRandom()
 {
 	Packet p;
 	p.src_id = local_id;
@@ -176,17 +176,17 @@ Packet ProcessingElement::trafficRandom()
 	return p;
 }
 
-int ProcessingElement::getRandomSize()
+int Processor::getRandomSize()
 {
 	return randInt(GlobalParams::min_packet_size, GlobalParams::max_packet_size);
 }
 
-unsigned int ProcessingElement::getQueueSize() const
+unsigned int Processor::getQueueSize() const
 {
 	return packet_queue.size();
 }
 
-int32_t ProcessingElement::GetTotalFlitsGenerated() const
+int32_t Processor::GetTotalFlitsGenerated() const
 {
 	return TotalFlitsGenerated;
 }

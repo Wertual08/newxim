@@ -1,20 +1,8 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the declaration of the router
- */
 #pragma once 
 #include <systemc.h>
 #include "DataStructs.h"
 #include "Buffer.h"
 #include "Stats.h"
-#include "RoutingTable.h"
-#include "ReservationTable.h"
-#include "Utils.h"
 #include "RoutingSelection/RoutingAlgorithm.h"
 #include "RoutingSelection/SelectionStrategy.h"
 
@@ -24,16 +12,16 @@ class Router : public sc_module
 {
 	SC_HAS_PROCESS(Router);
 private:
-	int32_t start_from_port;	// Port from which to start the reservation cycle
-
+	void Update();
 	RoutingAlgorithm& Algorithm;
 	SelectionStrategy& Strategy;
 
+protected:
+	int32_t start_from_port;			// Port from which to start the reservation cycle
+
 	int32_t PerformRoute(const RouteData& route_data);
-	void PerCycleProcess();
-	void TXProcess();			// The transmitting process
-	void RXProcess();			// The receiving process
-	void Update();
+	virtual void TXProcess() = 0;		// The transmitting process
+	virtual void RXProcess() = 0;		// The receiving process
 
 public:
 	struct Relay : sc_module
@@ -59,26 +47,22 @@ public:
 		{
 		}
 	};
-	sc_vector<Relay> Relays;
 
+	sc_vector<Relay> Relays;
 	Relay& LocalRelay;
 	const int32_t LocalRelayID;
 
-	ReservationTable reservation_table;		// Switch reservation table
-
 	// I/O Ports
-	sc_in_clk clock;			// The input clock for the router
-	sc_in<bool> reset;			// The reset signal for the router
+	sc_in_clk clock;					// The input clock for the router
+	sc_in<bool> reset;					// The reset signal for the router
 
 	// Registers
-	int32_t local_id;			// Unique ID
-	Stats stats;				// Statistics
+	const int32_t LocalID;				// Unique ID
+	Stats stats;						// Statistics
 	Power power;
 
-	RoutingTable::Node routing_table;		
-
-	Router(sc_module_name, int32_t id, size_t relays, double warm_up_time, uint32_t max_buffer_size,
-		RoutingAlgorithm& alg, SelectionStrategy& sel, RoutingTable& grt);
-
-	bool InCongestion() const;
+	Router(sc_module_name, int32_t id, size_t relays, int32_t max_buffer_size,
+		RoutingAlgorithm& alg, SelectionStrategy& sel);
 };
+
+

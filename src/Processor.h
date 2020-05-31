@@ -17,9 +17,9 @@
 
 
 
-class ProcessingElement : public sc_module
+class Processor : public sc_module
 {
-	SC_HAS_PROCESS(ProcessingElement);
+	SC_HAS_PROCESS(Processor);
 private:
 	int32_t TotalFlitsGenerated;
 	int32_t MaxID;
@@ -66,7 +66,7 @@ public:
 	unsigned int getQueueSize() const;
 
 	// Constructor
-	ProcessingElement(sc_module_name, int32_t max_id) : MaxID(max_id)
+	Processor(sc_module_name, int32_t max_id) : MaxID(max_id)
 	{
 		SC_METHOD(rxProcess);
 		sensitive << reset << clock.pos();

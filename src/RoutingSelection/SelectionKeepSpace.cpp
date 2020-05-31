@@ -10,10 +10,9 @@ int32_t SelectionKeepSpace::Apply(Router& router, const std::vector<int32_t>& di
 	for (int32_t i = 0; i < directions.size(); i++)
 	{
 		int32_t dir = directions[i];
-		bool available = !router.reservation_table.Reserved(dir);
 		int32_t free_slots = router.Relays[dir].free_slots_neighbor.read();
 
-		if (available && (route_data.dir_in != router.LocalRelayID || free_slots > route_data.sequence_length))
+		if (route_data.dir_in != router.LocalRelayID || free_slots > router.Relays.size())
 		{
 			if (free_slots > max_free_slots)
 			{

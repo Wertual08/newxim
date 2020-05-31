@@ -30,7 +30,8 @@ private:
 	int searchCommHistory(int src_id);
 
 public:
-	Stats(int32_t node_id, double warm_up, int32_t buffers);
+	Stats(int32_t node_id, int32_t buffers);
+	void SetWarmUpTime(double warm_up);
 
 	void UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time);
 	double GetBufferPopOrEmptyTime(int32_t buffer) const;

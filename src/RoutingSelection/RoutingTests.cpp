@@ -3,34 +3,35 @@
 
 
 
-RoutingAlgorithm* FindTestRouting(const std::string& name, const Configuration& config)
+std::unique_ptr<RoutingAlgorithm> FindTestRouting(const std::string& name, const Configuration& config, const RoutingTable& table)
 {
-    if (name == "TEST_RoutingChannelNextIDGraterCurrent") return new TEST_RoutingChannelNextIDGraterCurrent(config.Topology());
-    if (name == "TEST_RoutingChannelPrevIDGraterCurrent") return new TEST_RoutingChannelPrevIDGraterCurrent(config.Topology());
-    if (name == "TEST_RoutingChannelPrevIDGraterNext") return new TEST_RoutingChannelPrevIDGraterNext(config.Topology());
-    if (name == "TEST_RoutingChannelNextIDGraterCurrentDirectionInverse") return new TEST_RoutingChannelNextIDGraterCurrentDirectionInverse(config.Topology());
-    if (name == "TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse") return new TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse(config.Topology());
-    if (name == "TEST_RoutingChannelSourceID") return new TEST_RoutingChannelSourceID(config.Topology());
-    if (name == "TEST_RoutingChannelDestinationID") return new TEST_RoutingChannelDestinationID(config.Topology());
-    if (name == "TEST_RoutingChannelInputLinkLength") return new TEST_RoutingChannelInputLinkLength(config.Topology());
-    if (name == "TEST_RoutingChannelHopsGrater0") return new TEST_RoutingChannelHopsGrater0(config.Topology());
-    if (name == "TEST_RoutingChannelHopsGrater1") return new TEST_RoutingChannelHopsGrater1(config.Topology());
-    if (name == "TEST_RoutingChannelHopsGrater2") return new TEST_RoutingChannelHopsGrater2(config.Topology());
-    if (name == "TEST_RoutingChannelHopsSwitchNotMod2") return new TEST_RoutingChannelHopsSwitchNotMod2(config.Topology());
-    if (name == "TEST_RoutingChannelHopsSwitchNotMod3") return new TEST_RoutingChannelHopsSwitchNotMod3(config.Topology());
-    if (name == "TEST_RoutingChannelHopsSwitchNotMod4") return new TEST_RoutingChannelHopsSwitchNotMod4(config.Topology());
+    if (name == "TEST_RoutingChannelNextIDGraterCurrent") return std::make_unique<TEST_RoutingChannelNextIDGraterCurrent>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelPrevIDGraterCurrent") return std::make_unique<TEST_RoutingChannelPrevIDGraterCurrent>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelPrevIDGraterNext") return std::make_unique<TEST_RoutingChannelPrevIDGraterNext>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelNextIDGraterCurrentDirectionInverse") return std::make_unique<TEST_RoutingChannelNextIDGraterCurrentDirectionInverse>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse") return std::make_unique<TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelSourceID") return std::make_unique<TEST_RoutingChannelSourceID>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelDestinationID") return std::make_unique<TEST_RoutingChannelDestinationID>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelInputLinkLength") return std::make_unique<TEST_RoutingChannelInputLinkLength>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelHopsGrater0") return std::make_unique<TEST_RoutingChannelHopsGrater0>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelHopsGrater1") return std::make_unique<TEST_RoutingChannelHopsGrater1>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelHopsGrater2") return std::make_unique<TEST_RoutingChannelHopsGrater2>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelHopsSwitchNotMod2") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod2>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelHopsSwitchNotMod3") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod3>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelHopsSwitchNotMod4") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod4>(config.Topology(), table);
 	return nullptr;
 }
 
 
-TEST_RoutingChannelNextIDGraterCurrent::TEST_RoutingChannelNextIDGraterCurrent(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelNextIDGraterCurrent::TEST_RoutingChannelNextIDGraterCurrent(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
-std::vector<int32_t> TEST_RoutingChannelNextIDGraterCurrent::Route(Router& router, const RouteData& route_data)
+std::vector<int32_t> TEST_RoutingChannelNextIDGraterCurrent::Route(Router& router, const RouteData& route_data)  
 {
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t vc = 0;// prev_vc;
         int32_t next_id = TopologyGraph[route_data.current_id][r];
@@ -48,8 +49,9 @@ std::vector<int32_t> TEST_RoutingChannelNextIDGraterCurrent::Route(Router& route
 }
 
 
-TEST_RoutingChannelPrevIDGraterCurrent::TEST_RoutingChannelPrevIDGraterCurrent(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelPrevIDGraterCurrent::TEST_RoutingChannelPrevIDGraterCurrent(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelPrevIDGraterCurrent::Route(Router& router, const RouteData& route_data)
@@ -60,7 +62,7 @@ std::vector<int32_t> TEST_RoutingChannelPrevIDGraterCurrent::Route(Router& route
     if (route_data.dir_in < TopologyGraph[route_data.current_id].size())
         prev_id = TopologyGraph[route_data.current_id][route_data.dir_in];
    
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t vc = 0;
         int32_t next_id = TopologyGraph[route_data.current_id][r];
@@ -78,8 +80,9 @@ std::vector<int32_t> TEST_RoutingChannelPrevIDGraterCurrent::Route(Router& route
 }
 
 
-TEST_RoutingChannelPrevIDGraterNext::TEST_RoutingChannelPrevIDGraterNext(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelPrevIDGraterNext::TEST_RoutingChannelPrevIDGraterNext(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelPrevIDGraterNext::Route(Router& router, const RouteData& route_data)
@@ -90,7 +93,7 @@ std::vector<int32_t> TEST_RoutingChannelPrevIDGraterNext::Route(Router& router, 
     if (route_data.dir_in < TopologyGraph[route_data.current_id].size())
         prev_id = TopologyGraph[route_data.current_id][route_data.dir_in];
 
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t vc = 0;
         int32_t next_id = TopologyGraph[route_data.current_id][r];
@@ -108,8 +111,9 @@ std::vector<int32_t> TEST_RoutingChannelPrevIDGraterNext::Route(Router& router, 
 }
 
 
-TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::TEST_RoutingChannelNextIDGraterCurrentDirectionInverse(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::TEST_RoutingChannelNextIDGraterCurrentDirectionInverse(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::Route(Router& router, const RouteData& route_data)
@@ -117,7 +121,7 @@ std::vector<int32_t> TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::Rou
     std::vector<int32_t> result;
 
     int32_t dist = route_data.src_id - route_data.dst_id;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t vc = 0;
         int32_t next_id = TopologyGraph[route_data.current_id][r];
@@ -137,8 +141,9 @@ std::vector<int32_t> TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::Rou
 }
 
 
-TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::Route(Router& router, const RouteData& route_data)
@@ -150,15 +155,15 @@ std::vector<int32_t> TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::Rou
         prev_id = TopologyGraph[route_data.current_id][route_data.dir_in];
 
     int32_t dist = route_data.src_id - route_data.dst_id;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t vc = 0;// prev_vc;
         int32_t next_id = TopologyGraph[route_data.current_id][r];
 
-        if (dist > 0 && next_id > route_data.current_id) vc = 0;
-        if (dist > 0 && next_id < route_data.current_id) vc = 1;
-        if (dist < 0 && next_id > route_data.current_id) vc = 1;
-        if (dist < 0 && next_id < route_data.current_id) vc = 0;
+        if (dist > 0 && prev_id > route_data.current_id) vc = 0;
+        if (dist > 0 && prev_id < route_data.current_id) vc = 1;
+        if (dist < 0 && prev_id > route_data.current_id) vc = 1;
+        if (dist < 0 && prev_id < route_data.current_id) vc = 0;
 
         if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
@@ -170,15 +175,16 @@ std::vector<int32_t> TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::Rou
 }
 
 
-TEST_RoutingChannelSourceID::TEST_RoutingChannelSourceID(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelSourceID::TEST_RoutingChannelSourceID(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelSourceID::Route(Router& router, const RouteData& route_data)
 {
     std::vector<int32_t> result;
     int32_t vc = route_data.src_id < TopologyGraph.size() / 2 ? 0 : 1;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
 
@@ -191,15 +197,16 @@ std::vector<int32_t> TEST_RoutingChannelSourceID::Route(Router& router, const Ro
 }
 
 
-TEST_RoutingChannelDestinationID::TEST_RoutingChannelDestinationID(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelDestinationID::TEST_RoutingChannelDestinationID(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelDestinationID::Route(Router& router, const RouteData& route_data)
 {
     std::vector<int32_t> result;
     int32_t vc = route_data.dst_id < TopologyGraph.size() / 2 ? 0 : 1;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
 
@@ -212,8 +219,9 @@ std::vector<int32_t> TEST_RoutingChannelDestinationID::Route(Router& router, con
 }
 
 
-TEST_RoutingChannelInputLinkLength::TEST_RoutingChannelInputLinkLength(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelInputLinkLength::TEST_RoutingChannelInputLinkLength(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelInputLinkLength::Route(Router& router, const RouteData& route_data)
@@ -233,7 +241,7 @@ std::vector<int32_t> TEST_RoutingChannelInputLinkLength::Route(Router& router, c
     if (abs(prev_id - route_data.current_id) == max_length) vc = 1;
 
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
 
@@ -246,15 +254,16 @@ std::vector<int32_t> TEST_RoutingChannelInputLinkLength::Route(Router& router, c
 }
 
 
-TEST_RoutingChannelHopsGrater0::TEST_RoutingChannelHopsGrater0(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelHopsGrater0::TEST_RoutingChannelHopsGrater0(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelHopsGrater0::Route(Router& router, const RouteData& route_data)
 {
     int32_t vc = route_data.hop_no <= 0 ? 0 : 1;
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
         if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())
@@ -266,15 +275,16 @@ std::vector<int32_t> TEST_RoutingChannelHopsGrater0::Route(Router& router, const
 }
 
 
-TEST_RoutingChannelHopsGrater1::TEST_RoutingChannelHopsGrater1(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelHopsGrater1::TEST_RoutingChannelHopsGrater1(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelHopsGrater1::Route(Router& router, const RouteData& route_data)
 {
     int32_t vc = route_data.hop_no <= 1 ? 0 : 1;
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
         if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())
@@ -286,15 +296,16 @@ std::vector<int32_t> TEST_RoutingChannelHopsGrater1::Route(Router& router, const
 }
 
 
-TEST_RoutingChannelHopsGrater2::TEST_RoutingChannelHopsGrater2(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelHopsGrater2::TEST_RoutingChannelHopsGrater2(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelHopsGrater2::Route(Router& router, const RouteData& route_data)
 {
     int32_t vc = route_data.hop_no <= 2 ? 0 : 1;
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
         if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())
@@ -306,8 +317,9 @@ std::vector<int32_t> TEST_RoutingChannelHopsGrater2::Route(Router& router, const
 }
 
 
-TEST_RoutingChannelHopsSwitchNotMod2::TEST_RoutingChannelHopsSwitchNotMod2(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelHopsSwitchNotMod2::TEST_RoutingChannelHopsSwitchNotMod2(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod2::Route(Router& router, const RouteData& route_data)
@@ -322,7 +334,7 @@ std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod2::Route(Router& router,
 
     int32_t vc = route_data.hop_no % 2 ? prev_vc : !prev_vc;
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
         if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())
@@ -334,8 +346,9 @@ std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod2::Route(Router& router,
 }
 
 
-TEST_RoutingChannelHopsSwitchNotMod3::TEST_RoutingChannelHopsSwitchNotMod3(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelHopsSwitchNotMod3::TEST_RoutingChannelHopsSwitchNotMod3(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod3::Route(Router& router, const RouteData& route_data)
@@ -350,7 +363,7 @@ std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod3::Route(Router& router,
 
     int32_t vc = route_data.hop_no % 3 ? prev_vc : !prev_vc;
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
         if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())
@@ -362,8 +375,9 @@ std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod3::Route(Router& router,
 }
 
 
-TEST_RoutingChannelHopsSwitchNotMod4::TEST_RoutingChannelHopsSwitchNotMod4(const Graph& graph) :
-    TopologyGraph(graph)
+TEST_RoutingChannelHopsSwitchNotMod4::TEST_RoutingChannelHopsSwitchNotMod4(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
 {
 }
 std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod4::Route(Router& router, const RouteData& route_data)
@@ -378,7 +392,7 @@ std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod4::Route(Router& router,
 
     int32_t vc = route_data.hop_no % 4 ? prev_vc : !prev_vc;
     std::vector<int32_t> result;
-    for (int32_t r : router.routing_table[route_data.dst_id])
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {
         int32_t next_id = TopologyGraph[route_data.current_id][r];
         if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())

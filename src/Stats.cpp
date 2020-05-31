@@ -2,13 +2,16 @@
 
 
 
-Stats::Stats(int32_t node_id, double warm_up, int32_t buffers) :
+Stats::Stats(int32_t node_id, int32_t buffers) :
 	AVGBufferLoad(buffers, std::make_pair(0.0, 0.0)),
 	LastBufferPopOrEmptyTime(buffers, -1.0)
 {
 	id = node_id;
-	warm_up_time = warm_up;
 	total_flits_accepted = 0;
+}
+void Stats::SetWarmUpTime(double warm_up)
+{
+	warm_up_time = warm_up;
 }
 
 void Stats::UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time)

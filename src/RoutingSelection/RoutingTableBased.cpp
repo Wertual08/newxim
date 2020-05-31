@@ -2,7 +2,11 @@
 
 
 
-std::vector<int32_t> RoutingTableBased::Route(Router& router, const RouteData& routeData)
+RoutingTableBased::RoutingTableBased(const RoutingTable& table) : Table(table)
 {
-    return router.routing_table[routeData.dst_id];
+}
+
+std::vector<int32_t> RoutingTableBased::Route(Router& router, const RouteData& route_data)
+{
+    return Table[route_data.current_id][route_data.dst_id];
 }

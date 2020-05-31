@@ -1,18 +1,20 @@
 #pragma once
 #include "RoutingAlgorithm.h"
 #include "../Configuration.h"
+#include "../RoutingTable.h"
 
 
 
-RoutingAlgorithm* FindTestRouting(const std::string& name, const Configuration& config);
+std::unique_ptr<RoutingAlgorithm> FindTestRouting(const std::string& name, const Configuration& config, const RoutingTable& table);
 
 class TEST_RoutingChannelNextIDGraterCurrent : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelNextIDGraterCurrent(const Graph& graph);
+	TEST_RoutingChannelNextIDGraterCurrent(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -20,9 +22,10 @@ class TEST_RoutingChannelPrevIDGraterCurrent : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelPrevIDGraterCurrent(const Graph& graph);
+	TEST_RoutingChannelPrevIDGraterCurrent(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -30,9 +33,10 @@ class TEST_RoutingChannelPrevIDGraterNext : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelPrevIDGraterNext(const Graph& graph);
+	TEST_RoutingChannelPrevIDGraterNext(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -40,9 +44,10 @@ class TEST_RoutingChannelNextIDGraterCurrentDirectionInverse : public RoutingAlg
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelNextIDGraterCurrentDirectionInverse(const Graph& graph);
+	TEST_RoutingChannelNextIDGraterCurrentDirectionInverse(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -50,9 +55,10 @@ class TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse : public RoutingAlg
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse(const Graph& graph);
+	TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -60,9 +66,10 @@ class TEST_RoutingChannelSourceID : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelSourceID(const Graph& graph);
+	TEST_RoutingChannelSourceID(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -70,9 +77,10 @@ class TEST_RoutingChannelDestinationID : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelDestinationID(const Graph& graph);
+	TEST_RoutingChannelDestinationID(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -80,9 +88,10 @@ class TEST_RoutingChannelInputLinkLength : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelInputLinkLength(const Graph& graph);
+	TEST_RoutingChannelInputLinkLength(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -90,9 +99,10 @@ class TEST_RoutingChannelHopsGrater0 : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelHopsGrater0(const Graph& graph);
+	TEST_RoutingChannelHopsGrater0(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -100,9 +110,10 @@ class TEST_RoutingChannelHopsGrater1 : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelHopsGrater1(const Graph& graph);
+	TEST_RoutingChannelHopsGrater1(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -110,9 +121,10 @@ class TEST_RoutingChannelHopsGrater2 : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelHopsGrater2(const Graph& graph);
+	TEST_RoutingChannelHopsGrater2(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -120,9 +132,10 @@ class TEST_RoutingChannelHopsSwitchNotMod2 : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelHopsSwitchNotMod2(const Graph& graph);
+	TEST_RoutingChannelHopsSwitchNotMod2(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -130,9 +143,10 @@ class TEST_RoutingChannelHopsSwitchNotMod3 : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelHopsSwitchNotMod3(const Graph& graph);
+	TEST_RoutingChannelHopsSwitchNotMod3(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
 
@@ -140,8 +154,9 @@ class TEST_RoutingChannelHopsSwitchNotMod4 : public RoutingAlgorithm
 {
 private:
 	const Graph& TopologyGraph;
+	const RoutingTable& Table;
 
 public:
-	TEST_RoutingChannelHopsSwitchNotMod4(const Graph& graph);
+	TEST_RoutingChannelHopsSwitchNotMod4(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };

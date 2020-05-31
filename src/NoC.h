@@ -22,8 +22,11 @@ class NoC : sc_module
 {
 	SC_HAS_PROCESS(NoC);
 private:
-	RoutingAlgorithm* Algorithm;
-	SelectionStrategy* Strategy;
+	std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config);
+	std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config);
+
+	std::unique_ptr<RoutingAlgorithm> Algorithm;
+	std::unique_ptr<SelectionStrategy> Strategy;
 
 public:
 	sc_clock clock;

@@ -295,6 +295,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	flit_size = ReadParam<int32_t>(config, "flit_size");
 	min_packet_size = ReadParam<int32_t>(config, "min_packet_size");
 	max_packet_size = ReadParam<int32_t>(config, "max_packet_size");
+	router_type = ReadParam<std::string>(config, "router_type");
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 	packet_injection_rate = ReadParam<double>(config, "packet_injection_rate");
@@ -337,6 +338,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 				int32_t l = args[i].as<int32_t>();
 				for (int32_t j = 0; j < graph.size(); j++)
 				{
+					//if ((j + l) % graph.size() < j) continue;
 					graph[j].push_back((j + l) % graph.size(), channels_count);
 					graph[(j + l) % graph.size()].push_back(j, channels_count);
 				}
@@ -393,6 +395,28 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 					if (i * subnodes_count + j >= graph.size()) break;
 					graph[i].push_back(i * subnodes_count + j, channels_count);
 					graph[i * subnodes_count + j].push_back(i, channels_count);
+				}
+			}
+		}
+		else if (topology == "TMESH")
+		{
+			dim_x = args[0].as<int32_t>();
+			dim_y = args[1].as<int32_t>();
+
+			graph.resize(dim_x * dim_y);
+			for (int32_t x = 0; x < dim_x; x++)
+			{
+				for (int32_t y = 0; y < dim_y; y++)
+				{
+					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
+					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1, channels_count);
+					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x, channels_count);
+					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1, channels_count);
+
+					if (x + 1 < dim_x && y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + (x + 1), channels_count);
+					if (x - 1 >= 0 && y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + (x - 1), channels_count);
+					if (x - 1 >= 0 && y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + (x - 1), channels_count);
+					if (x + 1 < dim_x && y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + (x + 1), channels_count);
 				}
 			}
 		}
@@ -675,6 +699,10 @@ int32_t Configuration::MinPacketSize() const
 int32_t Configuration::MaxPacketSize() const
 {
 	return max_packet_size;
+}
+const std::string& Configuration::RouterType() const
+{
+	return router_type;
 }
 const std::string& Configuration::RoutingAlgorithm() const
 {

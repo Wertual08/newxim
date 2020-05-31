@@ -11,7 +11,7 @@
 #pragma once
 #include <systemc.h>
 #include "Router.h"
-#include "ProcessingElement.h"
+#include "Processor.h"
 
 
 
@@ -89,6 +89,7 @@ public:
 			free_slots.write(-1);
 		}
 	};
+
 	sc_vector<Relay> Relays;
 
 	// I/O Ports
@@ -96,71 +97,81 @@ public:
 	sc_in<bool> reset;	                        // The reset signal for the tile
 
 	// Instances
-	Router RouterDevice;						// Router instance
-	ProcessingElement ProcessingDevice;			// Processing Element instance
+	std::unique_ptr<Router> RouterDevice;
+	std::unique_ptr<Processor> ProcessorDevice;
 		
 	// Constructor
-	Tile(sc_module_name nm, int32_t id, int32_t max_id, size_t relays, double warm_up_time, uint32_t max_buffer_size,
-		RoutingAlgorithm& alg, SelectionStrategy& sel, RoutingTable& grt) : sc_module(nm),
-		Relays("TileRelays", relays),
-		RouterDevice("Router", id, relays, warm_up_time, max_buffer_size, alg, sel, grt), 
-		ProcessingDevice("ProcessingElement", max_id)
+	Tile(sc_module_name nm, size_t relays) : 
+		sc_module(nm), Relays("TileRelays", relays)
 	{
+	}
+	void SetRouter(std::unique_ptr<Router>& router)
+	{
+		if (!router) throw std::runtime_error("Tile error: Router can not be null.");
+		if (router->Relays.size() != Relays.size() + 1)
+			throw std::runtime_error("Tile error: Incompatible numbers of relays.");
+
+		RouterDevice = std::move(router);
 		// Router pin assignments
-		RouterDevice.clock(clock);
-		RouterDevice.reset(reset);
+		RouterDevice->clock(clock);
+		RouterDevice->reset(reset);
 
 		for (size_t i = 0; i < Relays.size(); i++)
 		{
-			RouterDevice.Relays[i].rx_flit(Relays[i].rx_flit);
-			RouterDevice.Relays[i].rx_req(Relays[i].rx_req);
-			RouterDevice.Relays[i].rx_ack(Relays[i].rx_ack);
-			RouterDevice.Relays[i].rx_buffer_full_status(Relays[i].rx_buffer_full_status);
-						 
-			RouterDevice.Relays[i].tx_flit(Relays[i].tx_flit);
-			RouterDevice.Relays[i].tx_req(Relays[i].tx_req);
-			RouterDevice.Relays[i].tx_ack(Relays[i].tx_ack);
-			RouterDevice.Relays[i].tx_buffer_full_status(Relays[i].tx_buffer_full_status);
-						 
-			RouterDevice.Relays[i].free_slots(Relays[i].free_slots);
-			RouterDevice.Relays[i].free_slots_neighbor(Relays[i].free_slots_neighbor);
+			RouterDevice->Relays[i].rx_flit(Relays[i].rx_flit);
+			RouterDevice->Relays[i].rx_req(Relays[i].rx_req);
+			RouterDevice->Relays[i].rx_ack(Relays[i].rx_ack);
+			RouterDevice->Relays[i].rx_buffer_full_status(Relays[i].rx_buffer_full_status);
+
+			RouterDevice->Relays[i].tx_flit(Relays[i].tx_flit);
+			RouterDevice->Relays[i].tx_req(Relays[i].tx_req);
+			RouterDevice->Relays[i].tx_ack(Relays[i].tx_ack);
+			RouterDevice->Relays[i].tx_buffer_full_status(Relays[i].tx_buffer_full_status);
+
+			RouterDevice->Relays[i].free_slots(Relays[i].free_slots);
+			RouterDevice->Relays[i].free_slots_neighbor(Relays[i].free_slots_neighbor);
 		}
 
 		// local
-		RouterDevice.LocalRelay.rx_flit(flit_tx_local);
-		RouterDevice.LocalRelay.rx_req(req_tx_local);
-		RouterDevice.LocalRelay.rx_ack(ack_tx_local);
-		RouterDevice.LocalRelay.rx_buffer_full_status(buffer_full_status_tx_local);
+		RouterDevice->LocalRelay.rx_flit(flit_tx_local);
+		RouterDevice->LocalRelay.rx_req(req_tx_local);
+		RouterDevice->LocalRelay.rx_ack(ack_tx_local);
+		RouterDevice->LocalRelay.rx_buffer_full_status(buffer_full_status_tx_local);
 
-		RouterDevice.LocalRelay.tx_flit(flit_rx_local);
-		RouterDevice.LocalRelay.tx_req(req_rx_local);
-		RouterDevice.LocalRelay.tx_ack(ack_rx_local);
-		RouterDevice.LocalRelay.tx_buffer_full_status(buffer_full_status_rx_local);
+		RouterDevice->LocalRelay.tx_flit(flit_rx_local);
+		RouterDevice->LocalRelay.tx_req(req_rx_local);
+		RouterDevice->LocalRelay.tx_ack(ack_rx_local);
+		RouterDevice->LocalRelay.tx_buffer_full_status(buffer_full_status_rx_local);
 
 		// NoP
-		RouterDevice.LocalRelay.free_slots(free_slots_local);
-		RouterDevice.LocalRelay.free_slots_neighbor(free_slots_neighbor_local);
+		RouterDevice->LocalRelay.free_slots(free_slots_local);
+		RouterDevice->LocalRelay.free_slots_neighbor(free_slots_neighbor_local);
+	}
+	void SetProcessor(std::unique_ptr<Processor>& processor)
+	{
+		if (!processor) throw std::runtime_error("Tile error: Processor can not be null.");
+
+		ProcessorDevice = std::move(processor);
 
 		// Processing Element pin assignments
-		ProcessingDevice.clock(clock);
-		ProcessingDevice.reset(reset);
+		ProcessorDevice->clock(clock);
+		ProcessorDevice->reset(reset);
 
-		ProcessingDevice.flit_rx(flit_rx_local);
-		ProcessingDevice.req_rx(req_rx_local);
-		ProcessingDevice.ack_rx(ack_rx_local);
-		ProcessingDevice.buffer_full_status_rx(buffer_full_status_rx_local);
+		ProcessorDevice->flit_rx(flit_rx_local);
+		ProcessorDevice->req_rx(req_rx_local);
+		ProcessorDevice->ack_rx(ack_rx_local);
+		ProcessorDevice->buffer_full_status_rx(buffer_full_status_rx_local);
 
-		ProcessingDevice.flit_tx(flit_tx_local);
-		ProcessingDevice.req_tx(req_tx_local);
-		ProcessingDevice.ack_tx(ack_tx_local);
-		ProcessingDevice.buffer_full_status_tx(buffer_full_status_tx_local);
-		ProcessingDevice.free_slots_neighbor(free_slots_neighbor_local);
-
-		ProcessingDevice.local_id = id;
+		ProcessorDevice->flit_tx(flit_tx_local);
+		ProcessorDevice->req_tx(req_tx_local);
+		ProcessorDevice->ack_tx(ack_tx_local);
+		ProcessorDevice->buffer_full_status_tx(buffer_full_status_tx_local);
+		ProcessorDevice->free_slots_neighbor(free_slots_neighbor_local);
 	}
+
 	void ConfigureRotuerPower(const std::string& routing_algorithm)
 	{
-		RouterDevice.power.configureRouter(GlobalParams::flit_size,
+		RouterDevice->power.configureRouter(GlobalParams::flit_size,
 			GlobalParams::buffer_depth, GlobalParams::flit_size,
 			routing_algorithm, "default");
 	}

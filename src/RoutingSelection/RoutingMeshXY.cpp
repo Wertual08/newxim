@@ -37,10 +37,10 @@ std::vector<int32_t> RoutingMeshXY::Route(Router& router, const RouteData& route
     int32_t dy = GetYFromID(route_data.dst_id) - y;
 
     std::vector<int32_t> result;
-    if (dx > 0) result.push_back(GetLinksTo(id, x + 1, y)[0]);
-    else if (dx < 0) result.push_back(GetLinksTo(id, x - 1, y)[0]);
-    else if (dy > 0) result.push_back(GetLinksTo(id, x, y + 1)[0]);
-    else if (dy < 0) result.push_back(GetLinksTo(id, x, y - 1)[0]);
+    if (dx > 0) result = std::move(GetLinksTo(id, x + 1, y));
+    else if (dx < 0) result = std::move(GetLinksTo(id, x - 1, y));
+    else if (dy > 0) result = std::move(GetLinksTo(id, x, y + 1));
+    else if (dy < 0) result = std::move(GetLinksTo(id, x, y - 1));
     else result.push_back(TorusGraph[id].size());
 
     return result;

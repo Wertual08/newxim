@@ -15,10 +15,27 @@
 #include "RoutingSelection/SelectionKeepSpace.h"
 #include "RoutingSelection/RoutingMeshXY.h"
 #include "RoutingSelection/RoutingTorusXY.h"
-#include "RoutingSelection/RoutingChannelIndexStep.h"
 #include "RoutingSelection/RoutingTests.h"
 
+#include "WormholeRouter.h"
+#include "PerFlitRouter.h"
 
+
+
+std::unique_ptr<RoutingAlgorithm> NoC::GetAlgorithm(const Configuration& config)
+{
+	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) return std::make_unique<RoutingTableBased>(GRTable);
+	else if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.Topology());
+	else if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.Topology());
+	else FindTestRouting(config.RoutingAlgorithm(), config, GRTable);
+}
+std::unique_ptr<SelectionStrategy> NoC::GetStrategy(const Configuration& config)
+{
+	if (config.SelectionStrategy() == "RANDOM") return std::make_unique<SelectionRandom>();
+	else if (config.SelectionStrategy() == "BUFFER_LEVEL") return std::make_unique<SelectionBufferLevel>();
+	else if (config.SelectionStrategy() == "KEEP_SPACE") return std::make_unique<SelectionKeepSpace>();
+	else return nullptr;
+}
 
 NoC::NoC(const Configuration& config, sc_module_name) :
 	clock("clock", GlobalParams::clock_period_ps, SC_PS), 
@@ -32,35 +49,49 @@ NoC::NoC(const Configuration& config, sc_module_name) :
 	if (config.TrafficDistribution() == TRAFFIC_TABLE_BASED)
 		GTTable.load(config.TrafficTableFilename().c_str());
 
-	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) Algorithm = new RoutingTableBased();
-	else if (config.RoutingAlgorithm() == "MESH_XY") Algorithm = new RoutingMeshXY(config.DimX(), config.DimY(), config.Topology());
-	else if (config.RoutingAlgorithm() == "TORUS_XY") Algorithm = new RoutingTorusXY(config.DimX(), config.DimY(), config.Topology());
-	else Algorithm = FindTestRouting(config.RoutingAlgorithm(), config);
-	if (config.SelectionStrategy() == "RANDOM") Strategy = new SelectionRandom();
-	else if (config.SelectionStrategy() == "BUFFER_LEVEL") Strategy = new SelectionBufferLevel();
-	else if (config.SelectionStrategy() == "KEEP_SPACE") Strategy = new SelectionKeepSpace();
+	Algorithm = GetAlgorithm(config);
+	Strategy = GetStrategy(config);
 
 	// Create and configure tiles
 	auto& graph = config.Topology();
 	Tiles.resize(graph.size());
 	for (int32_t id = 0; id < Tiles.size(); id++)
 	{
-		char tile_name[32];
-		sprintf(tile_name, "Tile[%002d]", id);
-		Tiles[id] = new Tile(tile_name, id, graph.size() - 1, graph[id].size(), 
-			GlobalParams::stats_warm_up_time, GlobalParams::buffer_depth, 
-			*Algorithm, *Strategy, GRTable);
-		
-		auto& tile = *Tiles[id];
+		char name[32];
 
-		tile.ConfigureRotuerPower(config.RoutingAlgorithm());
 
+		sprintf(name, "Router[%002d]", id);
+		std::unique_ptr<Router> RouterDevice;
+
+		if (config.RouterType() == "WORMHOLE") RouterDevice = std::make_unique<WormholeRouter>(
+			name, id, graph[id].size(), GlobalParams::buffer_depth, *Algorithm, *Strategy);
+		else if (config.RouterType() == "PER_FLIT") RouterDevice = std::make_unique<PerFlitRouter>(
+			name, id, graph[id].size(), GlobalParams::buffer_depth, *Algorithm, *Strategy);
+
+		RouterDevice->stats.SetWarmUpTime(GlobalParams::stats_warm_up_time);
+
+
+;
+		sprintf(name, "Processor[%002d]", id);
+		std::unique_ptr<Processor> ProcessorDevice;
+		ProcessorDevice = std::make_unique<Processor>(name, graph.size() - 1);
+		ProcessorDevice->local_id = id;
 		if (config.TrafficDistribution() == TRAFFIC_TABLE_BASED)
 		{
-			tile.ProcessingDevice.traffic_table = &GTTable;
-			tile.ProcessingDevice.never_transmit = GTTable.occurrencesAsSource(Tiles[id]->ProcessingDevice.local_id) == 0;
+			ProcessorDevice->traffic_table = &GTTable;
+			ProcessorDevice->never_transmit = GTTable.occurrencesAsSource(ProcessorDevice->local_id) == 0;
 		}
-		else tile.ProcessingDevice.never_transmit = false;
+		else ProcessorDevice->never_transmit = false;
+
+
+		sprintf(name, "Tile[%002d]", id);
+		Tiles[id] = new Tile(name, graph[id].size());
+		auto& tile = *Tiles[id];
+
+		tile.SetRouter(RouterDevice);
+		tile.SetProcessor(ProcessorDevice);
+
+		tile.ConfigureRotuerPower(config.RoutingAlgorithm());
 
 		tile.clock(clock);
 		tile.reset(reset);
@@ -96,8 +127,6 @@ NoC::NoC(const Configuration& config, sc_module_name) :
 NoC::~NoC()
 {
 	for (auto t : Tiles) delete t;
-	delete Algorithm;
-	delete Strategy;
 }
 
 void NoC::Update()

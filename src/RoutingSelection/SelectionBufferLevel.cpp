@@ -13,16 +13,13 @@ int32_t SelectionBufferLevel::Apply(Router& router, const std::vector<int32_t>& 
 		
 		int32_t free_slots = router.Relays[dir].free_slots_neighbor.read();
 
-		if (!router.reservation_table.Reserved(dir))
+		if (free_slots > max_free_slots) 
 		{
-			if (free_slots > max_free_slots) 
-			{
-				max_free_slots = free_slots;
-				best_dirs.clear();
-				best_dirs.push_back(dir);
-			}
-			else if (free_slots == max_free_slots) best_dirs.push_back(dir);
+			max_free_slots = free_slots;
+			best_dirs.clear();
+			best_dirs.push_back(dir);
 		}
+		else if (free_slots == max_free_slots) best_dirs.push_back(dir);
 	}
 
 	if (best_dirs.size()) return best_dirs[rand() % best_dirs.size()];
