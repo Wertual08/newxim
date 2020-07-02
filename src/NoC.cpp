@@ -74,7 +74,7 @@ NoC::NoC(const Configuration& config, sc_module_name) :
 ;
 		sprintf(name, "Processor[%002d]", id);
 		std::unique_ptr<Processor> ProcessorDevice;
-		ProcessorDevice = std::make_unique<Processor>(name, graph.size() - 1);
+		ProcessorDevice = std::make_unique<Processor>(name, graph.size() - 1, config.Traffic());
 		ProcessorDevice->local_id = id;
 		if (config.TrafficDistribution() == TRAFFIC_TABLE_BASED)
 		{

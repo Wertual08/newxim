@@ -13,6 +13,7 @@
 
 #include "DataStructs.h"
 #include "GlobalTrafficTable.h"
+#include "TrafficManager.h"
 #include "Utils.h"
 
 
@@ -23,6 +24,7 @@ class Processor : public sc_module
 private:
 	int32_t TotalFlitsGenerated;
 	int32_t MaxID;
+	const TrafficManager& Traffic;
 
 public:
 	// I/O Ports
@@ -55,6 +57,7 @@ public:
 	Flit nextFlit();				// Take the next flit of the current packet
 	Packet trafficRandom();			// Random destination distribution
 	Packet trafficLocal();			// Random with locality
+	Packet trafficHotspot();			// Random with locality
 
 	GlobalTrafficTable* traffic_table;	// Reference to the Global traffic Table
 	bool never_transmit;				// true if the PE does not transmit any packet 
@@ -66,7 +69,7 @@ public:
 	unsigned int getQueueSize() const;
 
 	// Constructor
-	Processor(sc_module_name, int32_t max_id) : MaxID(max_id)
+	Processor(sc_module_name, int32_t max_id, const TrafficManager& traffic) : MaxID(max_id), Traffic(traffic)
 	{
 		SC_METHOD(rxProcess);
 		sensitive << reset << clock.pos();

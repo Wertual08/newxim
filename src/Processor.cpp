@@ -107,10 +107,11 @@ bool Processor::canShot(Packet& packet)
 		if (!transmittedAtPreviousCycle) threshold = GlobalParams::packet_injection_rate;
 		else threshold = GlobalParams::probability_of_retransmission;
 
-		shot = (((double)rand()) / RAND_MAX < threshold);
+		shot = Traffic.FirePacket(local_id, threshold);/*(((double)rand()) / RAND_MAX < threshold)*/;
 		if (shot)
 		{
 			if (GlobalParams::traffic_distribution == TRAFFIC_RANDOM) packet = trafficRandom();
+			else if (GlobalParams::traffic_distribution == "TRAFFIC_HOTSPOT") packet = trafficHotspot();
 			else
 			{
 				cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
@@ -168,6 +169,23 @@ Packet Processor::trafficRandom()
 
 	// Random destination distribution
 	while ((p.dst_id = randInt(0, MaxID)) == p.src_id);
+
+	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+	p.size = p.flit_left = getRandomSize();
+	p.vc_id = 0;
+
+	return p;
+}
+
+Packet Processor::trafficHotspot()
+{
+	Packet p;
+	p.src_id = local_id;
+	double rnd = rand() / (double)RAND_MAX;
+	double range_start = 0.0;
+
+	// Random destination distribution
+	p.dst_id = Traffic.FindDestination(local_id);
 
 	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 	p.size = p.flit_left = getRandomSize();

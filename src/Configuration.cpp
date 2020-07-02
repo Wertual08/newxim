@@ -308,10 +308,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	dyad_threshold = ReadParam<double>(config, "dyad_threshold");
 	report_buffers = ReadParam<bool>(config, "report_buffers", false);
 
-	traffic_distribution = ReadParam<std::string>(config, "traffic_distribution");
-	if (traffic_distribution == "TRAFFIC_TABLE_BASED") 
-		traffic_table_filename = ReadParam<std::string>(config, "traffic_table_filename");
-
 	power_configuration = power_config["Energy"].as<Power>();
 
 	std::string topology = ReadParam<std::string>(config, "topology");
@@ -504,6 +500,24 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		exit(0);
 	}
 
+	traffic.Init(graph.size());
+	traffic_distribution = ReadParam<std::string>(config, "traffic_distribution");
+	if (traffic_distribution == "TRAFFIC_TABLE_BASED")
+		traffic_table_filename = ReadParam<std::string>(config, "traffic_table_filename");
+	else if (traffic_distribution == "TRAFFIC_HOTSPOT")
+	{
+		const auto& traffic_hotspots = config["traffic_hotspots"];
+		for (int32_t i = 0; i < traffic_hotspots.size(); i++)
+		{
+			const auto& hotspot = traffic_hotspots[i];
+			traffic.SetLoad(
+				hotspot[0].as<int32_t>(), 
+				hotspot[1].as<int32_t>(), 
+				hotspot[2].as<int32_t>());
+		}
+	}
+	traffic.Setup();
+
 	ParseArgs(arg_num, arg_vet);
 
 	Check();
@@ -678,6 +692,10 @@ const Graph& Configuration::Topology() const
 const RoutingTable& Configuration::GRTable() const
 {
 	return table;
+}
+const TrafficManager& Configuration::Traffic() const
+{
+	return traffic;
 }
 
 double Configuration::R2RLinkLength() const

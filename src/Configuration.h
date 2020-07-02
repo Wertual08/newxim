@@ -5,6 +5,7 @@
 #include <map>
 #include "Graph.h"
 #include "RoutingTable.h"
+#include "TrafficManager.h"
 
 
 
@@ -66,6 +67,7 @@ private:
 
 	Graph graph;
 	RoutingTable table;
+	TrafficManager traffic;
 
 public:
 	static std::string default_config_filename;
@@ -81,6 +83,7 @@ public:
 
 	const Graph& Topology() const;
 	const RoutingTable& GRTable() const;
+	const TrafficManager& Traffic() const;
 
 	double R2RLinkLength() const;
 	int32_t BufferDepth() const;

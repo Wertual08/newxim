@@ -15,6 +15,7 @@
 #include "RoutingTable.h"
 #include "GlobalTrafficTable.h"
 #include "Graph.h"
+#include "TrafficManager.h"
 
 
 

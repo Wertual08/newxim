@@ -50,7 +50,6 @@ void PerFlitRouter::TXProcess()
 					stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
 				}
 				/* End Power & Stats ------------------------------------------------- */
-				break;
 			}
 		}
 		else stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
@@ -95,6 +94,7 @@ void PerFlitRouter::RXProcess()
 			{
 				// should not happen with the new TBufferFullStatus control signals    
 				// except for flit coming from local PE, which don't use it 
+		
 				assert(i == LocalRelayID);
 			}
 
