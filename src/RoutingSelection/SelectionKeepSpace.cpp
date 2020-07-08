@@ -12,7 +12,7 @@ int32_t SelectionKeepSpace::Apply(Router& router, const std::vector<int32_t>& di
 		int32_t dir = directions[i];
 		int32_t free_slots = router.Relays[dir].free_slots_neighbor.read();
 
-		if (route_data.dir_in != router.LocalRelayID || free_slots > router.Relays.size())
+		if (route_data.dir_in != router.LocalRelayID)
 		{
 			if (free_slots > max_free_slots)
 			{
@@ -22,6 +22,7 @@ int32_t SelectionKeepSpace::Apply(Router& router, const std::vector<int32_t>& di
 			}
 			else if (free_slots == max_free_slots) best_dirs.push_back(dir);
 		}
+		else if (free_slots >= router.Relays[dir].buffer.GetMaxBufferSize() - 0) best_dirs.push_back(dir);
 	}
 
 	if (best_dirs.size() > 0) return best_dirs[rand() % best_dirs.size()];
@@ -31,6 +32,6 @@ int32_t SelectionKeepSpace::Apply(Router& router, const std::vector<int32_t>& di
 void SelectionKeepSpace::PerCycleProcess(Router& router)
 {
 	// update current input buffers level to neighbors
-	for (int i = 0; i < router.Relays.size(); i++)
+	for (int32_t i = 0; i < router.Relays.size(); i++)
 		router.Relays[i].free_slots.write(router.Relays[i].buffer.GetCurrentFreeSlots());
 }
