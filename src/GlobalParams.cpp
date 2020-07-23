@@ -25,5 +25,4 @@ int GlobalParams::clock_period_ps;
 int GlobalParams::simulation_time;
 int GlobalParams::reset_time;
 int GlobalParams::stats_warm_up_time;
-double GlobalParams::dyad_threshold;
 PowerConfig GlobalParams::power_configuration;

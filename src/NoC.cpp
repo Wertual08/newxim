@@ -13,6 +13,7 @@
 #include "RoutingSelection/SelectionRandom.h"
 #include "RoutingSelection/SelectionBufferLevel.h"
 #include "RoutingSelection/SelectionKeepSpace.h"
+#include "RoutingSelection/SelectionRandomKeepSpace.h"
 #include "RoutingSelection/RoutingMeshXY.h"
 #include "RoutingSelection/RoutingTorusXY.h"
 #include "RoutingSelection/RoutingTests.h"
@@ -34,6 +35,7 @@ std::unique_ptr<SelectionStrategy> NoC::GetStrategy(const Configuration& config)
 	if (config.SelectionStrategy() == "RANDOM") return std::make_unique<SelectionRandom>();
 	else if (config.SelectionStrategy() == "BUFFER_LEVEL") return std::make_unique<SelectionBufferLevel>();
 	else if (config.SelectionStrategy() == "KEEP_SPACE") return std::make_unique<SelectionKeepSpace>();
+	else if (config.SelectionStrategy() == "RANDOM_KEEP_SPACE") return std::make_unique<SelectionRandomKeepSpace>();
 	else return nullptr;
 }
 

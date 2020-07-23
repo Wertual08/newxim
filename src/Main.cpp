@@ -29,6 +29,11 @@ int sc_main(int arg_num, char* arg_vet[])
 	cout << '\n' << '\n';
 
 	Configuration Config(arg_num, arg_vet);
+	if (Config.ReportRoutingTable())
+	{
+		std::cout << "Generated routing table: " << Config.GRTable() << '\n';
+	}
+
 	configure(arg_num, arg_vet);
 	NoC Network(Config);
 	ProgressBar Bar(std::cout, Config.ResetTime(), Config.SimulationTime(), Config.ClockPeriodPS(), 20);

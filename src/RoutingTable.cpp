@@ -1,8 +1,86 @@
 #include "RoutingTable.h"
+#include <iostream>
 #include <fstream>
+#include <algorithm>
 
 
 
+std::pair<int32_t, int32_t> perform_routing_PairExchange(int32_t nodes_count, int32_t generator, int32_t source_node, int32_t dest_node)
+{
+	// d - generator
+	// N - nodes_count
+	// s - source_node
+	// j - dest_node
+	// i - curr_node
+	int32_t k = std::abs(source_node - dest_node);
+	int32_t sgn = dest_node <= source_node ? -1 : 1;
+	if (k > nodes_count / 2)
+	{
+		sgn = -sgn;
+		k = nodes_count - k;
+	}
+	int32_t betta = k % generator;
+	int32_t alpha = k / generator - betta;
+
+	int32_t xok, yok;
+
+	// formula (3)
+	if (betta - generator <= alpha && alpha <= generator)
+	{
+		xok = alpha;
+		yok = betta;
+	}
+	else if (alpha < betta - generator)
+	{
+		xok = alpha + generator + 1;
+		yok = betta - generator;
+	}
+	else
+	{
+		xok = alpha - (generator + 1);
+		yok = betta + generator;
+	}
+	return std::make_pair(sgn * xok, sgn * yok);
+}
+bool make_step(const std::vector<std::vector<int32_t>>& graph, std::vector<bool>& visited, int32_t prev, int32_t from)
+{
+	visited[from] = true;
+	for (int32_t i = 0; i < graph[from].size(); i++)
+	{
+		int32_t link_to = graph[from][i];
+		if (link_to == prev) continue;
+
+		if (visited[link_to]) 
+			return true;
+		else return make_step(graph, visited, from, link_to);
+	}
+	return false;
+}
+bool no_cycles(const std::vector<std::vector<int32_t>>& graph)
+{
+	std::vector<bool> visited(graph.size());
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		std::fill(visited.begin(), visited.end(), false);
+		if (make_step(graph, visited, -1, i)) return false;
+	}
+
+	return true;
+}
+void mark_weights(const Graph& graph, std::vector<int32_t>& weights, int32_t node)
+{
+	std::vector<bool> mask(graph[node].size(), false);
+	for (int32_t i = 0; i < graph[node].size(); i++)
+	{
+		int32_t n = graph[node][i];
+		if (weights[n] >= 0 && weights[n] <= weights[node] + 1) continue;
+		weights[n] = weights[node] + 1;
+		mask[i] = true;
+	}
+	for (int32_t i = 0; i < graph[node].size(); i++)
+		if (mask[i]) mark_weights(graph, weights, graph[node][i]);
+}
 std::vector<std::string> split(const std::string& str, char s)
 {
 	std::vector<std::string> result;
@@ -17,6 +95,82 @@ std::vector<std::string> split(const std::string& str, char s)
 	return std::move(result);
 }
 
+bool RoutingTable::LoadDijkstraDeadlockFree(const Graph& graph)
+{
+	int32_t helper_offset = 0;
+	Nodes.resize(graph.size());
+	for (int32_t i = 0; i < Nodes.size(); i++)
+	{
+		Nodes[i].resize(graph.size());
+		if (helper_offset < graph[i].size()) helper_offset = graph[i].size();
+	}
+
+	std::vector<std::vector<int32_t>> helper_graph(graph.size() * helper_offset);
+	std::vector<std::pair<int32_t, std::vector<int32_t>>> path_backup;
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		//printf("*");
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			if (i == j) Nodes[i][j].push_back(graph[i].size());
+			else
+			{
+				bool found = false;
+				auto shortest_paths = graph.get_paths(i, j);
+				for (const auto& path : shortest_paths)
+				{
+					path_backup.clear();
+					for (int32_t p = 0; p < path.size(); p++)
+					{
+						const auto& node = path[p];
+						if (node.ORelay >= 0)
+						{
+							int32_t index_o = node.NodeID * helper_offset + node.ORelay;
+							const auto& next_node = path[p + 1];
+
+							int32_t index = next_node.NodeID * helper_offset + next_node.IRelay;
+							if (std::find(helper_graph[index_o].begin(), helper_graph[index_o].end(), index) == helper_graph[index_o].end())
+							{
+								path_backup.push_back(std::make_pair(index_o, helper_graph[index_o]));
+								helper_graph[index_o].push_back(index);
+							}
+
+							if (node.IRelay >= 0)
+							{
+								int32_t index_i = node.NodeID * helper_offset + node.IRelay;
+
+								if (std::find(helper_graph[index_i].begin(), helper_graph[index_i].end(), index_o) == helper_graph[index_i].end())
+								{
+									path_backup.push_back(std::make_pair(index_i, helper_graph[index_i]));
+									helper_graph[index_i].push_back(index_o);
+								}
+							}
+						}
+					}
+					if (no_cycles(helper_graph))
+					{
+						Nodes[i][j].push_back(path[0].ORelay);
+						found = true;
+						break;
+					}
+					else
+					{
+						for (const auto& node : path_backup)
+							helper_graph[node.first] = node.second;
+					}
+				}
+				if (!found) return false;
+			}
+		}
+	}
+	for (int32_t i = 0; i < helper_graph.size(); i++)
+	{
+		for (int32_t v : helper_graph[i]) std::cout << v << " ";
+		std::cout << '\n';
+	}
+	return true;
+}
 bool RoutingTable::LoadDijkstra(const Graph& graph)
 {
 	Nodes.resize(graph.size());
@@ -114,7 +268,7 @@ bool RoutingTable::LoadDijkstraMultipath(const Graph& graph)
 					int32_t id = graph[min_index][j];
 					if (id >= 0)
 					{
-						int32_t t = min + 1; // 1 distance may be here...
+						int32_t t = min + 1; // distance may be here...
 						if (t < weights[id]) weights[id] = t;
 					}
 				}
@@ -141,6 +295,100 @@ bool RoutingTable::LoadDijkstraMultipath(const Graph& graph)
 			}
 		}
 	}
+	return true;
+}
+bool RoutingTable::LoadUpDown(const Graph& graph)
+{
+	Nodes.resize(graph.size(), Node(graph.size()));
+	std::vector<int32_t> weights(graph.size(), -1);
+	weights[0] = 0;
+	mark_weights(graph, weights, 0);
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			if (i == j) Nodes[i][j].push_back(graph[i].size());
+			else
+			{
+				auto paths = graph.get_simple_paths(i, j);
+
+				auto it = paths.begin();
+				while (it != paths.end())
+				{
+					bool found = false;
+					for (int32_t p = 1; p < it->size() - 1 && !found; p++)
+					{
+						int32_t pv = weights[it->at(p - 1)];
+						int32_t cv = weights[it->at(p)];
+						int32_t nv = weights[it->at(p + 1)];
+						if (pv == nv && pv + 1 == cv) found = true;
+					}
+					if (found) 
+						it = paths.erase(it);
+					else it++;
+				}
+				if (paths.empty()) return false;
+				for (const auto& path : paths)
+				{
+					auto links = graph[path[0]].links_to(path[1]);
+					for (int32_t l : links) if (std::find(Nodes[i][j].begin(), Nodes[i][j].end(), l) ==
+						Nodes[i][j].end()) Nodes[i][j].push_back(l);
+				}
+			}
+		}
+	}
+	return true;
+}
+bool RoutingTable::LoadPairExchange(const Graph& graph)
+{
+	Nodes.resize(graph.size(), Node(graph.size()));
+	if (graph.size() < 1) return true;
+	if (graph[0].size() < 1) return false;
+	int32_t generator = graph[0][0];
+	for (int32_t i = 1; i < graph[0].size(); i++) 
+		generator = std::min(generator, graph[0][i]);
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			if (i == j)
+			{
+				Nodes[i][j].push_back(graph[i].size());
+				continue;
+			}
+
+			auto vec = perform_routing_PairExchange(graph.size(), generator, i, j);
+			if (vec.first > 0)
+			{
+				int32_t dest = (i + generator) % graph.size();
+				for (int32_t l : graph[i].links_to(dest))
+					Nodes[i][j].push_back(l);
+			}
+			if (vec.first < 0)
+			{
+				int32_t dest = i - generator;
+				if (dest < 0) dest += graph.size();
+				for (int32_t l : graph[i].links_to(dest))
+					Nodes[i][j].push_back(l);
+			}
+			if (vec.second > 0)
+			{
+				int32_t dest = (i + generator + 1) % graph.size();
+				for (int32_t l : graph[i].links_to(dest))
+					Nodes[i][j].push_back(l);
+			}
+			if (vec.second < 0)
+			{
+				int32_t dest = i - (generator + 1);
+				if (dest < 0) dest += graph.size();
+				for (int32_t l : graph[i].links_to(dest))
+					Nodes[i][j].push_back(l);
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -191,6 +439,9 @@ bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 	if (generator == "DEFAULT") return LoadDijkstra(graph);
 	if (generator == "DIJKSTRA") return LoadDijkstra(graph);
 	if (generator == "DIJKSTRA_MULTIPATH") return LoadDijkstraMultipath(graph);
+	if (generator == "DIJKSTRA_DEADLOCK_FREE") return LoadDijkstraDeadlockFree(graph);
+	if (generator == "UP_DOWN") return LoadUpDown(graph);
+	if (generator == "PAIR_EXCHANGE") return LoadPairExchange(graph);
 	return false;
 }
 bool RoutingTable::LoadMeshXY(const Graph& graph, int32_t w, int32_t h)

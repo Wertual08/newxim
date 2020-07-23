@@ -96,6 +96,11 @@ double GlobalStats::getAverageThroughput(int src_id, int dst_id)
 {
 	return Network.Tiles[dst_id]->RouterDevice->stats.getAverageThroughput(src_id);
 }
+double GlobalStats::getAggregatedProduction() const
+{
+	int32_t total_cycles = Config.SimulationTime() - Config.StatsWarmUpTime();
+	return static_cast<double>(GetTotalFlitsGenerated()) / static_cast<double>(total_cycles);
+}
 double GlobalStats::getAggregatedThroughput() const
 {
 	int32_t total_cycles = Config.SimulationTime() - Config.StatsWarmUpTime();
@@ -224,9 +229,10 @@ std::ostream& operator<<(std::ostream& out, const GlobalStats& gs)
 {
 	out << "% Last time flit received: " << gs.getLastReceivedFlitTime() << '\n';
 	out << "% Max buffer stuck delay: " << gs.GetMaxBufferStuckDelay() << '\n';
-	out << "% Total generated flits: " << gs.GetTotalFlitsGenerated() << '\n';
+	out << "% Total produced flits: " << gs.GetTotalFlitsGenerated() << '\n';
 	out << "% Total accepted flits: " << gs.getAcceptedFlits() << '\n';
 	out << "% Total received flits: " << gs.getReceivedFlits() << '\n';
+	out << "% Network production (flits/cycle): " << gs.getAggregatedProduction() << '\n';
 	out << "% Network acceptance (flits/cycle): " << gs.getAggregatedAcceptance() << '\n';
 	out << "% Network throughput (flits/cycle): " << gs.getAggregatedThroughput() << '\n';
 	out << "% Total received packets: " << gs.getReceivedPackets() << '\n';

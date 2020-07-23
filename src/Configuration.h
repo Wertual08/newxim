@@ -59,11 +59,11 @@ private:
 	int32_t reset_time;
 	int32_t stats_warm_up_time;
 	int32_t rnd_generator_seed;
-	double dyad_threshold;
 	Power power_configuration;
 	int32_t dim_x, dim_y;
 	int32_t channels_count;
 	bool report_buffers;
+	bool report_routing_table;
 
 	Graph graph;
 	RoutingTable table;
@@ -106,10 +106,9 @@ public:
 	int32_t ResetTime() const;
 	int32_t StatsWarmUpTime() const;
 	int32_t RndGeneratorSeed() const;
-	std::vector<std::pair<int32_t, double>> Hotspots() const;
-	double DyadThreshold() const;
 	const Power& PowerConfiguration() const;
 	bool ReportBuffers() const;
+	bool ReportRoutingTable() const;
 
 	int32_t DimX() const;
 	int32_t DimY() const;

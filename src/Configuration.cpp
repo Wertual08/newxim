@@ -305,8 +305,8 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	reset_time = ReadParam<int32_t>(config, "reset_time");
 	stats_warm_up_time = ReadParam<int32_t>(config, "stats_warm_up_time");
 	rnd_generator_seed = ReadParam<int32_t>(config, "rnd_generator_seed", time(0));
-	dyad_threshold = ReadParam<double>(config, "dyad_threshold");
 	report_buffers = ReadParam<bool>(config, "report_buffers", false);
+	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
 
 	power_configuration = power_config["Energy"].as<Power>();
 
@@ -416,10 +416,15 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 				}
 			}
 		}
+		else
+		{
+		std::cerr << "ERROR: Unsupported topology.\n";
+		exit(0);
+		}
 	}
 	catch (...)
 	{
-		std::cerr << "ERROR: Cannot read topology. \n";
+		std::cerr << "ERROR: Cannot read topology.\n";
 		exit(0);
 	}
 	try
@@ -489,7 +494,14 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 					const auto& targs = config["topology_args"];
 					table.LoadTorusXY(graph, dim_x, dim_y);
 				}
-				else table.Load(graph, type);
+				else
+				{
+					if (!table.Load(graph, type))
+					{
+						std::cerr << "ERROR: Failed to generate routing table. \n";
+						exit(0);
+					}
+				}
 			}
 		}
 		else table.Load(graph);
@@ -543,7 +555,6 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 			else if (!strcmp(arg_vet[i], "-routing"))
 			{
 				routing_algorithm = arg_vet[++i];
-				//if (routing_algorithm == ROUTING_DYAD) dyad_threshold = atof(arg_vet[++i]);
 				if (routing_algorithm == ROUTING_TABLE_BASED)
 				{
 					//routing_table_filename = arg_vet[++i];
@@ -778,10 +789,6 @@ int32_t Configuration::RndGeneratorSeed() const
 {
 	return rnd_generator_seed;
 }
-double Configuration::DyadThreshold() const
-{
-	return dyad_threshold;
-}
 const Configuration::Power& Configuration::PowerConfiguration() const
 {
 	return power_configuration;
@@ -789,6 +796,10 @@ const Configuration::Power& Configuration::PowerConfiguration() const
 bool Configuration::ReportBuffers() const
 {
 	return report_buffers;
+}
+bool Configuration::ReportRoutingTable() const
+{
+	return report_routing_table;
 }
 
 int32_t Configuration::DimX() const

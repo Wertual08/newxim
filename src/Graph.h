@@ -30,9 +30,18 @@ public:
 			return std::move(result);
 		}
 	};
+	struct PathNode
+	{
+		int32_t IRelay;
+		int32_t NodeID;
+		int32_t ORelay;
+	};
 
 private:
 	std::vector<Node> Nodes;
+
+	void find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector<PathNode> path, const std::vector<int32_t>& weights, int32_t dest) const;
+	void find_shortest(std::vector<std::vector<int32_t>>& paths, std::vector<int32_t> path, const std::vector<int32_t>& weights, int32_t dest) const;
 
 public:
 	Graph(const std::string& path);
@@ -47,5 +56,8 @@ public:
 	const Node& operator[](int32_t i) const;
 
 	friend std::ostream& operator<<(std::ostream& os, const Graph& g);
+
+	std::vector<std::vector<PathNode>> get_paths(int32_t from, int32_t to) const;
+	std::vector<std::vector<int32_t>> get_simple_paths(int32_t from, int32_t to) const;
 };
 

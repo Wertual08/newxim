@@ -17,8 +17,11 @@ private:
 	// ID to Relations
 	std::vector<Node> Nodes;
 
+	bool LoadDijkstraDeadlockFree(const Graph& graph);
 	bool LoadDijkstra(const Graph& graph);
 	bool LoadDijkstraMultipath(const Graph& graph);
+	bool LoadUpDown(const Graph& graph);
+	bool LoadPairExchange(const Graph& graph);
 
 public:
 	RoutingTable();

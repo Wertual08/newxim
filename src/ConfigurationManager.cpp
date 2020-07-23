@@ -62,7 +62,6 @@ void loadConfiguration()
 	GlobalParams::simulation_time = readParam<int>(config, "simulation_time");
 	GlobalParams::reset_time = readParam<int>(config, "reset_time");
 	GlobalParams::stats_warm_up_time = readParam<int>(config, "stats_warm_up_time");
-	GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
 	GlobalParams::traffic_distribution = readParam<std::string>(config, "traffic_distribution");
 
 	GlobalParams::power_configuration = power_config["Energy"].as<PowerConfig>();

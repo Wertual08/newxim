@@ -40,6 +40,7 @@ private:
 	// Returns the max delay (cycles) for communication src_id->dst_id
 	double getMaxDelay(int src_id, int dst_id) const;
 	// Returns the aggregated average throughput (flits/cycles)
+	double getAggregatedProduction() const;
 	double getAggregatedThroughput() const;
 	double getAggregatedAcceptance() const;
 	// Returns the average throughput per IP (flit/cycles/IP)
