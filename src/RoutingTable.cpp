@@ -5,15 +5,14 @@
 
 
 
-std::pair<int32_t, int32_t> perform_routing_PairExchange(int32_t nodes_count, int32_t generator, int32_t source_node, int32_t dest_node)
+std::pair<int32_t, int32_t> PerformPairExchange(int32_t nodes_count, int32_t generator, int32_t source_node, int32_t target_node)
 {
 	// d - generator
 	// N - nodes_count
 	// s - source_node
 	// j - dest_node
-	// i - curr_node
-	int32_t k = std::abs(source_node - dest_node);
-	int32_t sgn = dest_node <= source_node ? -1 : 1;
+	int32_t k = std::abs(source_node - target_node);
+	int32_t sgn = target_node <= source_node ? -1 : 1;
 	if (k > nodes_count / 2)
 	{
 		sgn = -sgn;
@@ -42,6 +41,151 @@ std::pair<int32_t, int32_t> perform_routing_PairExchange(int32_t nodes_count, in
 	}
 	return std::make_pair(sgn * xok, sgn * yok);
 }
+int32_t PerformSpecialMultiplicative(int32_t nodes_count, int32_t source_node, int32_t target_node)
+{
+	//int32_t flag = 1;
+	//if (target_node > source_node) target_node -= source_node;
+	//else target_node += (nodes_count - source_node);
+	//if (target_node > nodes_count / 2)
+	//{
+	//	target_node = nodes_count - target_node;
+	//	flag = -1;
+	//}
+	//int32_t i = len(edges) - 1;
+	//while (target_node < edges[i]) i -= 1;
+	//if (std::abs(target_node - edges[i]) > std::abs(target_node - edges[i + 1])) return flag * edges[i + 1];
+	//else return flag * edges[i];
+	return -1;
+}
+int32_t PerformClockwise(int32_t nodes_count, int32_t generator_1, int32_t generator_2, int32_t source_node, int32_t target_node)
+{
+	int32_t s = target_node - source_node;
+	if (s == 0) return source_node;
+	if (s < 0) s += nodes_count;
+	if (s <= nodes_count / 2)
+	{
+		if (s >= generator_2) return (source_node + generator_2) % nodes_count;
+		else return (source_node + generator_1) % nodes_count;
+	}
+	else
+	{
+		s = nodes_count - s;
+		if (s >= generator_2) return (source_node + nodes_count - generator_2) % nodes_count;
+		else return (source_node + nodes_count - generator_1) % nodes_count;
+	}
+}
+int32_t PerformAdaptiveStepCycles(int32_t nodes_count, int32_t generator_1, int32_t generator_2, int32_t source_node, int32_t target_node)
+{
+	int32_t best_way_r, step_r, best_way_l, step_l;
+	int32_t s = target_node - source_node;
+	
+	int32_t r1 = s / generator_2 + s % generator_2;
+	int32_t r2 = s / generator_2 - s % generator_2 + generator_2 + 1;
+	if (s % generator_2 == 0)
+	{
+		best_way_r = r1;
+		step_r = generator_2;
+	}
+	else
+	{
+		if (r1 < r2)
+		{
+			best_way_r = r1;
+			step_r = generator_1;
+		}
+		else
+		{
+			best_way_r = r2;
+			step_r = generator_2;
+		}
+	}
+
+	int32_t r5 = (s + nodes_count) / generator_2 + (s + nodes_count) % generator_2;
+	int32_t r6 = (s + nodes_count) / generator_2 - (s + nodes_count) % generator_2 + generator_2 + 1;
+	if (r5 < best_way_r)
+	{
+		best_way_r = r5;
+		step_r = generator_2;
+	}
+	if (r6 < best_way_r)
+	{
+		best_way_r = r6;
+		step_r = generator_2;
+	}
+
+	int32_t r9 = (s + nodes_count * 2) / generator_2 + (s + nodes_count * 2) % generator_2;
+	int32_t r10 = (s + nodes_count * 2) / generator_2 - (s + nodes_count * 2) % generator_2 + generator_2 + 1;
+	if (r9 < best_way_r)
+	{
+		best_way_r = r9;
+		step_r = generator_2;
+	}
+	if (r10 < best_way_r)
+	{
+		best_way_r = r10;
+		step_r = generator_2;
+	}
+
+	s = source_node - target_node + nodes_count;
+	int32_t l1 = s / generator_2 + s % generator_2;
+	int32_t l2 = s / generator_2 - s % generator_2 + generator_2 + 1;
+	if (s % generator_2 == 0)
+	{
+		best_way_l = l1;
+		step_l = -generator_2;
+	}
+	else
+	{
+		if (l1 < l2)
+		{
+			best_way_l = l1;
+			step_l = -generator_1;
+		}
+		else
+		{
+			best_way_l = l2;
+			step_l = -generator_2;
+		}
+	}
+
+	int32_t r7 = (s + nodes_count) / generator_2 + (s + nodes_count) % generator_2;
+	int32_t r8 = (s + nodes_count) / generator_2 - (s + nodes_count) % generator_2 + generator_2 + 1;
+	if (r7 < best_way_l)
+	{
+		best_way_l = r7;
+		step_l = -generator_2;
+	}
+	if (r8 < best_way_l)
+	{
+		best_way_l = r8;
+		step_l = -generator_2;
+	}
+
+	int32_t r11 = (s + nodes_count * 2) / generator_2 + (s + nodes_count * 2) % generator_2;
+	int32_t r12 = (s + nodes_count * 2) / generator_2 - (s + nodes_count * 2) % generator_2 + generator_2 + 1;
+	if (r11 < best_way_l)
+	{
+		best_way_l = r11;
+		step_l = -generator_2;
+	}
+	if (r12 < best_way_l)
+	{
+		best_way_l = r12;
+		step_l = -generator_2;
+	}
+	if (best_way_r < best_way_l) return step_r;
+	else return step_l;
+}
+int32_t PerformAdaptive(int32_t nodes_count, int32_t generator_1, int32_t generator_2, int32_t source_node, int32_t target_node)
+{
+	int32_t result;
+	if (source_node > target_node) result = source_node - PerformAdaptiveStepCycles(nodes_count, generator_1, generator_2, target_node, source_node);
+	else result = source_node + PerformAdaptiveStepCycles(nodes_count, generator_1, generator_2, source_node, target_node);
+	if (result > nodes_count) result -= nodes_count;
+	else if (result <= 0) result += nodes_count;
+	return result;
+}
+
 bool make_step(const std::vector<std::vector<int32_t>>& graph, std::vector<bool>& visited, int32_t prev, int32_t from)
 {
 	visited[from] = true;
@@ -98,12 +242,9 @@ std::vector<std::string> split(const std::string& str, char s)
 bool RoutingTable::LoadDijkstraDeadlockFree(const Graph& graph)
 {
 	int32_t helper_offset = 0;
-	Nodes.resize(graph.size());
 	for (int32_t i = 0; i < Nodes.size(); i++)
-	{
-		Nodes[i].resize(graph.size());
-		if (helper_offset < graph[i].size()) helper_offset = graph[i].size();
-	}
+		if (helper_offset < graph[i].size()) 
+			helper_offset = graph[i].size();
 
 	std::vector<std::vector<int32_t>> helper_graph(graph.size() * helper_offset);
 	std::vector<std::pair<int32_t, std::vector<int32_t>>> path_backup;
@@ -173,10 +314,6 @@ bool RoutingTable::LoadDijkstraDeadlockFree(const Graph& graph)
 }
 bool RoutingTable::LoadDijkstra(const Graph& graph)
 {
-	Nodes.resize(graph.size());
-	for (int32_t i = 0; i < Nodes.size(); i++)
-		Nodes[i].resize(graph.size());
-
 	constexpr int32_t inf = std::numeric_limits<int32_t>::max();
 
 	for (int32_t i = 0; i < graph.size(); i++)
@@ -235,10 +372,6 @@ bool RoutingTable::LoadDijkstra(const Graph& graph)
 }
 bool RoutingTable::LoadDijkstraMultipath(const Graph& graph)
 {
-	Nodes.resize(graph.size());
-	for (int32_t i = 0; i < Nodes.size(); i++)
-		Nodes[i].resize(graph.size());
-
 	constexpr int32_t inf = std::numeric_limits<int32_t>::max();
 
 	for (int32_t i = 0; i < graph.size(); i++)
@@ -299,7 +432,6 @@ bool RoutingTable::LoadDijkstraMultipath(const Graph& graph)
 }
 bool RoutingTable::LoadUpDown(const Graph& graph)
 {
-	Nodes.resize(graph.size(), Node(graph.size()));
 	std::vector<int32_t> weights(graph.size(), -1);
 	weights[0] = 0;
 	mark_weights(graph, weights, 0);
@@ -340,11 +472,52 @@ bool RoutingTable::LoadUpDown(const Graph& graph)
 	}
 	return true;
 }
-bool RoutingTable::LoadPairExchange(const Graph& graph)
+bool RoutingTable::LoadMeshXY(const Graph& graph)
 {
 	Nodes.resize(graph.size(), Node(graph.size()));
 	if (graph.size() < 1) return true;
-	if (graph[0].size() < 1) return false;
+
+	int32_t w = 1;
+	int32_t h = 1;
+	while (graph[w - 1].links_to(w).size() > 0) w++;
+	while (graph[w * (h - 1)].links_to(w * h).size() > 0) h++;
+
+	for (int32_t x = 0; x < w; x++)
+	{
+		for (int32_t y = 0; y < h; y++)
+		{
+			int32_t id = y * w + x;
+			int32_t du = -1;
+			int32_t dl = -1;
+			int32_t dd = -1;
+			int32_t dr = -1;
+			if (y + 1 < h) du = graph[id].links_to((y + 1) * w + x)[0];
+			if (x - 1 >= 0) dl = graph[id].links_to(y * w + x - 1)[0];
+			if (y - 1 >= 0) dd = graph[id].links_to((y - 1) * w + x)[0];
+			if (x + 1 < w) dr = graph[id].links_to(y * w + x + 1)[0];
+
+			for (int dy = 0; dy < h; dy++)
+			{
+				for (int dx = 0; dx < w; dx++)
+				{
+					int32_t did = dy * w + dx;
+
+					if (dx > x) Nodes[id][did].push_back(dr); //return (int)Direction.East;
+					else if (dx < x) Nodes[id][did].push_back(dl); //return (int)Direction.West;
+					else if (dy > y) Nodes[id][did].push_back(du); //return (int)Direction.South;
+					else if (dy < y) Nodes[id][did].push_back(dd); //return (int)Direction.North;
+					else Nodes[id][did].push_back(graph[id].size());
+				}
+			}
+		}
+	}
+
+	return true;
+}
+bool RoutingTable::LoadCirculantPairExchange(const Graph& graph)
+{
+	if (graph.size() < 1) return true;
+	if (graph[0].size() < 2) return false;
 	int32_t generator = graph[0][0];
 	for (int32_t i = 1; i < graph[0].size(); i++) 
 		generator = std::min(generator, graph[0][i]);
@@ -359,7 +532,7 @@ bool RoutingTable::LoadPairExchange(const Graph& graph)
 				continue;
 			}
 
-			auto vec = perform_routing_PairExchange(graph.size(), generator, i, j);
+			auto vec = PerformPairExchange(graph.size(), generator, i, j);
 			if (vec.first > 0)
 			{
 				int32_t dest = (i + generator) % graph.size();
@@ -384,6 +557,72 @@ bool RoutingTable::LoadPairExchange(const Graph& graph)
 				int32_t dest = i - (generator + 1);
 				if (dest < 0) dest += graph.size();
 				for (int32_t l : graph[i].links_to(dest))
+					Nodes[i][j].push_back(l);
+			}
+		}
+	}
+
+	return true;
+}
+bool RoutingTable::LoadCirculantClockwise(const Graph& graph)
+{
+	if (graph.size() < 1) return true;
+	if (graph[0].size() < 2) return false;
+	int32_t generator_1 = std::min(graph[0][0], graph[0][1]);
+	int32_t generator_2 = std::max(graph[0][0], graph[0][1]);
+	
+	for (int32_t i = 2; i < graph[0].size(); i++)
+	{
+		generator_1 = std::min(generator_1, graph[0][i]);
+		if (graph[0][i] > generator_1) generator_2 = std::min(generator_2, graph[0][i]);
+	}
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			if (i == j) Nodes[i][j].push_back(graph[i].size());
+			else
+			{
+				for (int32_t l : graph[i].links_to(PerformClockwise(
+					graph.size(), generator_1, generator_2, i, j)))
+					Nodes[i][j].push_back(l);
+			}
+		}
+	}
+
+	return true;
+}
+bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
+{
+	if (graph.size() < 1) return true;
+	if (graph[0].size() < 2) return false;
+	int32_t generator_1 = std::min(graph[0][0], graph[0][1]);
+	int32_t generator_2 = std::max(graph[0][0], graph[0][1]);
+
+	for (int32_t i = 2; i < graph[0].size(); i++)
+	{
+		generator_1 = std::min(generator_1, graph[0][i]);
+		if (graph[0][i] > generator_1) generator_2 = std::min(generator_2, graph[0][i]);
+	}
+
+	int32_t target = 7, current = 1;
+	while (current != target)
+	{
+		std::cout << current << " >> ";
+		current = PerformAdaptive(graph.size(), generator_1, generator_2, current, target);
+	}
+	std::cout << current << '\n';
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			if (i == j) Nodes[i][j].push_back(graph[i].size());
+			else
+			{
+				for (int32_t l : graph[i].links_to(PerformAdaptive(
+					graph.size(), generator_1, generator_2, i + 1, j + 1) - 1))
 					Nodes[i][j].push_back(l);
 			}
 		}
@@ -433,53 +672,19 @@ bool RoutingTable::Load(const std::string& path)
 
 	return true;
 }
-
 bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 {
+	Nodes.resize(graph.size(), Node(graph.size()));
 	if (generator == "DEFAULT") return LoadDijkstra(graph);
 	if (generator == "DIJKSTRA") return LoadDijkstra(graph);
 	if (generator == "DIJKSTRA_MULTIPATH") return LoadDijkstraMultipath(graph);
 	if (generator == "DIJKSTRA_DEADLOCK_FREE") return LoadDijkstraDeadlockFree(graph);
 	if (generator == "UP_DOWN") return LoadUpDown(graph);
-	if (generator == "PAIR_EXCHANGE") return LoadPairExchange(graph);
+	if (generator == "MESH_XY") return LoadMeshXY(graph);
+	if (generator == "CIRCULANT_PAIR_EXCHANGE") return LoadCirculantPairExchange(graph);
+	if (generator == "CIRCULANT_CLOCKWISE") return LoadCirculantClockwise(graph);
+	if (generator == "CIRCULANT_ADAPTIVE") return LoadCirculantAdaptive(graph);
 	return false;
-}
-bool RoutingTable::LoadMeshXY(const Graph& graph, int32_t w, int32_t h)
-{
-	Nodes.resize(graph.size());
-
-	for (int32_t x = 0; x < w; x++)
-	{
-		for (int32_t y = 0; y < h; y++)
-		{
-			int32_t id = y * w + x;
-			int32_t du = -1;
-			int32_t dl = -1;
-			int32_t dd = -1;
-			int32_t dr = -1;
-			if (y + 1 < h) du = graph[id].links_to((y + 1) * w + x)[0];
-			if (x - 1 >= 0) dl = graph[id].links_to(y * w + x - 1)[0];
-			if (y - 1 >= 0) dd = graph[id].links_to((y - 1) * w + x)[0];
-			if (x + 1 < w) dr = graph[id].links_to(y * w + x + 1)[0];
-
-			Nodes[id].resize(graph.size());
-			for (int dy = 0; dy < h; dy++)
-			{
-				for (int dx = 0; dx < w; dx++)
-				{
-					int32_t did = dy * w + dx;
-
-					if (dx > x) Nodes[id][did].push_back(dr); //return (int)Direction.East;
-					else if (dx < x) Nodes[id][did].push_back(dl); //return (int)Direction.West;
-					else if (dy > y) Nodes[id][did].push_back(du); //return (int)Direction.South;
-					else if (dy < y) Nodes[id][did].push_back(dd); //return (int)Direction.North;
-					else Nodes[id][did].push_back(graph[id].size());
-				}
-			}
-		}
-	}
-
-	return true;
 }
 bool RoutingTable::LoadTorusXY(const Graph& graph, int32_t w, int32_t h)
 {
@@ -530,73 +735,6 @@ bool RoutingTable::LoadTorusXY(const Graph& graph, int32_t w, int32_t h)
 		}
 	}
 
-	return true;
-}
-bool RoutingTable::LoadCirculant(const Graph& graph)
-{
-	Nodes.resize(graph.size());
-	for (int32_t i = 0; i < Nodes.size(); i++)
-		Nodes[i].resize(graph.size());
-
-	constexpr int32_t inf = std::numeric_limits<int32_t>::max();
-
-	std::vector<int32_t> weights(graph.size(), inf);
-	std::vector<bool> visited(graph.size(), false);
-	weights[0] = 0;
-
-	int32_t min_index, min;
-	do
-	{
-		min_index = min = inf;
-
-		for (int32_t j = 0; j < graph.size(); j++)
-		{
-			if (!visited[j] && weights[j] < min)
-			{
-				min = weights[j];
-				min_index = j;
-			}
-		}
-
-		if (min_index != inf)
-		{
-			for (int32_t j = 0; j < graph[min_index].size(); j++)
-			{
-				int32_t id = graph[min_index][j];
-				if (id >= 0)
-				{
-					int32_t t = min + 1; // 1 distance may be here...
-					if (t < weights[id]) weights[id] = t;
-				}
-			}
-			visited[min_index] = true;
-		}
-	} while (min_index != inf);
-
-	for (int32_t j = 0; j < graph.size(); j++)
-	{
-		if (j == 0) Nodes[j][0].push_back(graph[0].size());
-		else
-		{
-			auto& current_relay = Nodes[j][0];
-
-			for (int32_t k = 0; k < graph[j].size(); k++)
-			{
-				int32_t id = graph[j][k];
-				if (id >= 0)
-				{
-					int32_t t = weights[j] - 1;
-					if (t == weights[id]) current_relay.push_back(k);
-				}
-			}
-		}
-	}
-
-	for (int32_t i = 1; i < graph.size(); i++)
-	{
-
-	}
-	
 	return true;
 }
 

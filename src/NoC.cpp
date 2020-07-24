@@ -28,7 +28,7 @@ std::unique_ptr<RoutingAlgorithm> NoC::GetAlgorithm(const Configuration& config)
 	if (config.RoutingAlgorithm() == ROUTING_TABLE_BASED) return std::make_unique<RoutingTableBased>(GRTable);
 	else if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.Topology());
 	else if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.Topology());
-	else FindTestRouting(config.RoutingAlgorithm(), config, GRTable);
+	else return FindTestRouting(config.RoutingAlgorithm(), config, GRTable);
 }
 std::unique_ptr<SelectionStrategy> NoC::GetStrategy(const Configuration& config)
 {

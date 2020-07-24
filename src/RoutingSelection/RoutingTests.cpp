@@ -19,6 +19,7 @@ std::unique_ptr<RoutingAlgorithm> FindTestRouting(const std::string& name, const
     if (name == "TEST_RoutingChannelHopsSwitchNotMod2") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod2>(config.Topology(), table);
     if (name == "TEST_RoutingChannelHopsSwitchNotMod3") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod3>(config.Topology(), table);
     if (name == "TEST_RoutingChannelHopsSwitchNotMod4") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod4>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelSwitchNode0AndNDiv2") return std::make_unique<TEST_RoutingChannelSwitchNode0AndNDiv2>(config.Topology(), table);
 	return nullptr;
 }
 
@@ -391,6 +392,34 @@ std::vector<int32_t> TEST_RoutingChannelHopsSwitchNotMod4::Route(Router& router,
             prev_vc = i;
 
     int32_t vc = route_data.hop_no % 4 ? prev_vc : !prev_vc;
+    std::vector<int32_t> result;
+    for (int32_t r : Table[route_data.current_id][route_data.dst_id])
+    {
+        int32_t next_id = TopologyGraph[route_data.current_id][r];
+        if (vc >= TopologyGraph[route_data.current_id].links_to(next_id).size())
+            throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
+        if (r == TopologyGraph[route_data.current_id].links_to(next_id)[vc]) result.push_back(r);
+    }
+    if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
+    return std::move(result);
+}
+
+TEST_RoutingChannelSwitchNode0AndNDiv2::TEST_RoutingChannelSwitchNode0AndNDiv2(
+    const Graph& graph, const RoutingTable& table) :
+    TopologyGraph(graph), Table(table)
+{
+}
+std::vector<int32_t> TEST_RoutingChannelSwitchNode0AndNDiv2::Route(Router& router, const RouteData& route_data)
+{
+    int32_t prev_id = route_data.current_id;
+    if (route_data.dir_in < TopologyGraph[route_data.current_id].size())
+        prev_id = TopologyGraph[route_data.current_id][route_data.dir_in];
+    int32_t prev_vc = 0;
+    for (int32_t i = 0; i < TopologyGraph[route_data.current_id].links_to(prev_id).size(); i++)
+        if (TopologyGraph[route_data.current_id].links_to(prev_id)[i] == route_data.dir_in)
+            prev_vc = i;
+
+    int32_t vc = route_data.current_id == 0 || route_data.current_id == TopologyGraph.size() / 2 ? 1 : prev_vc;
     std::vector<int32_t> result;
     for (int32_t r : Table[route_data.current_id][route_data.dst_id])
     {

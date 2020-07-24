@@ -484,12 +484,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 			else
 			{
 				std::string type = node.as<std::string>();
-				if (type == "MESH_XY")
-				{
-					const auto& targs = config["topology_args"];
-					table.LoadMeshXY(graph, dim_x, dim_y);
-				}
-				else if (type == "TORUS_XY")
+				if (type == "TORUS_XY")
 				{
 					const auto& targs = config["topology_args"];
 					table.LoadTorusXY(graph, dim_x, dim_y);

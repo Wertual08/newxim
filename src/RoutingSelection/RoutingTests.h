@@ -160,3 +160,14 @@ public:
 	TEST_RoutingChannelHopsSwitchNotMod4(const Graph& graph, const RoutingTable& table);
 	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
 };
+
+class TEST_RoutingChannelSwitchNode0AndNDiv2 : public RoutingAlgorithm
+{
+private:
+	const Graph& TopologyGraph;
+	const RoutingTable& Table;
+
+public:
+	TEST_RoutingChannelSwitchNode0AndNDiv2(const Graph& graph, const RoutingTable& table);
+	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
+};
