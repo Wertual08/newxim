@@ -1,9 +1,9 @@
 #pragma once
-#include "SelectionStrategy.h"
+#include "SelectionStrategy.hpp"
 
 
 
-class SelectionBufferLevel : public SelectionStrategy
+class SelectionKeepSpace : public SelectionStrategy
 {
 public:
 	int32_t Apply(Router& router, const std::vector<int32_t>& directions, const RouteData& route_data) override;

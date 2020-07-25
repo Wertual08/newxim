@@ -8,13 +8,13 @@
  * This file contains the implementation of the top-level of Noxim
  */
 
-#include "NoC.h"
-#include "GlobalStats.h"
-#include "DataStructs.h"
-#include "Graph.h"
-#include "ConfigurationManager.h"
-#include "Configuration.h"
-#include "ProgressBar.h"
+#include "NoC.hpp"
+#include "GlobalStats.hpp"
+#include "DataStructs.hpp"
+#include "Graph.hpp"
+#include "ConfigurationManager.hpp"
+#include "Configuration.hpp"
+#include "ProgressBar.hpp"
 
 
 

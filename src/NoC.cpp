@@ -8,18 +8,18 @@
  * This file contains the implementation of the Network-on-Chip
  */
 
-#include "NoC.h"
-#include "RoutingSelection/RoutingTableBased.h"
-#include "RoutingSelection/SelectionRandom.h"
-#include "RoutingSelection/SelectionBufferLevel.h"
-#include "RoutingSelection/SelectionKeepSpace.h"
-#include "RoutingSelection/SelectionRandomKeepSpace.h"
-#include "RoutingSelection/RoutingMeshXY.h"
-#include "RoutingSelection/RoutingTorusXY.h"
-#include "RoutingSelection/RoutingTests.h"
+#include "NoC.hpp"
+#include "RoutingSelection/RoutingTableBased.hpp"
+#include "RoutingSelection/SelectionRandom.hpp"
+#include "RoutingSelection/SelectionBufferLevel.hpp"
+#include "RoutingSelection/SelectionKeepSpace.hpp"
+#include "RoutingSelection/SelectionRandomKeepSpace.hpp"
+#include "RoutingSelection/RoutingMeshXY.hpp"
+#include "RoutingSelection/RoutingTorusXY.hpp"
+#include "RoutingSelection/RoutingTests.hpp"
 
-#include "WormholeRouter.h"
-#include "PerFlitRouter.h"
+#include "WormholeRouter.hpp"
+#include "PerFlitRouter.hpp"
 
 
 

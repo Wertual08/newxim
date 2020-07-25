@@ -9,8 +9,8 @@
  */
 
 #include <iostream>
-#include "Power.h"
-#include "Utils.h"
+#include "Power.hpp"
+#include "Utils.hpp"
 #include "systemc.h"
 
 #define W2J(watt) ((watt)*GlobalParams::clock_period_ps*1.0e-12)

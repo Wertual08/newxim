@@ -8,7 +8,7 @@
  * This file contains the implementation of the buffer
  */
 
-#include "Buffer.h"
+#include "Buffer.hpp"
 #include <cassert>
 
 

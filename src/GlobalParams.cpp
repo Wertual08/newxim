@@ -8,7 +8,7 @@
  * This file contains the implementation of the command line parser
  */
 
-#include "GlobalParams.h"
+#include "GlobalParams.hpp"
 
 double GlobalParams::r2r_link_length;
 int GlobalParams::buffer_depth;

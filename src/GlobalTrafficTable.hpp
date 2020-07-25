@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include "DataStructs.h"
+#include "DataStructs.hpp"
 
 
 

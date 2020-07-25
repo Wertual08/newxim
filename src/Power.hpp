@@ -13,7 +13,7 @@
 
 #include <cassert>
 #include <map>
-#include "DataStructs.h"
+#include "DataStructs.hpp"
 
 #include "yaml-cpp/yaml.h"
 

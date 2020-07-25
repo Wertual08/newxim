@@ -11,8 +11,8 @@
 #pragma once
 #include <vector>
 #include <map>
-#include "Configuration.h"
-#include "NoC.h"
+#include "Configuration.hpp"
+#include "NoC.hpp"
 
 
 

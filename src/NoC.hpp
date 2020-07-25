@@ -10,12 +10,12 @@
 
 #pragma once
 #include <systemc.h>
-#include "Configuration.h"
-#include "Tile.h"
-#include "RoutingTable.h"
-#include "GlobalTrafficTable.h"
-#include "Graph.h"
-#include "TrafficManager.h"
+#include "Configuration.hpp"
+#include "Tile.hpp"
+#include "RoutingTable.hpp"
+#include "GlobalTrafficTable.hpp"
+#include "Graph.hpp"
+#include "TrafficManager.hpp"
 
 
 

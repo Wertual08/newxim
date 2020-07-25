@@ -12,7 +12,7 @@
 #include <systemc.h>
 #include <tlm>
 
-#include "DataStructs.h"
+#include "DataStructs.hpp"
 #include <iomanip>
 #include <sstream>
 

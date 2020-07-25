@@ -11,10 +11,10 @@
 #include <queue>
 #include <systemc.h>
 
-#include "DataStructs.h"
-#include "GlobalTrafficTable.h"
-#include "TrafficManager.h"
-#include "Utils.h"
+#include "DataStructs.hpp"
+#include "GlobalTrafficTable.hpp"
+#include "TrafficManager.hpp"
+#include "Utils.hpp"
 
 
 

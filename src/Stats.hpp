@@ -2,8 +2,8 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include "DataStructs.h"
-#include "Power.h"
+#include "DataStructs.hpp"
+#include "Power.hpp"
 
 
 

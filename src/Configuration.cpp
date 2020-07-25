@@ -1,11 +1,11 @@
-#include "Configuration.h"
+#include "Configuration.hpp"
 #include <yaml-cpp/yaml.h>
 #include <systemc.h>
 #include <iostream>
 #include <fstream>
 #include <cassert>
 #include <ctime>
-#include "Buffer.h"
+#include "Buffer.hpp"
 
 
 

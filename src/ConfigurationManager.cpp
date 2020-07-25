@@ -8,7 +8,7 @@
  * This file contains the implementation of the command line parser
  */
 
-#include "ConfigurationManager.h"
+#include "ConfigurationManager.hpp"
 #include <fstream>
 #include <ctime>
 

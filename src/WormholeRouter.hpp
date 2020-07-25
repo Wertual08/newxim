@@ -1,6 +1,6 @@
 #pragma once
-#include "Router.h"
-#include "ReservationTable.h"
+#include "Router.hpp"
+#include "ReservationTable.hpp"
 
 
 

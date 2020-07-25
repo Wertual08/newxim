@@ -8,7 +8,7 @@
  * This file contains the implementation of the global traffic table
  */
 
-#include "GlobalTrafficTable.h"
+#include "GlobalTrafficTable.hpp"
 
 GlobalTrafficTable::GlobalTrafficTable()
 {

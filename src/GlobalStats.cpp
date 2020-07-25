@@ -1,4 +1,4 @@
-#include "GlobalStats.h"
+#include "GlobalStats.hpp"
 #include <iostream>
 #include <iomanip>
 

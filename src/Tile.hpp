@@ -10,8 +10,8 @@
 
 #pragma once
 #include <systemc.h>
-#include "Router.h"
-#include "Processor.h"
+#include "Router.hpp"
+#include "Processor.hpp"
 
 
 

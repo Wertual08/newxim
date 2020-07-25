@@ -3,9 +3,9 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "Graph.h"
-#include "RoutingTable.h"
-#include "TrafficManager.h"
+#include "Graph.hpp"
+#include "RoutingTable.hpp"
+#include "TrafficManager.hpp"
 
 
 

@@ -8,7 +8,7 @@
  * This file contains the implementation of the processing element
  */
 
-#include "Processor.h"
+#include "Processor.hpp"
 
 int Processor::randInt(int min, int max)
 {

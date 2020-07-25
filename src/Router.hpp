@@ -1,10 +1,10 @@
 #pragma once 
 #include <systemc.h>
-#include "DataStructs.h"
-#include "Buffer.h"
-#include "Stats.h"
-#include "RoutingSelection/RoutingAlgorithm.h"
-#include "RoutingSelection/SelectionStrategy.h"
+#include "DataStructs.hpp"
+#include "Buffer.hpp"
+#include "Stats.hpp"
+#include "RoutingSelection/RoutingAlgorithm.hpp"
+#include "RoutingSelection/SelectionStrategy.hpp"
 
 
 
