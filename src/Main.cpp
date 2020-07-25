@@ -20,6 +20,7 @@
 
 int sc_main(int arg_num, char* arg_vet[])
 {
+	auto x = clock();
 	cout << "\t--------------------------------------------\n";
 	cout << "\t\tNoxim - the NoC Simulator\n";
 	cout << "\t\t(C) University of Catania\n";
@@ -36,8 +37,8 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	configure(arg_num, arg_vet);
 	NoC Network(Config);
-	ProgressBar Bar(std::cout, Config.ResetTime(), Config.SimulationTime(), Config.ClockPeriodPS(), 20);
-	Bar.clock(Network.clock);
+	std::unique_ptr<ProgressBar> Bar;
+	if (Config.ReportProgress()) Bar = std::make_unique<ProgressBar>(std::cout, Config.ResetTime(), Config.SimulationTime(), Config.ClockPeriodPS(), 20, Network.clock);
 
 	// Reset the chip
 	Network.reset.write(1);
@@ -48,9 +49,14 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	// Run the simulation
 	cout << " Now running for " << GlobalParams::simulation_time << " cycles..." << endl;
-	std::cout << " Progress: ";
-	sc_start(GlobalParams::simulation_time, SC_NS);
-	std::cout << '\n';
+
+	if (Config.ReportProgress())
+	{
+		std::cout << " Progress: ";
+		sc_start(GlobalParams::simulation_time, SC_NS);
+		std::cout << '\n';
+	}
+	else sc_start(GlobalParams::simulation_time, SC_NS);
 	
 	// Close the simulation
 	cout << "Noxim simulation completed.";
@@ -59,6 +65,6 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	// Show statistics
 	std::cout << GlobalStats(Network, Config);
-
+	std::cout << clock() - x;
 	return 0;
 }

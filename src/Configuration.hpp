@@ -62,6 +62,7 @@ private:
 	Power power_configuration;
 	int32_t dim_x, dim_y;
 	int32_t channels_count;
+	bool report_progress;
 	bool report_buffers;
 	bool report_routing_table;
 
@@ -107,6 +108,7 @@ public:
 	int32_t StatsWarmUpTime() const;
 	int32_t RndGeneratorSeed() const;
 	const Power& PowerConfiguration() const;
+	bool ReportProgress() const;
 	bool ReportBuffers() const;
 	bool ReportRoutingTable() const;
 

@@ -4,9 +4,6 @@
 #
 #
 
-rnd_generator_seed: 0
-report_buffers: false
-
 # Supported topologies:
 #   CUSTOM:
 #     topology_args: [specify graph]
@@ -18,8 +15,8 @@ report_buffers: false
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: MESH
-topology_args: [8, 8]
+topology: CIRCULANT
+topology_args: [64, 5, 6]
 topology_channels: 1
 
 # Router types:
@@ -27,43 +24,51 @@ topology_channels: 1
 #   PER_FLIT
 router_type: PER_FLIT 
 
-# Routing algorithms:
-#   TABLE_BASED
-#   MESH_XY
-#   TORUS_XY
-# Each of the above labels should match a corresponding
-# implementation in the routingAlgorithms source code directory
-routing_algorithm: TABLE_BASED
-
-# Default routing table generators:
-#   DIJKSTRA
-#   DIJKSTRA_MULTIPATH
-#   MESH_XY
-#   just table
-routing_table: DIJKSTRA_MULTIPATH
-
 # number of flits for each router buffer
-buffer_depth: 8
+buffer_depth: 9
 # size of flits, in bits
 flit_size: 32
 # lenght in mm of router to router connection
 r2r_link_length: 1.0
 
-# Routing specific parameters
-#   dyad_threshold: double
-dyad_threshold: 0.6
+# Default routing table generators:
+#   DIJKSTRA
+#   DIJKSTRA_MULTIPATH
+#   DIJKSTRA_DEADLOCK_FREE (test)
+#   UP_DOWN
+#   MESH_XY
+#   CIRCULANT_PAIR_EXCHANGE
+#   CIRCULANT_MULTIPLICATIVE
+#   CIRCULANT_CLOCKWISE
+#   CIRCULANT_ADAPTIVE
+#   just table
+routing_table: CIRCULANT_PAIR_EXCHANGE
+routing_table_id_based: true
+
+# Routing algorithms:
+#   TABLE_BASED
+#   MESH_XY
+#   TORUS_XY (test)
+# Each of the above labels should match a corresponding
+# implementation in the routingAlgorithms source code directory
+routing_algorithm: TABLE_BASED
 
 # Selection Strategies:
 #   RANDOM
 #   BUFFER_LEVEL
-#   NOP
 #   KEEP_SPACE
+#   RANDOM_KEEP_SPACE
 # Each of the above labels should match a corresponding
 # implementation in the selectionStrategies source code directory
-selection_strategy: BUFFER_LEVEL
+selection_strategy: KEEP_SPACE
 
 # SIMULATION PARAMETERS
 #
+rnd_generator_seed: 0
+report_progress: true
+report_buffers: false
+report_routing_table: false
+
 clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
@@ -81,14 +86,19 @@ probability_of_retransmission: 1
 
 # Traffic distribution:
 #   TRAFFIC_RANDOM
+#   TRAFFIC_HOTSPOT:
+#     traffic_hotspots: [[node_id, send_factor, receive_factor], ...]
 #   TRAFFIC_TRANSPOSE1
 #   TRAFFIC_TRANSPOSE2
-#   TRAFFIC_HOTSPOT
 #   TRAFFIC_TABLE_BASED
 #   TRAFFIC_BIT_REVERSAL
 #   TRAFFIC_SHUFFLE
 #   TRAFFIC_BUTTERFLY
 traffic_distribution: TRAFFIC_RANDOM
+#traffic_hotspots: [
+#  [34, 2, 2], 
+#  [35, 2, 2], 
+#]
 # when traffic table based is specified, use the following
 # configuration file
 # traffic_table_filename: "t.txt"

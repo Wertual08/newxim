@@ -305,6 +305,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	reset_time = ReadParam<int32_t>(config, "reset_time");
 	stats_warm_up_time = ReadParam<int32_t>(config, "stats_warm_up_time");
 	rnd_generator_seed = ReadParam<int32_t>(config, "rnd_generator_seed", time(0));
+	report_progress = ReadParam<bool>(config, "report_progress", false);
 	report_buffers = ReadParam<bool>(config, "report_buffers", false);
 	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
 
@@ -787,6 +788,10 @@ int32_t Configuration::RndGeneratorSeed() const
 const Configuration::Power& Configuration::PowerConfiguration() const
 {
 	return power_configuration;
+}
+bool Configuration::ReportProgress() const
+{
+	return report_progress;
 }
 bool Configuration::ReportBuffers() const
 {
