@@ -25,6 +25,7 @@ private:
 	bool LoadCirculantPairExchange(const Graph& graph);
 	bool LoadCirculantClockwise(const Graph& graph);
 	bool LoadCirculantAdaptive(const Graph& graph);
+	bool LoadCirculantMultiplicative(const Graph& graph);
 
 public:
 	RoutingTable();

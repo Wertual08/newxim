@@ -41,21 +41,28 @@ std::pair<int32_t, int32_t> PerformPairExchange(int32_t nodes_count, int32_t gen
 	}
 	return std::make_pair(sgn * xok, sgn * yok);
 }
-int32_t PerformSpecialMultiplicative(int32_t nodes_count, int32_t source_node, int32_t target_node)
+int32_t PerformMultiplicative(int32_t nodes_count, const std::vector<int32_t>& generators, int32_t source_node, int32_t target_node)
 {
-	//int32_t flag = 1;
-	//if (target_node > source_node) target_node -= source_node;
-	//else target_node += (nodes_count - source_node);
-	//if (target_node > nodes_count / 2)
-	//{
-	//	target_node = nodes_count - target_node;
-	//	flag = -1;
-	//}
-	//int32_t i = len(edges) - 1;
-	//while (target_node < edges[i]) i -= 1;
-	//if (std::abs(target_node - edges[i]) > std::abs(target_node - edges[i + 1])) return flag * edges[i + 1];
-	//else return flag * edges[i];
-	return -1;
+	int32_t flag = 1;
+	if (target_node > source_node) target_node -= source_node;
+	else target_node += (nodes_count - source_node);
+	if (target_node > nodes_count / 2)
+	{
+		target_node = nodes_count - target_node;
+		flag = -1;
+	}
+	int32_t i = generators.size() - 2;
+	while (target_node < generators[i]) i -= 1;
+
+	int32_t result;
+	if (std::abs(target_node - generators[i]) > 
+		std::abs(target_node - generators[i + 1])) 
+		result = source_node + flag * generators[i + 1];
+	else result = source_node + flag * generators[i];
+
+	result %= nodes_count;
+	if (result < 0) result += nodes_count;
+	return result;
 }
 int32_t PerformClockwise(int32_t nodes_count, int32_t generator_1, int32_t generator_2, int32_t source_node, int32_t target_node)
 {
@@ -606,14 +613,6 @@ bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
 		if (graph[0][i] > generator_1) generator_2 = std::min(generator_2, graph[0][i]);
 	}
 
-	int32_t target = 7, current = 1;
-	while (current != target)
-	{
-		std::cout << current << " >> ";
-		current = PerformAdaptive(graph.size(), generator_1, generator_2, current, target);
-	}
-	std::cout << current << '\n';
-
 	for (int32_t i = 0; i < graph.size(); i++)
 	{
 		for (int32_t j = 0; j < graph.size(); j++)
@@ -623,6 +622,34 @@ bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
 			{
 				for (int32_t l : graph[i].links_to(PerformAdaptive(
 					graph.size(), generator_1, generator_2, i + 1, j + 1) - 1))
+					Nodes[i][j].push_back(l);
+			}
+		}
+	}
+
+	return true;
+}
+bool RoutingTable::LoadCirculantMultiplicative(const Graph& graph)
+{
+	if (graph.size() < 1) return true;
+
+	std::vector<int32_t> generators;
+	for (int32_t i = 0; i < graph[0].size(); i++)
+		if (std::find(generators.begin(), generators.end(), 
+			graph[0][i]) == generators.end())
+			generators.push_back(graph[0][i]);
+	std::sort(generators.begin(), generators.end());
+	generators.resize(generators.size() / 2);
+	
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			if (i == j) Nodes[i][j].push_back(graph[i].size());
+			else
+			{
+				for (int32_t l : graph[i].links_to(PerformMultiplicative(
+					graph.size(), generators, i, j)))
 					Nodes[i][j].push_back(l);
 			}
 		}
@@ -682,6 +709,7 @@ bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 	if (generator == "UP_DOWN") return LoadUpDown(graph);
 	if (generator == "MESH_XY") return LoadMeshXY(graph);
 	if (generator == "CIRCULANT_PAIR_EXCHANGE") return LoadCirculantPairExchange(graph);
+	if (generator == "CIRCULANT_MULTIPLICATIVE") return LoadCirculantMultiplicative(graph);
 	if (generator == "CIRCULANT_CLOCKWISE") return LoadCirculantClockwise(graph);
 	if (generator == "CIRCULANT_ADAPTIVE") return LoadCirculantAdaptive(graph);
 	return false;
