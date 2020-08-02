@@ -1,18 +1,59 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the implementation of the processing element
- */
-
 #include "Processor.hpp"
 
-int Processor::randInt(int min, int max)
+
+
+static int randInt(int min, int max)
 {
 	return min + (int)((double)(max - min + 1) * rand() / (RAND_MAX + 1.0));
+}
+
+
+void Processor::UpdateCurrentPacket()
+{
+	current_packet.src_id = local_id;
+
+	// Random destination distribution
+	current_packet.dst_id = Traffic.FindDestination(local_id);
+
+	current_packet.timestamp = oldest_packet_time_stamp;
+	current_packet.size = current_packet.flit_left = getRandomSize();
+	current_packet.vc_id = 0;
+}
+void Processor::PushPacket()
+{
+	double time_stamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+	if (!packets_in_queue)
+	{
+		oldest_packet_time_stamp = time_stamp;
+		newest_packet_time_stamp = time_stamp;
+		UpdateCurrentPacket();
+	}
+	else
+	{
+		oldest_packet_time_stamp = std::min(oldest_packet_time_stamp, time_stamp);
+		newest_packet_time_stamp = std::max(newest_packet_time_stamp, time_stamp);
+	}
+
+	packets_in_queue++;
+}
+void Processor::PopPacket()
+{
+	oldest_packet_time_stamp += (newest_packet_time_stamp - oldest_packet_time_stamp) / packets_in_queue;
+	packets_in_queue--;
+
+	if (packets_in_queue) UpdateCurrentPacket();
+}
+Packet& Processor::FrontPacket()
+{
+	return current_packet;
+}
+bool Processor::PacketQueueEmpty() const
+{
+	return !packets_in_queue;
+}
+size_t Processor::PacketQueueSize() const
+{
+	return packets_in_queue;
 }
 
 void Processor::rxProcess()
@@ -43,13 +84,11 @@ void Processor::txProcess()
 	}
 	else 
 	{
-		Packet packet;
-
-		if (canShot(packet))
+		if (canShot())
 		{
+			PushPacket();
 			if (sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time > 
-				GlobalParams::stats_warm_up_time) TotalFlitsGenerated += packet.size;
-			packet_queue.push(packet);
+				GlobalParams::stats_warm_up_time) TotalFlitsGenerated += FrontPacket().size;
 			transmittedAtPreviousCycle = true;
 		}
 		else transmittedAtPreviousCycle = false;
@@ -57,7 +96,7 @@ void Processor::txProcess()
 
 		if (ack_tx.read() == current_level_tx) 
 		{
-			if (!packet_queue.empty()) 
+			if (!PacketQueueEmpty()) 
 			{
 				Flit flit = nextFlit();	// Generate a new flit
 				flit_tx->write(flit);	// Send the generated flit
@@ -71,7 +110,7 @@ void Processor::txProcess()
 Flit Processor::nextFlit()
 {
 	Flit flit;
-	Packet packet = packet_queue.front();
+	Packet packet = FrontPacket();
 
 	flit.src_id = packet.src_id;
 	flit.dst_id = packet.dst_id;
@@ -88,14 +127,14 @@ Flit Processor::nextFlit()
 		flit.flit_type = FLIT_TYPE_TAIL;
 	else flit.flit_type = FLIT_TYPE_BODY;
 
-	packet_queue.front().flit_left--;
-	if (packet_queue.front().flit_left == 0)
-		packet_queue.pop();
+	FrontPacket().flit_left--;
+	if (FrontPacket().flit_left == 0)
+		PopPacket();
 
 	return flit;
 }
 
-bool Processor::canShot(Packet& packet)
+bool Processor::canShot()
 {
 	if (never_transmit) return false;
 	bool shot;
@@ -107,91 +146,40 @@ bool Processor::canShot(Packet& packet)
 		if (!transmittedAtPreviousCycle) threshold = GlobalParams::packet_injection_rate;
 		else threshold = GlobalParams::probability_of_retransmission;
 
-		shot = Traffic.FirePacket(local_id, threshold);/*(((double)rand()) / RAND_MAX < threshold)*/;
-		if (shot)
-		{
-			if (GlobalParams::traffic_distribution == TRAFFIC_RANDOM) packet = trafficRandom();
-			else if (GlobalParams::traffic_distribution == "TRAFFIC_HOTSPOT") packet = trafficHotspot();
-			else
-			{
-				cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
-				exit(-1);
-			}
-		}
+		shot = Traffic.FirePacket(local_id, threshold);
+		//if (shot)
+		//{
+		//	if (GlobalParams::traffic_distribution == TRAFFIC_RANDOM) packet = trafficRandom();
+		//	else if (GlobalParams::traffic_distribution == "TRAFFIC_HOTSPOT") packet = trafficHotspot();
+		//	else
+		//	{
+		//		cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
+		//		exit(-1);
+		//	}
+		//}
 	}
 	else {			// Table based communication traffic
 		if (never_transmit) return false;
 
-		bool use_pir = (transmittedAtPreviousCycle == false);
+		bool use_pir = !transmittedAtPreviousCycle;
 		std::vector<std::pair<int, double>> dst_prob;
 		double threshold =
 			traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
 
 		double prob = (double)rand() / RAND_MAX;
 		shot = (prob < threshold);
-		if (shot) {
-			for (unsigned int i = 0; i < dst_prob.size(); i++) {
-				if (prob < dst_prob[i].second) {
-					int vc = 0;
-					packet.make(local_id, dst_prob[i].first, vc, now, getRandomSize());
-					break;
-				}
-			}
-		}
+		//if (shot) {
+		//	for (unsigned int i = 0; i < dst_prob.size(); i++) {
+		//		if (prob < dst_prob[i].second) {
+		//			int vc = 0;
+		//			packet.make(local_id, dst_prob[i].first, vc, now, getRandomSize());
+		//			break;
+		//		}
+		//	}
+		//}
 	}
 
 	return shot;
-}
-
-Packet Processor::trafficLocal()
-{
-	Packet p;
-	p.src_id = local_id;
-	double rnd = rand() / (double)RAND_MAX;
-
-	std::vector<int> dst_set;
-	int i_rnd = rand() % dst_set.size();
-
-	p.dst_id = dst_set[i_rnd];
-	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-	p.size = p.flit_left = getRandomSize();
-	p.vc_id = 0;
-
-	return p;
-}
-
-Packet Processor::trafficRandom()
-{
-	Packet p;
-	p.src_id = local_id;
-	double rnd = rand() / (double)RAND_MAX;
-	double range_start = 0.0;
-
-	// Random destination distribution
-	while ((p.dst_id = randInt(0, MaxID)) == p.src_id);
-
-	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-	p.size = p.flit_left = getRandomSize();
-	p.vc_id = 0;
-
-	return p;
-}
-
-Packet Processor::trafficHotspot()
-{
-	Packet p;
-	p.src_id = local_id;
-	double rnd = rand() / (double)RAND_MAX;
-	double range_start = 0.0;
-
-	// Random destination distribution
-	p.dst_id = Traffic.FindDestination(local_id);
-
-	p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-	p.size = p.flit_left = getRandomSize();
-	p.vc_id = 0;
-
-	return p;
 }
 
 int Processor::getRandomSize()
@@ -201,11 +189,10 @@ int Processor::getRandomSize()
 
 unsigned int Processor::getQueueSize() const
 {
-	return packet_queue.size();
+	return PacketQueueSize();
 }
 
 int32_t Processor::GetTotalFlitsGenerated() const
 {
 	return TotalFlitsGenerated;
 }
-

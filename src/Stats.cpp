@@ -82,13 +82,24 @@ void Stats::receivedFlit(double arrival_time, const Flit& flit)
 
 		ch.src_id = flit.src_id;
 		ch.total_received_flits = 0;
+
+		ch.total_received_packets = 0;
+		ch.total_packets_delay = 0.0;
+		ch.packets_max_delay = 0.0;
+
 		chist.push_back(ch);
 
 		i = chist.size() - 1;
 	}
 
 	if (flit.flit_type == FLIT_TYPE_HEAD)
-		chist[i].delays.push_back(arrival_time - flit.timestamp);
+	{
+		double delay = arrival_time - flit.timestamp;
+		chist[i].total_received_packets++;
+		chist[i].total_packets_delay += delay;
+		chist[i].packets_max_delay = std::max(chist[i].packets_max_delay, delay);
+		//chist[i].delays.push_back(arrival_time - flit.timestamp);
+	}
 
 	chist[i].total_received_flits++;
 	chist[i].last_received_flit_time = arrival_time - warm_up_time;
@@ -96,16 +107,16 @@ void Stats::receivedFlit(double arrival_time, const Flit& flit)
 
 double Stats::getAverageDelay(const int src_id)
 {
-	double sum = 0.0;
+	//double sum = 0.0;
 
 	int i = searchCommHistory(src_id);
 
 	assert(i >= 0);
 
-	for (unsigned int j = 0; j < chist[i].delays.size(); j++)
-		sum += chist[i].delays[j];
+	//for (unsigned int j = 0; j < chist[i].delays.size(); j++)
+	//	sum += chist[i].delays[j];
 
-	return sum / (double)chist[i].delays.size();
+	return chist[i].total_packets_delay / chist[i].total_received_packets;// sum / (double)chist[i].delays.size();
 }
 
 double Stats::getAverageDelay()
@@ -113,9 +124,10 @@ double Stats::getAverageDelay()
 	double avg = 0.0;
 
 	for (unsigned int k = 0; k < chist.size(); k++) {
-		unsigned int samples = chist[k].delays.size();
-		if (samples)
-			avg += (double)samples * getAverageDelay(chist[k].src_id);
+		//unsigned int samples = chist[k].delays.size();
+		//if (samples)
+		//	avg += (double)samples * getAverageDelay(chist[k].src_id);
+		avg += chist[k].total_packets_delay;
 	}
 
 	return avg / (double)getReceivedPackets();
@@ -129,11 +141,12 @@ double Stats::getMaxDelay(const int src_id)
 
 	assert(i >= 0);
 
-	for (unsigned int j = 0; j < chist[i].delays.size(); j++)
-		if (chist[i].delays[j] > maxd) {
-			maxd = chist[i].delays[j];
-		}
-	return maxd;
+	//for (unsigned int j = 0; j < chist[i].delays.size(); j++)
+	//	if (chist[i].delays[j] > maxd) {
+	//		maxd = chist[i].delays[j];
+	//	}
+	//return maxd;
+	return chist[i].packets_max_delay;
 }
 
 double Stats::getMaxDelay()
@@ -141,11 +154,13 @@ double Stats::getMaxDelay()
 	double maxd = -1.0;
 
 	for (unsigned int k = 0; k < chist.size(); k++) {
-		unsigned int samples = chist[k].delays.size();
-		if (samples) {
-			double m = getMaxDelay(chist[k].src_id);
-			if (m > maxd)
-				maxd = m;
+		//unsigned int samples = chist[k].delays.size();
+		//if (samples) {
+		if (chist[k].total_received_packets)
+		{
+			//double m = getMaxDelay(chist[k].src_id);
+			double m = chist[k].packets_max_delay;
+			if (m > maxd) maxd = m;
 		}
 	}
 
@@ -185,7 +200,8 @@ unsigned int Stats::getReceivedPackets()
 	int n = 0;
 
 	for (unsigned int i = 0; i < chist.size(); i++)
-		n += chist[i].delays.size();
+		//n += chist[i].delays.size();
+		n += chist[i].total_received_packets;
 
 	return n;
 }
@@ -267,7 +283,7 @@ void Stats::showStats(int curr_node, std::ostream& out, bool header)
 			<< std::setw(15) << getAverageThroughput(chist[i].src_id)
 			<< std::setw(13) << getCommunicationEnergy(chist[i].src_id,
 				curr_node)
-			<< std::setw(12) << chist[i].delays.size()
+			<< std::setw(12) << chist[i].total_received_packets//chist[i].delays.size()
 			<< std::setw(12) << chist[i].total_received_flits << endl;
 	}
 

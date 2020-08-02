@@ -10,7 +10,11 @@
 struct CommHistory 
 {
 	int32_t src_id;
-	std::vector<double> delays;
+
+	uint32_t total_received_packets; 
+	double total_packets_delay; 
+	double packets_max_delay; 
+
 	uint32_t total_received_flits;
 	double last_received_flit_time;
 };

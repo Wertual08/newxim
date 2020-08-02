@@ -52,7 +52,7 @@ int32_t PerformMultiplicative(int32_t nodes_count, const std::vector<int32_t>& g
 		flag = -1;
 	}
 	int32_t i = generators.size() - 2;
-	while (target_node < generators[i]) i -= 1;
+	while (target_node < generators[i]) i--;
 
 	int32_t result;
 	if (std::abs(target_node - generators[i]) > 
@@ -754,7 +754,8 @@ bool RoutingTable::LoadCirculantMultiplicative(const Graph& graph)
 
 	for (int32_t i = 0; i < graph.size(); i++)
 	{
-		int32_t from_zero_to_i = PerformMultiplicative(graph.size(), generators, 0, i);
+		int32_t from_zero_to_i = -1;
+		if (i != 0) PerformMultiplicative(graph.size(), generators, 0, i);
 
 		for (int32_t j = 0; j < graph.size(); j++)
 		{

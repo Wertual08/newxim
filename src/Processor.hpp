@@ -26,6 +26,18 @@ private:
 	int32_t MaxID;
 	const TrafficManager& Traffic;
 
+	size_t packets_in_queue = 0;
+	double oldest_packet_time_stamp = 0.0;
+	double newest_packet_time_stamp = 0.0;
+	Packet current_packet;
+
+	void UpdateCurrentPacket();
+	void PushPacket();
+	void PopPacket();
+	Packet& FrontPacket();
+	bool PacketQueueEmpty() const;
+	size_t PacketQueueSize() const;
+
 public:
 	// I/O Ports
 	sc_in_clk clock;		// The input clock for the PE
@@ -47,23 +59,18 @@ public:
 	int local_id;		// Unique identification number
 	bool current_level_rx;	// Current level for Alternating Bit Protocol (ABP)
 	bool current_level_tx;	// Current level for Alternating Bit Protocol (ABP)
-	std::queue<Packet> packet_queue;	// Local queue of packets
 	bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
 	// Functions
 	void rxProcess();				// The receiving process
 	void txProcess();				// The transmitting process
-	bool canShot(Packet& packet);	// True when the packet must be shot
+	bool canShot();	// True when the packet must be shot
 	Flit nextFlit();				// Take the next flit of the current packet
-	Packet trafficRandom();			// Random destination distribution
-	Packet trafficLocal();			// Random with locality
-	Packet trafficHotspot();			// Random with locality
 
 	GlobalTrafficTable* traffic_table;	// Reference to the Global traffic Table
 	bool never_transmit;				// true if the PE does not transmit any packet 
 	//  (valid only for the table based traffic)
 
-	int randInt(int min, int max);		// Extracts a random integer number between min and max
 	int getRandomSize();				// Returns a random size in flits for the packet
 
 	unsigned int getQueueSize() const;

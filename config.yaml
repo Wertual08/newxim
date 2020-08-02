@@ -16,7 +16,7 @@
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
 topology: CIRCULANT
-topology_args: [64, 5, 6]
+topology_args: [64, 1, 8]
 topology_channels: 1
 
 # Router types:
@@ -42,7 +42,7 @@ r2r_link_length: 1.0
 #   CIRCULANT_CLOCKWISE
 #   CIRCULANT_ADAPTIVE
 #   just table
-routing_table: CIRCULANT_PAIR_EXCHANGE
+routing_table: CIRCULANT_MULTIPLICATIVE
 routing_table_id_based: true
 
 # Routing algorithms:
@@ -67,13 +67,13 @@ selection_strategy: KEEP_SPACE
 rnd_generator_seed: 0
 report_progress: true
 report_buffers: false
-report_routing_table: true
+report_routing_table: false
 
 clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 10000
+simulation_time: 100000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
 # stop after a given amount of load has been processed
