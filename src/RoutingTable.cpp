@@ -18,26 +18,26 @@ std::pair<int32_t, int32_t> PerformPairExchange(int32_t nodes_count, int32_t gen
 		sgn = -sgn;
 		k = nodes_count - k;
 	}
-	int32_t betta = k % generator;
-	int32_t alpha = k / generator - betta;
+	int32_t beta = k % generator;
+	int32_t alpha = k / generator - beta;
 
 	int32_t xok, yok;
 
 	// formula (3)
-	if (betta - generator <= alpha && alpha <= generator)
+	if (beta - generator <= alpha && alpha <= generator)
 	{
 		xok = alpha;
-		yok = betta;
+		yok = beta;
 	}
-	else if (alpha < betta - generator)
+	else if (alpha < beta - generator)
 	{
 		xok = alpha + generator + 1;
-		yok = betta - generator;
+		yok = beta - generator;
 	}
 	else
 	{
 		xok = alpha - (generator + 1);
-		yok = betta + generator;
+		yok = beta + generator;
 	}
 	return std::make_pair(sgn * xok, sgn * yok);
 }
@@ -188,8 +188,8 @@ int32_t PerformAdaptive(int32_t nodes_count, int32_t generator_1, int32_t genera
 	int32_t result;
 	if (source_node > target_node) result = source_node - PerformAdaptiveStepCycles(nodes_count, generator_1, generator_2, target_node, source_node);
 	else result = source_node + PerformAdaptiveStepCycles(nodes_count, generator_1, generator_2, source_node, target_node);
-	if (result > nodes_count) result -= nodes_count;
-	else if (result <= 0) result += nodes_count;
+	if (result >= nodes_count) result -= nodes_count;
+	else if (result < 0) result += nodes_count;
 	return result;
 }
 
@@ -569,6 +569,71 @@ bool RoutingTable::LoadCirculantPairExchange(const Graph& graph)
 		}
 	}
 
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		auto vec = PerformPairExchange(graph.size(), generator, 0, i);
+		if (vec.first > 0)
+		{
+			int32_t from_zero_to_i = generator;
+	
+			for (int32_t j = 0; j < graph.size(); j++)
+			{
+				int32_t target = (i + j) % graph.size();
+				if (j == target) Nodes[j][target].push_back(graph[j].size());
+				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+				{
+					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					Nodes[j][target].push_back(l);
+				}
+			}
+		}
+		if (vec.first < 0)
+		{
+			int32_t from_zero_to_i = graph.size() - generator;
+	
+			for (int32_t j = 0; j < graph.size(); j++)
+			{
+				int32_t target = (i + j) % graph.size();
+				if (j == target) Nodes[j][target].push_back(graph[j].size());
+				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+				{
+					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					Nodes[j][target].push_back(l);
+				}
+			}
+		}
+		if (vec.second > 0)
+		{
+			int32_t from_zero_to_i = generator + 1;
+			
+			for (int32_t j = 0; j < graph.size(); j++)
+			{
+				int32_t target = (i + j) % graph.size();
+				if (j == target) Nodes[j][target].push_back(graph[j].size());
+				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+				{
+					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					Nodes[j][target].push_back(l);
+				}
+			}
+		}
+		if (vec.second < 0)
+		{
+			int32_t from_zero_to_i = graph.size() - (generator + 1);
+			
+			for (int32_t j = 0; j < graph.size(); j++)
+			{
+				int32_t target = (i + j) % graph.size();
+				if (j == target) Nodes[j][target].push_back(graph[j].size());
+				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+				{
+					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					Nodes[j][target].push_back(l);
+				}
+			}
+		}
+	}
+
 	return true;
 }
 bool RoutingTable::LoadCirculantClockwise(const Graph& graph)
@@ -598,6 +663,22 @@ bool RoutingTable::LoadCirculantClockwise(const Graph& graph)
 		}
 	}
 
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		int32_t from_zero_to_i = PerformClockwise(graph.size(), generator_1, generator_2, 0, i);
+
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			int32_t target = (i + j) % graph.size();
+			if (j == target) Nodes[j][target].push_back(graph[j].size());
+			else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+			{
+				if (Nodes[j][target][0] != l) std::cout << "SHIT";
+				Nodes[j][target].push_back(l);
+			}
+		}
+	}
+
 	return true;
 }
 bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
@@ -621,8 +702,24 @@ bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
 			else
 			{
 				for (int32_t l : graph[i].links_to(PerformAdaptive(
-					graph.size(), generator_1, generator_2, i + 1, j + 1) - 1))
+					graph.size(), generator_1, generator_2, i, j)))
 					Nodes[i][j].push_back(l);
+			}
+		}
+	}
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		int32_t from_zero_to_i = PerformAdaptive(graph.size(), generator_1, generator_2, 0, i);
+	
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			int32_t target = (i + j) % graph.size();
+			if (j == target) Nodes[j][target].push_back(graph[j].size());
+			else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+			{
+				if (Nodes[j][target][0] != l) std::cout << "SHIT";
+				Nodes[j][target].push_back(l);
 			}
 		}
 	}
@@ -651,6 +748,22 @@ bool RoutingTable::LoadCirculantMultiplicative(const Graph& graph)
 				for (int32_t l : graph[i].links_to(PerformMultiplicative(
 					graph.size(), generators, i, j)))
 					Nodes[i][j].push_back(l);
+			}
+		}
+	}
+
+	for (int32_t i = 0; i < graph.size(); i++)
+	{
+		int32_t from_zero_to_i = PerformMultiplicative(graph.size(), generators, 0, i);
+
+		for (int32_t j = 0; j < graph.size(); j++)
+		{
+			int32_t target = (i + j) % graph.size();
+			if (j == target) Nodes[j][target].push_back(graph[j].size());
+			else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+			{
+				if (Nodes[j][target][0] != l) std::cout << "SHIT";
+				Nodes[j][target].push_back(l);
 			}
 		}
 	}

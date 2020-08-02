@@ -20,7 +20,6 @@
 
 int sc_main(int arg_num, char* arg_vet[])
 {
-	auto x = clock();
 	cout << "\t--------------------------------------------\n";
 	cout << "\t\tNoxim - the NoC Simulator\n";
 	cout << "\t\t(C) University of Catania\n";
@@ -65,6 +64,5 @@ int sc_main(int arg_num, char* arg_vet[])
 
 	// Show statistics
 	std::cout << GlobalStats(Network, Config);
-	std::cout << clock() - x;
 	return 0;
 }

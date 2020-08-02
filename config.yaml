@@ -67,7 +67,7 @@ selection_strategy: KEEP_SPACE
 rnd_generator_seed: 0
 report_progress: true
 report_buffers: false
-report_routing_table: false
+report_routing_table: true
 
 clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
