@@ -3,7 +3,7 @@
 #include <fstream>
 #include <algorithm>
 
-
+// TODO: Decide how to generate routing table for circulants
 
 std::pair<int32_t, int32_t> PerformPairExchange(int32_t nodes_count, int32_t generator, int32_t source_node, int32_t target_node)
 {
@@ -582,7 +582,7 @@ bool RoutingTable::LoadCirculantPairExchange(const Graph& graph)
 				if (j == target) Nodes[j][target].push_back(graph[j].size());
 				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
 				{
-					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					//if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
 					Nodes[j][target].push_back(l);
 				}
 			}
@@ -597,7 +597,7 @@ bool RoutingTable::LoadCirculantPairExchange(const Graph& graph)
 				if (j == target) Nodes[j][target].push_back(graph[j].size());
 				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
 				{
-					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					//if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
 					Nodes[j][target].push_back(l);
 				}
 			}
@@ -612,7 +612,7 @@ bool RoutingTable::LoadCirculantPairExchange(const Graph& graph)
 				if (j == target) Nodes[j][target].push_back(graph[j].size());
 				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
 				{
-					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					//if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
 					Nodes[j][target].push_back(l);
 				}
 			}
@@ -627,7 +627,7 @@ bool RoutingTable::LoadCirculantPairExchange(const Graph& graph)
 				if (j == target) Nodes[j][target].push_back(graph[j].size());
 				else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
 				{
-					if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
+					//if (std::find(Nodes[j][target].begin(), Nodes[j][target].end(), l) == Nodes[j][target].end()) std::cout << "SHIT";
 					Nodes[j][target].push_back(l);
 				}
 			}
@@ -673,7 +673,7 @@ bool RoutingTable::LoadCirculantClockwise(const Graph& graph)
 			if (j == target) Nodes[j][target].push_back(graph[j].size());
 			else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
 			{
-				if (Nodes[j][target][0] != l) std::cout << "SHIT";
+				//if (Nodes[j][target][0] != l) std::cout << "SHIT";
 				Nodes[j][target].push_back(l);
 			}
 		}
@@ -718,7 +718,7 @@ bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
 			if (j == target) Nodes[j][target].push_back(graph[j].size());
 			else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
 			{
-				if (Nodes[j][target][0] != l) std::cout << "SHIT";
+				//if (Nodes[j][target][0] != l) std::cout << "SHIT";
 				Nodes[j][target].push_back(l);
 			}
 		}
@@ -752,22 +752,22 @@ bool RoutingTable::LoadCirculantMultiplicative(const Graph& graph)
 		}
 	}
 
-	for (int32_t i = 0; i < graph.size(); i++)
-	{
-		int32_t from_zero_to_i = -1;
-		if (i != 0) PerformMultiplicative(graph.size(), generators, 0, i);
-
-		for (int32_t j = 0; j < graph.size(); j++)
-		{
-			int32_t target = (i + j) % graph.size();
-			if (j == target) Nodes[j][target].push_back(graph[j].size());
-			else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
-			{
-				if (Nodes[j][target][0] != l) std::cout << "SHIT";
-				Nodes[j][target].push_back(l);
-			}
-		}
-	}
+	//for (int32_t i = 0; i < graph.size(); i++)
+	//{
+	//	int32_t from_zero_to_i = -1;
+	//	if (i != 0) PerformMultiplicative(graph.size(), generators, 0, i);
+	//
+	//	for (int32_t j = 0; j < graph.size(); j++)
+	//	{
+	//		int32_t target = (i + j) % graph.size();
+	//		if (j == target) Nodes[j][target].push_back(graph[j].size());
+	//		else for (int32_t l : graph[j].links_to((from_zero_to_i + j) % graph.size()))
+	//		{
+	//			//if (Nodes[j][target][0] != l) std::cout << "SHIT";
+	//			Nodes[j][target].push_back(l);
+	//		}
+	//	}
+	//}
 
 	return true;
 }

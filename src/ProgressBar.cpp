@@ -4,11 +4,10 @@
 
 void ProgressBar::Update()
 {
-	int32_t stamp = sc_time_stamp().to_double() / ClockPeriod;
-	if (stamp > TimeOffset)
+	if (Timer.SimulationTime() >= 0.0)
 	{
-		int32_t level = BarUnits * (stamp - TimeOffset) / TotalTime;
-		int32_t percent = std::round(100.0 * (stamp - TimeOffset) / TotalTime);
+		int32_t level = BarUnits * Timer.Progress();
+		int32_t percent = std::round(100.0 * Timer.Progress());
 		if (level > CurrentLevel || percent > CurrentPercent)
 		{
 			if (CurrentLevel < 0)
@@ -57,14 +56,14 @@ void ProgressBar::Update()
 	}
 }
 
-ProgressBar::ProgressBar(sc_module_name, std::ostream& os, int32_t offset, int32_t total, int32_t period, int32_t units, const sc_clock& clk) :
-	Output(os), TimeOffset(offset), TotalTime(total), ClockPeriod(period), BarUnits(units), CurrentLevel(-1), CurrentPercent(-1)
+ProgressBar::ProgressBar(sc_module_name, std::ostream& os, const SimulationTimer& timer, int32_t units, const sc_clock& clk) :
+	Output(os), Timer(timer), BarUnits(units), CurrentLevel(-1), CurrentPercent(-1)
 {
 	clock(clk);
 }
 
-ProgressBar::ProgressBar(std::ostream& os, int32_t offset, int32_t total, int32_t period, int32_t units, const sc_clock& clk) :
-	ProgressBar("ProgressBar", os, offset, total, period, units, clk)
+ProgressBar::ProgressBar(std::ostream& os, const SimulationTimer& timer, int32_t units, const sc_clock& clk) :
+	ProgressBar("ProgressBar", os, timer, units, clk)
 {
 	SC_METHOD(Update);
 	sensitive << clock.pos();

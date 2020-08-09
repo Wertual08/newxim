@@ -10,7 +10,7 @@ protected:
 	virtual void RXProcess() override;
 
 public:
-	PerFlitRouter(sc_module_name mname, int32_t id,
-		size_t relays, int32_t max_buffer_size,
+	PerFlitRouter(sc_module_name mname, const SimulationTimer& timer, 
+		int32_t id, size_t relays, int32_t max_buffer_size,
 		RoutingAlgorithm& alg, SelectionStrategy& sel);
 };

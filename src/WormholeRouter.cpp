@@ -62,7 +62,7 @@ void WormholeRouter::TXProcess()
 				if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.Release(i);
 
 				/* Power & Stats ------------------------------------------------- */
-				stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+				stats.UpdateBufferPopOrEmptyTime(i);
 
 				power.r2rLink();
 
@@ -72,12 +72,12 @@ void WormholeRouter::TXProcess()
 				if (out_port == LocalRelayID)
 				{
 					power.networkInterface();
-					stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
+					stats.receivedFlit(flit);
 				}
 				/* End Power & Stats ------------------------------------------------- */
 			}
 		}
-		else stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+		else stats.UpdateBufferPopOrEmptyTime(i);
 	} // for loop directions
 }
 void WormholeRouter::RXProcess()
@@ -110,7 +110,7 @@ void WormholeRouter::RXProcess()
 				// if a new flit is injected from local PE
 				if (received_flit.src_id == LocalID)
 				{
-					stats.AcceptFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+					stats.AcceptFlit();
 					power.networkInterface();
 				}
 			}
@@ -128,8 +128,8 @@ void WormholeRouter::RXProcess()
 	}
 }
 
-WormholeRouter::WormholeRouter(sc_module_name mname, int32_t id, size_t relays, 
+WormholeRouter::WormholeRouter(sc_module_name mname, const SimulationTimer& timer, int32_t id, size_t relays, 
 	int32_t max_buffer_size, RoutingAlgorithm& alg, SelectionStrategy& sel) : 
-	Router(mname, id, relays, max_buffer_size, alg, sel), reservation_table(Relays.size())
+	Router(mname, timer, id, relays, max_buffer_size, alg, sel), reservation_table(Relays.size())
 {
 }

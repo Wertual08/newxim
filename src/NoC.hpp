@@ -23,11 +23,12 @@ class NoC : sc_module
 {
 	SC_HAS_PROCESS(NoC);
 private:
-	std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config);
-	std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config);
-
+	const SimulationTimer Timer;
 	std::unique_ptr<RoutingAlgorithm> Algorithm;
 	std::unique_ptr<SelectionStrategy> Strategy;
+
+	std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config);
+	std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config);
 
 public:
 	sc_clock clock;
@@ -38,7 +39,7 @@ public:
 	RoutingTable GRTable;
 	GlobalTrafficTable GTTable;
 
-	NoC(const Configuration& config, sc_module_name = "NoC");
+	NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name = "NoC");
 	~NoC();
 
 	void Update();

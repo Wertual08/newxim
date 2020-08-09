@@ -1,3 +1,6 @@
+# lenght in mm of router to router connection
+r2r_link_length: 1.0
+
 Energy:
     Buffer: #Energy consumed by a single flit in Joule
     #   - [Depth ItemSize Leakage Push Front Pop]

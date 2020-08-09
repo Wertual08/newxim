@@ -33,13 +33,13 @@ public:
 		BufferPower bufferPowerConfig;
 		std::map<double, std::pair<double, double>> linkBitLinePowerConfig;
 		RouterPower routerPowerConfig;
+		double r2r_link_length;
 	};
 
 private:
 	std::string topology;
 	std::string topology_args;
 
-	double r2r_link_length;
 	int32_t buffer_depth;
 	int32_t flit_size;
 	int32_t min_packet_size;
@@ -52,8 +52,6 @@ private:
 	double locality;
 	std::string traffic_distribution;
 	std::string traffic_table_filename;
-	std::string config_filename;
-	std::string power_config_filename;
 	int32_t clock_period_ps;
 	int32_t simulation_time;
 	int32_t reset_time;
@@ -86,7 +84,6 @@ public:
 	const RoutingTable& GRTable() const;
 	const TrafficManager& Traffic() const;
 
-	double R2RLinkLength() const;
 	int32_t BufferDepth() const;
 	int32_t FlitSize() const;
 	int32_t MinPacketSize() const;
@@ -100,8 +97,6 @@ public:
 	double Locality() const;
 	const std::string& TrafficDistribution() const;
 	const std::string& TrafficTableFilename() const;
-	const std::string& ConfigFilename() const;
-	const std::string& PowerConfigFilename() const;
 	int32_t ClockPeriodPS() const;
 	int32_t SimulationTime() const;
 	int32_t ResetTime() const;

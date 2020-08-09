@@ -8,12 +8,12 @@
  * This file contains the declaration of the power model
  */
 
-#ifndef __NOXIMPOWER_H__
-#define __NOXIMPOWER_H__
-
+#pragma once
 #include <cassert>
 #include <map>
 #include "DataStructs.hpp"
+#include "SimulationTimer.hpp"
+#include "Configuration.hpp"
 
 #include "yaml-cpp/yaml.h"
 
@@ -21,10 +21,16 @@
 
 class Power 
 {
-public:
-	Power();
+private:
+	const SimulationTimer Timer;
+	double W2J(double watt);
 
-	void configureRouter(int link_width,
+public:
+	Power(const SimulationTimer& timer);
+
+	void configureRouter(
+		const Configuration::Power& config,
+		int link_width,
 		int buffer_depth,
 		int buffer_item_size,
 		std::string routing_function,
@@ -116,5 +122,3 @@ private:
 
 	int sleep_end_cycle;
 };
-
-#endif

@@ -38,7 +38,7 @@ void Router::Update()
 	{
 		power.leakageBufferRouter();
 		power.leakageLinkRouter2Router();
-		stats.UpdateBufferLoad(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, i, Relays[i].buffer.GetLoad());
+		stats.UpdateBufferLoad(i, Relays[i].buffer.GetLoad());
 	}
 }
 
@@ -51,10 +51,11 @@ int32_t Router::PerformRoute(const RouteData& route_data)
 	return Strategy.Apply(*this, Algorithm.Route(*this, route_data), route_data);
 }
 
-Router::Router(sc_module_name, int32_t id, size_t relays, int32_t max_buffer_size,
+Router::Router(sc_module_name, const SimulationTimer& timer, int32_t id, size_t relays, int32_t max_buffer_size,
 	RoutingAlgorithm& alg, SelectionStrategy& sel) : LocalID(id),
 	Relays("RouterRelays", relays + 1), LocalRelay(Relays[relays]),
-	LocalRelayID(relays), Algorithm(alg), Strategy(sel), stats(id, Relays.size())
+	LocalRelayID(relays), Algorithm(alg), Strategy(sel), 
+	stats(timer, id, Relays.size()), power(timer)
 {
 	SC_METHOD(Update);
 	sensitive << reset << clock.pos();

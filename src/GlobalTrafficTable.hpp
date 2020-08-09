@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <vector>
 #include "DataStructs.hpp"
+#include "SimulationTimer.hpp"
 
 
 
@@ -33,10 +34,13 @@ struct Communication
 class GlobalTrafficTable 
 {
 private:
+	const double ResetTime;
+	const double SimulationTime;
+	const double PIR;
 	std::vector<Communication> traffic_table;
 
 public:
-	GlobalTrafficTable();
+	GlobalTrafficTable(double reset_time, double simulation_time, double pir);
 
 	// Load traffic table from file. Returns true if ok, false otherwise
 	bool load(const char* fname);

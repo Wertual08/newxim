@@ -6,9 +6,37 @@
 #include <cassert>
 #include <ctime>
 #include "Buffer.hpp"
+#include <filesystem>
 
 
 
+template <typename T>
+T ReadParam(YAML::Node node, std::string param, T default_value)
+{
+	try
+	{
+		return node[param].as<T>();
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "WARNING: parameter " << param << " not present in YAML configuration file.\n";
+		std::cerr << "Using command line value or default value " << default_value << '\n';
+		return default_value;
+	}
+}
+template <typename T>
+T ReadParam(YAML::Node node, std::string param)
+{
+	try
+	{
+		return node[param].as<T>();
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "ERROR: Cannot read param " << param << ". \n";
+		exit(0);
+	}
+}
 namespace YAML
 {
 	template<>
@@ -96,41 +124,13 @@ namespace YAML
 	{
 		static bool decode(const Node& node, Configuration::Power& powerConfig)
 		{
-			powerConfig.bufferPowerConfig = node["Buffer"].as<Configuration::BufferPower>();
-			powerConfig.linkBitLinePowerConfig = node["LinkBitLine"].as<std::map<double, std::pair<double, double>>>();
-			powerConfig.routerPowerConfig = node["Router"].as<Configuration::RouterPower>();
+			powerConfig.r2r_link_length = ReadParam<double>(node, "r2r_link_length");
+			powerConfig.bufferPowerConfig = node["Energy"]["Buffer"].as<Configuration::BufferPower>();
+			powerConfig.linkBitLinePowerConfig = node["Energy"]["LinkBitLine"].as<std::map<double, std::pair<double, double>>>();
+			powerConfig.routerPowerConfig = node["Energy"]["Router"].as<Configuration::RouterPower>();
 			return true;
 		}
 	};
-}
-template <typename T>
-T ReadParam(YAML::Node node, std::string param, T default_value)
-{
-	try 
-	{
-		return node[param].as<T>();
-	}
-	catch (std::exception& e) 
-	{
-		/*
-		std::cerr << "WARNING: parameter " << param << " not present in YAML configuration file.\n";
-		std::cerr << "Using command line value or default value " << default_value << '\n';
-		 */
-		return default_value;
-	}
-}
-template <typename T>
-T ReadParam(YAML::Node node, std::string param)
-{
-	try
-	{
-		return node[param].as<T>();
-	}
-	catch (std::exception& e) 
-	{
-		std::cerr << "ERROR: Cannot read param " << param << ". \n";
-		exit(0);
-	}
 }
 
 
@@ -201,8 +201,6 @@ void Configuration::ShowHelp(const std::string& selfname)
 Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 {
 	// TODO: Maybe I should make it beautiful... But later
-	bool config_found = false;
-	bool power_config_found = false;
 
 	for (int32_t i = 1; i < arg_num; i++)
 	{
@@ -213,55 +211,25 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		}
 	}
 
+	YAML::Node config;
+	std::string config_filename = default_config_filename;
 	for (int32_t i = 1; i < arg_num; i++)
 	{
 		if (!strcmp(arg_vet[i], "-config"))
 		{
 			config_filename = arg_vet[++i];
-			config_found = true;
 			break;
 		}
 	}
-	if (!config_found)
-	{
-		if (std::ifstream(default_config_filename).good()) config_filename = default_config_filename;
-		else
-		{
-			std::cerr << "No YAML configuration file found!\n Use -config to load examples from config_examples folder\n";
-			exit(0);
-		}
-	}
-
-	for (int32_t i = 1; i < arg_num; i++)
-	{
-		if (!strcmp(arg_vet[i], "-power"))
-		{
-			power_config_filename = arg_vet[++i];
-			power_config_found = true;
-			break;
-		}
-	}
-	if (!power_config_found)
-	{
-		if (std::ifstream(default_power_config_filename).good()) power_config_filename = default_power_config_filename;
-		else
-		{
-			std::cerr << "No YAML power configurations file found!\n Use -power to load examples from config_examples folder\n";
-			exit(0);
-		}
-	}
-
-	YAML::Node config;
-	YAML::Node power_config;
 	std::cout << "Loading configuration from file \"" << config_filename << "\"...";
-	try 
+	try
 	{
 		config = YAML::LoadFile(config_filename);
 		std::cout << " Done\n";
 	}
 	catch (YAML::BadFile& e) {
 		std::cout << " Failed\n";
-		std::cerr << "The specified YAML configuration file was not found!\n";
+		std::cerr << "The specified YAML configuration file was not found!\nUse -config to load examples from config_examples folder.\n";
 		exit(0);
 	}
 	catch (YAML::ParserException& pe) {
@@ -270,27 +238,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		exit(0);
 	}
 
-	std::cout << "Loading power configurations from file \"" << power_config_filename << "\"...";
-	try 
-	{
-		power_config = YAML::LoadFile(power_config_filename);
-		std::cout << " Done\n";
-	}
-	catch (YAML::BadFile& e) 
-	{
-		std::cout << " Failed\n";
-		std::cerr << "The specified YAML power configurations file was not found!\n";
-		exit(0);
-	}
-	catch (YAML::ParserException& pe) 
-	{
-		std::cout << " Failed\n";
-		std::cerr << "ERROR at line " << pe.mark.line + 1 << " column " << pe.mark.column + 1 << ": " << pe.msg << ". Please check identation.\n";
-		exit(0);
-	}
-	
-
-	r2r_link_length = ReadParam<double>(config, "r2r_link_length");
 	buffer_depth = ReadParam<int32_t>(config, "buffer_depth");
 	flit_size = ReadParam<int32_t>(config, "flit_size");
 	min_packet_size = ReadParam<int32_t>(config, "min_packet_size");
@@ -308,8 +255,6 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	report_progress = ReadParam<bool>(config, "report_progress", false);
 	report_buffers = ReadParam<bool>(config, "report_buffers", false);
 	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
-
-	power_configuration = power_config["Energy"].as<Power>();
 
 	std::string topology = ReadParam<std::string>(config, "topology");
 	channels_count = ReadParam<int32_t>(config, "topology_channels", 1);
@@ -526,6 +471,38 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	}
 	traffic.Setup();
 
+
+	YAML::Node power_config;
+	std::string power_config_filename = default_power_config_filename;
+	for (int32_t i = 1; i < arg_num; i++)
+	{
+		if (!strcmp(arg_vet[i], "-power"))
+		{
+			power_config_filename = arg_vet[++i];
+			break;
+		}
+	}
+	std::cout << "Loading power configurations from file \"" << power_config_filename << "\"...";
+	try
+	{
+		power_config = YAML::LoadFile(power_config_filename);
+		std::cout << " Done\n";
+	}
+	catch (YAML::BadFile& e)
+	{
+		std::cout << " Failed\n";
+		std::cerr << "The specified YAML power configurations file was not found!\nUse -power to load examples from config_examples folder.\n";
+		exit(0);
+	}
+	catch (YAML::ParserException& pe)
+	{
+		std::cout << " Failed\n";
+		std::cerr << "ERROR at line " << pe.mark.line + 1 << " column " << pe.mark.column + 1 << ": " << pe.msg << ". Please check identation.\n";
+		exit(0);
+	}
+	power_configuration = power_config.as<Power>();
+
+
 	ParseArgs(arg_num, arg_vet);
 
 	Check();
@@ -551,10 +528,10 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 			else if (!strcmp(arg_vet[i], "-routing"))
 			{
 				routing_algorithm = arg_vet[++i];
-				if (routing_algorithm == ROUTING_TABLE_BASED)
+				if (routing_algorithm == "TABLE_BASED")
 				{
 					//routing_table_filename = arg_vet[++i];
-					packet_injection_rate = 0;
+					//packet_injection_rate = 0;
 				}
 			}
 			else if (!strcmp(arg_vet[i], "-sel")) selection_strategy = arg_vet[++i];
@@ -583,7 +560,7 @@ void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
 			else if (!strcmp(arg_vet[i], "-traffic"))
 			{
 				char* traffic = arg_vet[++i];
-				if (!strcmp(traffic, "random")) traffic_distribution = TRAFFIC_RANDOM;
+				if (!strcmp(traffic, "random")) traffic_distribution = "TRAFFIC_RANDOM";
 				//else if (!strcmp(traffic, "transpose1")) traffic_distribution = TRAFFIC_TRANSPOSE1;
 				//else if (!strcmp(traffic, "transpose2")) traffic_distribution = TRAFFIC_TRANSPOSE2;
 				//else if (!strcmp(traffic, "bitreversal")) traffic_distribution = TRAFFIC_BIT_REVERSAL;
@@ -705,10 +682,6 @@ const TrafficManager& Configuration::Traffic() const
 	return traffic;
 }
 
-double Configuration::R2RLinkLength() const
-{
-	return r2r_link_length;
-}
 int32_t Configuration::BufferDepth() const
 {
 	return buffer_depth;
@@ -756,14 +729,6 @@ const std::string& Configuration::TrafficDistribution() const
 const std::string& Configuration::TrafficTableFilename() const
 {
 	return traffic_table_filename;
-}
-const std::string& Configuration::ConfigFilename() const
-{
-	return config_filename;
-}
-const std::string& Configuration::PowerConfigFilename() const
-{
-	return power_config_filename;
 }
 int32_t Configuration::ClockPeriodPS() const
 {

@@ -10,7 +10,10 @@
 
 #include "GlobalTrafficTable.hpp"
 
-GlobalTrafficTable::GlobalTrafficTable()
+
+
+GlobalTrafficTable::GlobalTrafficTable(double reset_time, double simulation_time, double pir) :
+	ResetTime(reset_time), SimulationTime(simulation_time), PIR(pir)
 {
 }
 
@@ -47,43 +50,31 @@ bool GlobalTrafficTable::load(const char* fname)
 					communication.dst = dst;
 
 					// Custom PIR
-					if (params >= 3 && pir >= 0 && pir <= 1)
-						communication.pir = pir;
-					else
-						communication.pir =
-						GlobalParams::packet_injection_rate;
+					if (params >= 3 && pir >= 0 && pir <= 1) communication.pir = pir;
+					else communication.pir = PIR;
 
 					// Custom POR
-					if (params >= 4 && por >= 0 && por <= 1)
-						communication.por = por;
-					else
-						communication.por = communication.pir;	// GlobalParams::probability_of_retransmission;
+					if (params >= 4 && por >= 0 && por <= 1) communication.por = por;
+					else communication.por = communication.pir;	// GlobalParams::probability_of_retransmission;
 
 					  // Custom Ton
-					if (params >= 5 && t_on >= 0)
-						communication.t_on = t_on;
-					else
-						communication.t_on = 0;
+					if (params >= 5 && t_on >= 0) communication.t_on = t_on;
+					else communication.t_on = 0;
 
 					// Custom Toff
-					if (params >= 6 && t_off >= 0) {
+					if (params >= 6 && t_off >= 0) 
+					{
 						assert(t_off > t_on);
 						communication.t_off = t_off;
 					}
-					else
-						communication.t_off =
-						GlobalParams::reset_time +
-						GlobalParams::simulation_time;
+					else communication.t_off = ResetTime + SimulationTime;
 
 					// Custom Tperiod
 					if (params >= 7 && t_period > 0) {
 						assert(t_period > t_off);
 						communication.t_period = t_period;
 					}
-					else
-						communication.t_period =
-						GlobalParams::reset_time +
-						GlobalParams::simulation_time;
+					else communication.t_period = ResetTime + SimulationTime;
 
 					// Add this communication to the vector of communications
 					traffic_table.push_back(communication);

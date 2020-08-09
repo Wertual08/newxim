@@ -4,6 +4,7 @@
 #include <vector>
 #include "DataStructs.hpp"
 #include "Power.hpp"
+#include "SimulationTimer.hpp"
 
 
 
@@ -22,9 +23,9 @@ struct CommHistory
 class Stats 
 {
 private:
+	const SimulationTimer Timer;
 	int32_t id;
 	std::vector<CommHistory> chist;
-	double warm_up_time;
 	double last_received_flit_time;
 	int32_t total_flits_accepted;
 
@@ -34,23 +35,22 @@ private:
 	int searchCommHistory(int src_id);
 
 public:
-	Stats(int32_t node_id, int32_t buffers);
-	void SetWarmUpTime(double warm_up);
+	Stats(const SimulationTimer& timer, int32_t node_id, int32_t buffers);
 
-	void UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time);
+	void UpdateBufferPopOrEmptyTime(int32_t buffer);
 	double GetBufferPopOrEmptyTime(int32_t buffer) const;
 	double GetMinBufferPopOrEmptyTime() const;
 
-	void AcceptFlit(double arrival_time);
+	void AcceptFlit();
 	int32_t GetAcceptedFlits() const;
 
-	void UpdateBufferLoad(double time, int32_t buffer, double load);
+	void UpdateBufferLoad(int32_t buffer, double load);
 	double GetAVGBufferLoad(int32_t channel, int32_t channels_count);
 
 	double getLastReceivedFlitTime() const;
 
 	// Access point for stats update
-	void receivedFlit(double arrival_time, const Flit& flit);
+	void receivedFlit(const Flit& flit);
 
 	// Returns the average delay (cycles) for the current node as
 	// regards to the communication whose source is src_id

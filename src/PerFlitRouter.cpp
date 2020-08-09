@@ -37,7 +37,7 @@ void PerFlitRouter::TXProcess()
 				out_rel.tx_req.write(out_rel.tx_current_level);
 
 				/* Power & Stats ------------------------------------------------- */
-				stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+				stats.UpdateBufferPopOrEmptyTime(i);
 
 				power.r2rLink();
 
@@ -47,12 +47,12 @@ void PerFlitRouter::TXProcess()
 				if (out_port == LocalRelayID)
 				{
 					power.networkInterface();
-					stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
+					stats.receivedFlit(flit);
 				}
 				/* End Power & Stats ------------------------------------------------- */
 			}
 		}
-		else stats.UpdateBufferPopOrEmptyTime(i, sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+		else stats.UpdateBufferPopOrEmptyTime(i);
 	} // for loop directions
 
 }
@@ -86,7 +86,7 @@ void PerFlitRouter::RXProcess()
 				// if a new flit is injected from local PE
 				if (received_flit.src_id == LocalID)
 				{
-					stats.AcceptFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps);
+					stats.AcceptFlit();
 					power.networkInterface();
 				}
 			}
@@ -105,8 +105,8 @@ void PerFlitRouter::RXProcess()
 	}
 }
 
-PerFlitRouter::PerFlitRouter(sc_module_name mname, int32_t id, size_t relays,
+PerFlitRouter::PerFlitRouter(sc_module_name mname, const SimulationTimer& timer, int32_t id, size_t relays,
 	int32_t max_buffer_size, RoutingAlgorithm& alg, SelectionStrategy& sel) :
-	Router(mname, id, relays, max_buffer_size, alg, sel)
+	Router(mname, timer, id, relays, max_buffer_size, alg, sel)
 {
 }

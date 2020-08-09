@@ -21,7 +21,7 @@ void Processor::UpdateCurrentPacket()
 }
 void Processor::PushPacket()
 {
-	double time_stamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+	double time_stamp = Timer.SystemTime();
 	if (!packets_in_queue)
 	{
 		oldest_packet_time_stamp = time_stamp;
@@ -87,8 +87,7 @@ void Processor::txProcess()
 		if (canShot())
 		{
 			PushPacket();
-			if (sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time > 
-				GlobalParams::stats_warm_up_time) TotalFlitsGenerated += FrontPacket().size;
+			if (Timer.StatisticsTime() < 0.0) TotalFlitsGenerated += FrontPacket().size;
 			transmittedAtPreviousCycle = true;
 		}
 		else transmittedAtPreviousCycle = false;
@@ -138,45 +137,28 @@ bool Processor::canShot()
 {
 	if (never_transmit) return false;
 	bool shot;
-	double threshold;
 
-	double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+	double now = Timer.SystemTime();
 
-	if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
-		if (!transmittedAtPreviousCycle) threshold = GlobalParams::packet_injection_rate;
-		else threshold = GlobalParams::probability_of_retransmission;
-
-		shot = Traffic.FirePacket(local_id, threshold);
-		//if (shot)
-		//{
-		//	if (GlobalParams::traffic_distribution == TRAFFIC_RANDOM) packet = trafficRandom();
-		//	else if (GlobalParams::traffic_distribution == "TRAFFIC_HOTSPOT") packet = trafficHotspot();
-		//	else
-		//	{
-		//		cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
-		//		exit(-1);
-		//	}
-		//}
-	}
-	else {			// Table based communication traffic
+	if (TableBased) 
+	{
+		// Table based communication traffic
 		if (never_transmit) return false;
 
 		bool use_pir = !transmittedAtPreviousCycle;
 		std::vector<std::pair<int, double>> dst_prob;
-		double threshold =
-			traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
+		double threshold = traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
 
 		double prob = (double)rand() / RAND_MAX;
 		shot = (prob < threshold);
-		//if (shot) {
-		//	for (unsigned int i = 0; i < dst_prob.size(); i++) {
-		//		if (prob < dst_prob[i].second) {
-		//			int vc = 0;
-		//			packet.make(local_id, dst_prob[i].first, vc, now, getRandomSize());
-		//			break;
-		//		}
-		//	}
-		//}
+	}
+	else 
+	{
+		double threshold;
+		if (!transmittedAtPreviousCycle) threshold = PacketInjectionRate;
+		else threshold = ProbabilityOfRetransmission;
+
+		shot = Traffic.FirePacket(local_id, threshold);
 	}
 
 	return shot;
@@ -184,7 +166,7 @@ bool Processor::canShot()
 
 int Processor::getRandomSize()
 {
-	return randInt(GlobalParams::min_packet_size, GlobalParams::max_packet_size);
+	return randInt(MinPacketSize, MaxPacketSize);
 }
 
 unsigned int Processor::getQueueSize() const

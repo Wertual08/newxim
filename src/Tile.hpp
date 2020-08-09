@@ -169,10 +169,10 @@ public:
 		ProcessorDevice->free_slots_neighbor(free_slots_neighbor_local);
 	}
 
-	void ConfigureRotuerPower(const std::string& routing_algorithm)
+	void ConfigureRotuerPower(const Configuration::Power& config, int32_t flit_size, int32_t buffer_depth, const std::string& routing_algorithm)
 	{
-		RouterDevice->power.configureRouter(GlobalParams::flit_size,
-			GlobalParams::buffer_depth, GlobalParams::flit_size,
+		RouterDevice->power.configureRouter(config, 
+			flit_size, buffer_depth, flit_size,
 			routing_algorithm, "default");
 	}
 };

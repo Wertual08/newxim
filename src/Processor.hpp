@@ -22,6 +22,7 @@ class Processor : public sc_module
 {
 	SC_HAS_PROCESS(Processor);
 private:
+	const SimulationTimer Timer;
 	int32_t TotalFlitsGenerated;
 	int32_t MaxID;
 	const TrafficManager& Traffic;
@@ -30,6 +31,12 @@ private:
 	double oldest_packet_time_stamp = 0.0;
 	double newest_packet_time_stamp = 0.0;
 	Packet current_packet;
+
+	const bool TableBased;
+	const double PacketInjectionRate;
+	const double ProbabilityOfRetransmission;
+	const int32_t MinPacketSize;
+	const int32_t MaxPacketSize;
 
 	void UpdateCurrentPacket();
 	void PushPacket();
@@ -76,7 +83,12 @@ public:
 	unsigned int getQueueSize() const;
 
 	// Constructor
-	Processor(sc_module_name, int32_t max_id, const TrafficManager& traffic) : MaxID(max_id), Traffic(traffic)
+	Processor(sc_module_name, SimulationTimer timer, bool table_based,
+		double packet_injection_rate, double probability_of_retransmission,
+		int32_t min_packet_size, int32_t max_packet_size, int32_t max_id, const TrafficManager& traffic) :
+		Timer(timer), TableBased(table_based), PacketInjectionRate(packet_injection_rate),
+		ProbabilityOfRetransmission(probability_of_retransmission), MinPacketSize(min_packet_size),
+		MaxPacketSize(max_packet_size), MaxID(max_id), Traffic(traffic)
 	{
 		SC_METHOD(rxProcess);
 		sensitive << reset << clock.pos();

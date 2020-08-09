@@ -61,7 +61,7 @@ public:
 	Stats stats;						// Statistics
 	Power power;
 
-	Router(sc_module_name, int32_t id, size_t relays, int32_t max_buffer_size,
+	Router(sc_module_name, const SimulationTimer& timer, int32_t id, size_t relays, int32_t max_buffer_size,
 		RoutingAlgorithm& alg, SelectionStrategy& sel);
 };
 

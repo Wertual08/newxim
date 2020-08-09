@@ -13,11 +13,14 @@
 #include "Utils.hpp"
 #include "systemc.h"
 
-#define W2J(watt) ((watt)*GlobalParams::clock_period_ps*1.0e-12)
 
 
+double Power::W2J(double watt)
+{
+    return watt * Timer.ClockPeriod() * 1.0e-12;
+}
 
-Power::Power()
+Power::Power(const SimulationTimer& timer) : Timer(timer)
 {
     total_power_s = 0.0;
 
@@ -54,17 +57,20 @@ Power::Power()
     ni_pwr_s = 0.0;
 
 
-    sleep_end_cycle = NOT_VALID;
+    sleep_end_cycle = -1; // NOT_VALID
 
     initPowerBreakdown();
 }
 
-void Power::configureRouter(int link_width,
+void Power::configureRouter(
+    const Configuration::Power& config_, 
+    int link_width,
 	int buffer_depth,
 	int buffer_item_size,
 	std::string routing_function,
 	std::string selection_function)
 {
+    Configuration::Power config = config_; // TODO: Fix this shit
 // (s)tatic, (d)ynamic power
 
     // Buffer 
@@ -73,39 +79,39 @@ void Power::configureRouter(int link_width,
     // Dynamic values are expressed in Joule
     // Static/Leakage values must be converted from Watt to Joule
 
-    buffer_router_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key]);
-    buffer_router_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key];
-    buffer_router_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key];
-    buffer_router_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
+    buffer_router_pwr_s = W2J(config.bufferPowerConfig.leakage[key]);
+    buffer_router_push_pwr_d = config.bufferPowerConfig.push[key];
+    buffer_router_front_pwr_d = config.bufferPowerConfig.front[key];
+    buffer_router_pop_pwr_d = config.bufferPowerConfig.pop[key];
 
     // Routing 
-    routing_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm[routing_function].first);
-    routing_pwr_d = GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm[routing_function].second;
+    routing_pwr_s = W2J(config.routerPowerConfig.routing_algorithm_pm[routing_function].first);
+    routing_pwr_d = config.routerPowerConfig.routing_algorithm_pm[routing_function].second;
 
     // Selection 
-    selection_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm[selection_function].first);
-    selection_pwr_d = GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm[selection_function].second;
+    selection_pwr_s = W2J(config.routerPowerConfig.selection_strategy_pm[selection_function].first);
+    selection_pwr_d = config.routerPowerConfig.selection_strategy_pm[selection_function].second;
 
     // CrossBar
     // TODO future work: tuning of crossbar radix
-    std::pair<int,int> xbar_k = std::pair<int,int>(5, GlobalParams::flit_size);
-    assert(GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.find(xbar_k) != GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.end());
-    crossbar_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].first);
-    crossbar_pwr_d = GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].second;
+    std::pair<int,int> xbar_k = std::pair<int,int>(5, buffer_item_size);
+    assert(config.routerPowerConfig.crossbar_pm.find(xbar_k) != config.routerPowerConfig.crossbar_pm.end());
+    crossbar_pwr_s = W2J(config.routerPowerConfig.crossbar_pm[xbar_k].first);
+    crossbar_pwr_d = config.routerPowerConfig.crossbar_pm[xbar_k].second;
     
     // NetworkInterface
-    ni_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.network_interface[GlobalParams::flit_size].first);
-    ni_pwr_d = GlobalParams::power_configuration.routerPowerConfig.network_interface[GlobalParams::flit_size].second;
+    ni_pwr_s = W2J(config.routerPowerConfig.network_interface[buffer_item_size].first);
+    ni_pwr_d = config.routerPowerConfig.network_interface[buffer_item_size].second;
 
     // Link 
     // Router has both type of links
-    double length_r2r = GlobalParams::r2r_link_length;
+    double length_r2r = config.r2r_link_length;
     
-    assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2r)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
+    assert(config.linkBitLinePowerConfig.find(length_r2r)!=config.linkBitLinePowerConfig.end());
 
 
-    link_r2r_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].first);
-    link_r2r_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].second;
+    link_r2r_pwr_s= W2J(link_width * config.linkBitLinePowerConfig[length_r2r].first);
+    link_r2r_pwr_d= link_width * config.linkBitLinePowerConfig[length_r2r].second;
 }
 
 // Router buffer
@@ -220,14 +226,14 @@ void Power::printBreakDown(std::ostream & out)
 void Power::rxSleep(int cycles)
 {
 
-    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period_ps);
+    int sleep_start_cycle = static_cast<int32_t>(Timer.SystemTime());
     sleep_end_cycle = sleep_start_cycle + cycles;
 }
 
 
 bool Power::isSleeping()
 {
-    int now = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period_ps);
+    int now = static_cast<int32_t>(Timer.SystemTime());
 
     return (now<sleep_end_cycle);
 

@@ -10,7 +10,6 @@
 
 #pragma once
 #include <systemc.h>
-#include "GlobalParams.hpp"
 
 // FlitType -- Flit type enumeration
 enum FlitType 

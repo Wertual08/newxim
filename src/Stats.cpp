@@ -2,22 +2,19 @@
 
 
 
-Stats::Stats(int32_t node_id, int32_t buffers) :
+Stats::Stats(const SimulationTimer& timer, int32_t node_id, int32_t buffers) :
+	Timer(timer),
 	AVGBufferLoad(buffers, std::make_pair(0.0, 0.0)),
 	LastBufferPopOrEmptyTime(buffers, -1.0)
 {
 	id = node_id;
 	total_flits_accepted = 0;
 }
-void Stats::SetWarmUpTime(double warm_up)
-{
-	warm_up_time = warm_up;
-}
 
-void Stats::UpdateBufferPopOrEmptyTime(int32_t buffer, double pop_time)
+void Stats::UpdateBufferPopOrEmptyTime(int32_t buffer)
 {
 	//if (pop_time - GlobalParams::reset_time < warm_up_time)	return;
-	LastBufferPopOrEmptyTime[buffer] = pop_time;
+	LastBufferPopOrEmptyTime[buffer] = Timer.SystemTime();
 }
 
 double Stats::GetBufferPopOrEmptyTime(int32_t buffer) const
@@ -33,9 +30,10 @@ double Stats::GetMinBufferPopOrEmptyTime() const
 	return min;
 }
 
-void Stats::AcceptFlit(double arrival_time)
+void Stats::AcceptFlit()
 {
-	if (arrival_time - GlobalParams::reset_time < warm_up_time)	return;
+	if (Timer.StatisticsTime() < 0.0) return;
+
 	total_flits_accepted++;
 }
 int32_t Stats::GetAcceptedFlits() const
@@ -43,9 +41,10 @@ int32_t Stats::GetAcceptedFlits() const
 	return total_flits_accepted;
 }
 
-void Stats::UpdateBufferLoad(double time, int32_t buffer, double load)
+void Stats::UpdateBufferLoad(int32_t buffer, double load)
 {
-	if (time - GlobalParams::reset_time < warm_up_time)	return;
+	if (Timer.StatisticsTime() < 0.0) return;
+
 	AVGBufferLoad[buffer].first += 1.0;
 	AVGBufferLoad[buffer].second += load;
 }
@@ -66,11 +65,11 @@ double Stats::getLastReceivedFlitTime() const
 	return last_received_flit_time;
 }
 
-void Stats::receivedFlit(double arrival_time, const Flit& flit)
+void Stats::receivedFlit(const Flit& flit)
 {
-	//if (arrival_time - GlobalParams::reset_time < 560)	return;
-	if (arrival_time - GlobalParams::reset_time < warm_up_time)	return;
-	last_received_flit_time = arrival_time - GlobalParams::reset_time;
+	if (Timer.StatisticsTime() < 0.0) return;
+
+	last_received_flit_time = Timer.SimulationTime();
 
 	int i = searchCommHistory(flit.src_id);
 
@@ -94,7 +93,7 @@ void Stats::receivedFlit(double arrival_time, const Flit& flit)
 
 	if (flit.flit_type == FLIT_TYPE_HEAD)
 	{
-		double delay = arrival_time - flit.timestamp;
+		double delay = Timer.SystemTime() - flit.timestamp;
 		chist[i].total_received_packets++;
 		chist[i].total_packets_delay += delay;
 		chist[i].packets_max_delay = std::max(chist[i].packets_max_delay, delay);
@@ -102,7 +101,7 @@ void Stats::receivedFlit(double arrival_time, const Flit& flit)
 	}
 
 	chist[i].total_received_flits++;
-	chist[i].last_received_flit_time = arrival_time - warm_up_time;
+	chist[i].last_received_flit_time = Timer.StatisticsTime();
 }
 
 double Stats::getAverageDelay(const int src_id)
@@ -176,7 +175,7 @@ double Stats::getAverageThroughput(const int src_id)
 	// not using GlobalParams::simulation_time since 
 	// the value must takes into account the invokation time
 	// (when called before simulation ended, e.g. turi signal)
-	int current_sim_cycles = sc_time_stamp().to_double() / GlobalParams::clock_period_ps - warm_up_time - GlobalParams::reset_time;
+	int current_sim_cycles = Timer.StatisticsTime();
 
 	if (chist[i].total_received_flits == 0) return -1.0;
 	else return (double)chist[i].total_received_flits / current_sim_cycles;
