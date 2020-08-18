@@ -22,6 +22,7 @@ topology_channels: 1
 # Router types:
 #   WORMHOLE
 #   PER_FLIT
+#   PER_FLIT_TREE_REROUTE
 router_type: PER_FLIT 
 
 # number of flits for each router buffer

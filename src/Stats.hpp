@@ -10,7 +10,7 @@
 
 struct CommHistory 
 {
-	int32_t src_id;
+	std::int32_t src_id;
 
 	uint32_t total_received_packets; 
 	double total_packets_delay; 
@@ -24,10 +24,10 @@ class Stats
 {
 private:
 	const SimulationTimer Timer;
-	int32_t id;
+	std::int32_t id;
 	std::vector<CommHistory> chist;
 	double last_received_flit_time;
-	int32_t total_flits_accepted;
+	std::int32_t total_flits_accepted;
 
 	std::vector<std::pair<double, double>> AVGBufferLoad;
 	std::vector<double> LastBufferPopOrEmptyTime;
@@ -35,17 +35,17 @@ private:
 	int searchCommHistory(int src_id);
 
 public:
-	Stats(const SimulationTimer& timer, int32_t node_id, int32_t buffers);
+	Stats(const SimulationTimer& timer, std::int32_t node_id, std::int32_t buffers);
 
-	void UpdateBufferPopOrEmptyTime(int32_t buffer);
-	double GetBufferPopOrEmptyTime(int32_t buffer) const;
+	void UpdateBufferPopOrEmptyTime(std::int32_t buffer);
+	double GetBufferPopOrEmptyTime(std::int32_t buffer) const;
 	double GetMinBufferPopOrEmptyTime() const;
 
 	void AcceptFlit();
-	int32_t GetAcceptedFlits() const;
+	std::int32_t GetAcceptedFlits() const;
 
-	void UpdateBufferLoad(int32_t buffer, double load);
-	double GetAVGBufferLoad(int32_t channel, int32_t channels_count);
+	void UpdateBufferLoad(std::int32_t buffer, double load);
+	double GetAVGBufferLoad(std::int32_t channel, std::int32_t channels_count);
 
 	double getLastReceivedFlitTime() const;
 

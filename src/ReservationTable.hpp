@@ -7,16 +7,16 @@
 class ReservationTable
 {
 private:
-	const int32_t PortsCount;
-	std::vector<int32_t> Table;
+	const std::int32_t PortsCount;
+	std::vector<std::int32_t> Table;
 
 public:
-	ReservationTable(int32_t ports);
+	ReservationTable(std::int32_t ports);
 
-	void Reserve(int32_t port_in, int32_t port_out);
-	void Release(int32_t port_in);
-	bool Reserved(int32_t port_out) const;
-	int32_t Reservation(int32_t port_in);
+	void Reserve(std::int32_t port_in, std::int32_t port_out);
+	void Release(std::int32_t port_in);
+	bool Reserved(std::int32_t port_out) const;
+	std::int32_t Reservation(std::int32_t port_in);
 
 	friend std::ostream& operator<<(std::ostream& os, const ReservationTable& table);
 };

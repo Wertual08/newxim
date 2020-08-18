@@ -2,7 +2,7 @@
 
 
 
-Stats::Stats(const SimulationTimer& timer, int32_t node_id, int32_t buffers) :
+Stats::Stats(const SimulationTimer& timer, std::int32_t node_id, std::int32_t buffers) :
 	Timer(timer),
 	AVGBufferLoad(buffers, std::make_pair(0.0, 0.0)),
 	LastBufferPopOrEmptyTime(buffers, -1.0)
@@ -11,13 +11,13 @@ Stats::Stats(const SimulationTimer& timer, int32_t node_id, int32_t buffers) :
 	total_flits_accepted = 0;
 }
 
-void Stats::UpdateBufferPopOrEmptyTime(int32_t buffer)
+void Stats::UpdateBufferPopOrEmptyTime(std::int32_t buffer)
 {
 	//if (pop_time - GlobalParams::reset_time < warm_up_time)	return;
 	LastBufferPopOrEmptyTime[buffer] = Timer.SystemTime();
 }
 
-double Stats::GetBufferPopOrEmptyTime(int32_t buffer) const
+double Stats::GetBufferPopOrEmptyTime(std::int32_t buffer) const
 {
 	return LastBufferPopOrEmptyTime[buffer];
 }
@@ -25,7 +25,7 @@ double Stats::GetBufferPopOrEmptyTime(int32_t buffer) const
 double Stats::GetMinBufferPopOrEmptyTime() const
 {
 	double min = LastBufferPopOrEmptyTime[0];
-	for (int32_t i = 1; i < LastBufferPopOrEmptyTime.size(); i++)
+	for (std::int32_t i = 1; i < LastBufferPopOrEmptyTime.size(); i++)
 		if (min > LastBufferPopOrEmptyTime[i]) min = LastBufferPopOrEmptyTime[i];
 	return min;
 }
@@ -36,19 +36,19 @@ void Stats::AcceptFlit()
 
 	total_flits_accepted++;
 }
-int32_t Stats::GetAcceptedFlits() const
+std::int32_t Stats::GetAcceptedFlits() const
 {
 	return total_flits_accepted;
 }
 
-void Stats::UpdateBufferLoad(int32_t buffer, double load)
+void Stats::UpdateBufferLoad(std::int32_t buffer, double load)
 {
 	if (Timer.StatisticsTime() < 0.0) return;
 
 	AVGBufferLoad[buffer].first += 1.0;
 	AVGBufferLoad[buffer].second += load;
 }
-double Stats::GetAVGBufferLoad(int32_t channel, int32_t channels_count)
+double Stats::GetAVGBufferLoad(std::int32_t channel, std::int32_t channels_count)
 {
 	auto load = std::make_pair(0.0, 0.0);
 	for (int i = 0; i < (AVGBufferLoad.size() - 1) / channels_count; i++)
@@ -263,7 +263,7 @@ void Stats::showStats(int curr_node, std::ostream& out, bool header)
 			<< std::setw(10) << "delay max"
 			<< std::setw(15) << "throughput"
 			<< std::setw(13) << "energy"
-			<< std::setw(12) << "received" << std::setw(12) << "received" << endl;
+			<< std::setw(12) << "received" << std::setw(12) << "received\n";
 		out << "%"
 			<< std::setw(5) << ""
 			<< std::setw(5) << ""
@@ -271,7 +271,7 @@ void Stats::showStats(int curr_node, std::ostream& out, bool header)
 			<< std::setw(10) << "cycles"
 			<< std::setw(15) << "flits/cycle"
 			<< std::setw(13) << "Joule"
-			<< std::setw(12) << "packets" << std::setw(12) << "flits" << endl;
+			<< std::setw(12) << "packets" << std::setw(12) << "flits\n";
 	}
 	for (unsigned int i = 0; i < chist.size(); i++) {
 		out << " "
@@ -283,9 +283,9 @@ void Stats::showStats(int curr_node, std::ostream& out, bool header)
 			<< std::setw(13) << getCommunicationEnergy(chist[i].src_id,
 				curr_node)
 			<< std::setw(12) << chist[i].total_received_packets//chist[i].delays.size()
-			<< std::setw(12) << chist[i].total_received_flits << endl;
+			<< std::setw(12) << chist[i].total_received_flits << '\n';
 	}
 
-	out << "% Aggregated average delay (cycles): " << getAverageDelay() << endl;
-	out << "% Aggregated average throughput (flits/cycle): " << getAverageThroughput() << endl;
+	out << "% Aggregated average delay (cycles): " << getAverageDelay() << '\n';
+	out << "% Aggregated average throughput (flits/cycle): " << getAverageThroughput() << '\n';
 }

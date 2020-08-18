@@ -14,7 +14,5 @@ protected:
 	virtual void RXProcess() override;
 
 public:
-	WormholeRouter(sc_module_name mname, const SimulationTimer& timer, int32_t id,
-		size_t relays, int32_t max_buffer_size,
-		RoutingAlgorithm& alg, SelectionStrategy& sel);
+	WormholeRouter(const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size);
 };

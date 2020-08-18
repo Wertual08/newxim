@@ -7,16 +7,16 @@
 class RoutingTorusXY : public RoutingAlgorithm
 {
 private:
-	const int32_t TorusW, TorusH;
+	const std::int32_t TorusW, TorusH;
 	const Graph& TorusGraph;
 
-	int32_t GetXFromID(int32_t id);
-	int32_t GetYFromID(int32_t id);
-	int32_t GetIDFromXY(int32_t x, int32_t y);
-	std::vector<int32_t> GetLinksTo(int32_t id, int32_t x, int32_t y);
+	std::int32_t GetXFromID(std::int32_t id) const;
+	std::int32_t GetYFromID(std::int32_t id) const;
+	std::int32_t GetIDFromXY(std::int32_t x, std::int32_t y) const;
+	std::vector<std::int32_t> GetLinksTo(std::int32_t id, std::int32_t x, std::int32_t y) const;
 
 public:
-	RoutingTorusXY(int32_t w, int32_t h, const Graph& graph);
+	RoutingTorusXY(std::int32_t w, std::int32_t h, const Graph& graph);
 
-	std::vector<int32_t> Route(Router& router, const RouteData& route_data) override;
+	std::vector<std::int32_t> Route(Router& router, const RouteData& route_data) const override;
 };

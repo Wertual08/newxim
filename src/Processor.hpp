@@ -1,17 +1,9 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the declaration of the processing element
- */
 #pragma once
 #include <queue>
+#include <cstdint>
 #include <systemc.h>
 
-#include "DataStructs.hpp"
+#include "Relay.hpp"
 #include "GlobalTrafficTable.hpp"
 #include "TrafficManager.hpp"
 #include "Utils.hpp"
@@ -23,9 +15,9 @@ class Processor : public sc_module
 	SC_HAS_PROCESS(Processor);
 private:
 	const SimulationTimer Timer;
-	int32_t TotalFlitsGenerated;
-	int32_t MaxID;
-	const TrafficManager& Traffic;
+	std::int32_t TotalFlitsGenerated;
+	std::int32_t MaxID;
+	const TrafficManager* Traffic;
 
 	size_t packets_in_queue = 0;
 	double oldest_packet_time_stamp = 0.0;
@@ -35,8 +27,12 @@ private:
 	const bool TableBased;
 	const double PacketInjectionRate;
 	const double ProbabilityOfRetransmission;
-	const int32_t MinPacketSize;
-	const int32_t MaxPacketSize;
+	const std::int32_t MinPacketSize;
+	const std::int32_t MaxPacketSize;
+
+	Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id, bool table_based,
+		double packet_injection_rate, double probability_of_retransmission,
+		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
 
 	void UpdateCurrentPacket();
 	void PushPacket();
@@ -50,23 +46,18 @@ public:
 	sc_in_clk clock;		// The input clock for the PE
 	sc_in<bool> reset;	// The reset signal for the PE
 
-	sc_in<Flit> flit_rx;	// The input channel
-	sc_in<bool> req_rx;	// The request associated with the input channel
-	sc_out<bool> ack_rx;	// The outgoing ack signal associated with the input channel
-	sc_out<bool> buffer_full_status_rx;
-
-	sc_out<Flit> flit_tx;	// The output channel
-	sc_out<bool> req_tx;	// The request associated with the output channel
-	sc_in<bool> ack_tx;	// The outgoing ack signal associated with the output channel
-	sc_in<bool> buffer_full_status_tx;
-
-	sc_in<int> free_slots_neighbor;
+	Relay relay;
 
 	// Registers
-	int local_id;		// Unique identification number
+	const std::int32_t local_id;		// Unique identification number
 	bool current_level_rx;	// Current level for Alternating Bit Protocol (ABP)
 	bool current_level_tx;	// Current level for Alternating Bit Protocol (ABP)
 	bool transmittedAtPreviousCycle;	// Used for distributions with memory
+
+	Processor(const SimulationTimer& timer, std::int32_t id, bool table_based,
+		double packet_injection_rate, double probability_of_retransmission,
+		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
+	void SetTrafficManager(const TrafficManager& traffic);
 
 	// Functions
 	void rxProcess();				// The receiving process
@@ -78,23 +69,9 @@ public:
 	bool never_transmit;				// true if the PE does not transmit any packet 
 	//  (valid only for the table based traffic)
 
-	int getRandomSize();				// Returns a random size in flits for the packet
+	std::int32_t getRandomSize();				// Returns a random size in flits for the packet
 
-	unsigned int getQueueSize() const;
+	uint32_t getQueueSize() const;
 
-	// Constructor
-	Processor(sc_module_name, SimulationTimer timer, bool table_based,
-		double packet_injection_rate, double probability_of_retransmission,
-		int32_t min_packet_size, int32_t max_packet_size, int32_t max_id, const TrafficManager& traffic) :
-		Timer(timer), TableBased(table_based), PacketInjectionRate(packet_injection_rate),
-		ProbabilityOfRetransmission(probability_of_retransmission), MinPacketSize(min_packet_size),
-		MaxPacketSize(max_packet_size), MaxID(max_id), Traffic(traffic)
-	{
-		SC_METHOD(rxProcess);
-		sensitive << reset << clock.pos();
-		SC_METHOD(txProcess);
-		sensitive << reset << clock.pos();
-	}
-
-	int32_t GetTotalFlitsGenerated() const;
+	std::int32_t GetTotalFlitsGenerated() const;
 };

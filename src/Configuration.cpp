@@ -198,11 +198,11 @@ void Configuration::ShowHelp(const std::string& selfname)
 		<< "and if need to solve any other problem of your life please contact Turi Monteleone <salvatore.monteleone@dieei.unict.it>\n";
 }
 
-Configuration::Configuration(int32_t arg_num, char* arg_vet[])
+Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 {
 	// TODO: Maybe I should make it beautiful... But later
 
-	for (int32_t i = 1; i < arg_num; i++)
+	for (std::int32_t i = 1; i < arg_num; i++)
 	{
 		if (!strcmp(arg_vet[i], "-help"))
 		{
@@ -213,7 +213,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 
 	YAML::Node config;
 	std::string config_filename = default_config_filename;
-	for (int32_t i = 1; i < arg_num; i++)
+	for (std::int32_t i = 1; i < arg_num; i++)
 	{
 		if (!strcmp(arg_vet[i], "-config"))
 		{
@@ -238,47 +238,47 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		exit(0);
 	}
 
-	buffer_depth = ReadParam<int32_t>(config, "buffer_depth");
-	flit_size = ReadParam<int32_t>(config, "flit_size");
-	min_packet_size = ReadParam<int32_t>(config, "min_packet_size");
-	max_packet_size = ReadParam<int32_t>(config, "max_packet_size");
+	buffer_depth = ReadParam<std::int32_t>(config, "buffer_depth");
+	flit_size = ReadParam<std::int32_t>(config, "flit_size");
+	min_packet_size = ReadParam<std::int32_t>(config, "min_packet_size");
+	max_packet_size = ReadParam<std::int32_t>(config, "max_packet_size");
 	router_type = ReadParam<std::string>(config, "router_type");
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 	packet_injection_rate = ReadParam<double>(config, "packet_injection_rate");
 	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
-	clock_period_ps = ReadParam<int32_t>(config, "clock_period_ps");
-	simulation_time = ReadParam<int32_t>(config, "simulation_time");
-	reset_time = ReadParam<int32_t>(config, "reset_time");
-	stats_warm_up_time = ReadParam<int32_t>(config, "stats_warm_up_time");
-	rnd_generator_seed = ReadParam<int32_t>(config, "rnd_generator_seed", time(0));
+	clock_period_ps = ReadParam<std::int32_t>(config, "clock_period_ps");
+	simulation_time = ReadParam<std::int32_t>(config, "simulation_time");
+	reset_time = ReadParam<std::int32_t>(config, "reset_time");
+	stats_warm_up_time = ReadParam<std::int32_t>(config, "stats_warm_up_time");
+	rnd_generator_seed = ReadParam<std::int32_t>(config, "rnd_generator_seed", time(0));
 	report_progress = ReadParam<bool>(config, "report_progress", false);
 	report_buffers = ReadParam<bool>(config, "report_buffers", false);
 	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
 
 	std::string topology = ReadParam<std::string>(config, "topology");
-	channels_count = ReadParam<int32_t>(config, "topology_channels", 1);
+	channels_count = ReadParam<std::int32_t>(config, "topology_channels", 1);
 	try
 	{
 		const auto& args = config["topology_args"];
 		if (topology == "CUSTOM")
 		{
-			for (int32_t i = 0; i < args.size(); i++)
+			for (std::int32_t i = 0; i < args.size(); i++)
 			{
 				const auto& branch = args[i];
 				Graph::Node gnode;
-				for (int32_t j = 0; j < branch.size(); j++)
-					gnode.push_back(branch[j].as<int32_t>());
+				for (std::int32_t j = 0; j < branch.size(); j++)
+					gnode.push_back(branch[j].as<std::int32_t>());
 				graph.push_back(std::move(gnode));
 			}
 		}
 		else if (topology == "CIRCULANT")
 		{
-			graph.resize(args[0].as<int32_t>());
-			for (int32_t i = 1; i < args.size(); i++)
+			graph.resize(args[0].as<std::int32_t>());
+			for (std::int32_t i = 1; i < args.size(); i++)
 			{
-				int32_t l = args[i].as<int32_t>();
-				for (int32_t j = 0; j < graph.size(); j++)
+				std::int32_t l = args[i].as<std::int32_t>();
+				for (std::int32_t j = 0; j < graph.size(); j++)
 				{
 					//if ((j + l) % graph.size() < j) continue;
 					graph[j].push_back((j + l) % graph.size(), channels_count);
@@ -288,13 +288,13 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		}
 		else if (topology == "MESH")
 		{
-			dim_x = args[0].as<int32_t>();
-			dim_y = args[1].as<int32_t>();
+			dim_x = args[0].as<std::int32_t>();
+			dim_y = args[1].as<std::int32_t>();
 
 			graph.resize(dim_x * dim_y);
-			for (int32_t x = 0; x < dim_x; x++)
+			for (std::int32_t x = 0; x < dim_x; x++)
 			{
-				for (int32_t y = 0; y < dim_y; y++)
+				for (std::int32_t y = 0; y < dim_y; y++)
 				{
 					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
 					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1, channels_count);
@@ -305,13 +305,13 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		}
 		else if (topology == "TORUS")
 		{
-			dim_x = args[0].as<int32_t>();
-			dim_y = args[1].as<int32_t>();
+			dim_x = args[0].as<std::int32_t>();
+			dim_y = args[1].as<std::int32_t>();
 
 			graph.resize(dim_x * dim_y);
-			for (int32_t x = 0; x < dim_x; x++)
+			for (std::int32_t x = 0; x < dim_x; x++)
 			{
-				for (int32_t y = 0; y < dim_y; y++)
+				for (std::int32_t y = 0; y < dim_y; y++)
 				{
 					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
 					else graph[y * dim_x + x].push_back(x, channels_count);
@@ -326,13 +326,13 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		}
 		else if (topology == "TREE")
 		{
-			int32_t nodes_count = args[0].as<int32_t>();
-			int32_t subnodes_count = args[1].as<int32_t>();
+			std::int32_t nodes_count = args[0].as<std::int32_t>();
+			std::int32_t subnodes_count = args[1].as<std::int32_t>();
 			graph.resize(nodes_count);
-			for (int32_t i = 0; i < graph.size(); i++)
+			for (std::int32_t i = 0; i < graph.size(); i++)
 			{
 				if (i * subnodes_count + 1 >= graph.size()) break;
-				for (int32_t j = 1; j <= subnodes_count; j++)
+				for (std::int32_t j = 1; j <= subnodes_count; j++)
 				{
 					if (i * subnodes_count + j >= graph.size()) break;
 					graph[i].push_back(i * subnodes_count + j, channels_count);
@@ -342,13 +342,13 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 		}
 		else if (topology == "TMESH")
 		{
-			dim_x = args[0].as<int32_t>();
-			dim_y = args[1].as<int32_t>();
+			dim_x = args[0].as<std::int32_t>();
+			dim_y = args[1].as<std::int32_t>();
 
 			graph.resize(dim_x * dim_y);
-			for (int32_t x = 0; x < dim_x; x++)
+			for (std::int32_t x = 0; x < dim_x; x++)
 			{
-				for (int32_t y = 0; y < dim_y; y++)
+				for (std::int32_t y = 0; y < dim_y; y++)
 				{
 					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
 					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1, channels_count);
@@ -386,42 +386,42 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 					id_based = config["routing_table_id_based"].as<bool>();
 				if (id_based)
 				{
-					for (int32_t i = 0; i < node.size(); i++)
+					for (std::int32_t i = 0; i < node.size(); i++)
 					{
 						const auto& branch = node[i];
 						RoutingTable::Node rnode;
-						for (int32_t j = 0; j < branch.size(); j++)
+						for (std::int32_t j = 0; j < branch.size(); j++)
 						{
-							if (j == i) rnode.push_back(std::vector<int32_t>(1, graph[i].size()));
+							if (j == i) rnode.push_back(std::vector<std::int32_t>(1, graph[i].size()));
 							else if (branch[j].IsSequence())
 							{
-								rnode.push_back(std::vector<int32_t>());
-								for (int32_t k = 0; k < branch[j].size(); k++)
+								rnode.push_back(std::vector<std::int32_t>());
+								for (std::int32_t k = 0; k < branch[j].size(); k++)
 								{
-									auto links = graph[i].links_to(branch[j][k].as<int32_t>());
-									for (int32_t l : links) rnode[j].push_back(l);
+									auto links = graph[i].links_to(branch[j][k].as<std::int32_t>());
+									for (std::int32_t l : links) rnode[j].push_back(l);
 								}
 							}
-							else rnode.push_back(graph[i].links_to(branch[j].as<int32_t>()));
+							else rnode.push_back(graph[i].links_to(branch[j].as<std::int32_t>()));
 						}
 						table.push_back(std::move(rnode));
 					}
 				}
 				else
 				{
-					for (int32_t i = 0; i < node.size(); i++)
+					for (std::int32_t i = 0; i < node.size(); i++)
 					{
 						const auto& branch = node[i];
 						RoutingTable::Node rnode;
-						for (int32_t j = 0; j < branch.size(); j++)
+						for (std::int32_t j = 0; j < branch.size(); j++)
 						{
 							if (branch[j].IsSequence())
 							{
-								rnode.push_back(std::vector<int32_t>());
-								for (int32_t k = 0; k < branch[j].size(); k++)
-									rnode[j].push_back(branch[j][k].as<int32_t>());
+								rnode.push_back(std::vector<std::int32_t>());
+								for (std::int32_t k = 0; k < branch[j].size(); k++)
+									rnode[j].push_back(branch[j][k].as<std::int32_t>());
 							}
-							else rnode.push_back(std::vector<int32_t>(1, branch[j].as<int32_t>()));
+							else rnode.push_back(std::vector<std::int32_t>(1, branch[j].as<std::int32_t>()));
 						}
 						table.push_back(std::move(rnode));
 					}
@@ -460,13 +460,13 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	else if (traffic_distribution == "TRAFFIC_HOTSPOT")
 	{
 		const auto& traffic_hotspots = config["traffic_hotspots"];
-		for (int32_t i = 0; i < traffic_hotspots.size(); i++)
+		for (std::int32_t i = 0; i < traffic_hotspots.size(); i++)
 		{
 			const auto& hotspot = traffic_hotspots[i];
 			traffic.SetLoad(
-				hotspot[0].as<int32_t>(), 
-				hotspot[1].as<int32_t>(), 
-				hotspot[2].as<int32_t>());
+				hotspot[0].as<std::int32_t>(), 
+				hotspot[1].as<std::int32_t>(), 
+				hotspot[2].as<std::int32_t>());
 		}
 	}
 	traffic.Setup();
@@ -474,7 +474,7 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 
 	YAML::Node power_config;
 	std::string power_config_filename = default_power_config_filename;
-	for (int32_t i = 1; i < arg_num; i++)
+	for (std::int32_t i = 1; i < arg_num; i++)
 	{
 		if (!strcmp(arg_vet[i], "-power"))
 		{
@@ -510,13 +510,13 @@ Configuration::Configuration(int32_t arg_num, char* arg_vet[])
 	// Show configuration
 	// Show();
 }
-void Configuration::ParseArgs(int32_t arg_num, char* arg_vet[])
+void Configuration::ParseArgs(std::int32_t arg_num, char* arg_vet[])
 {
 	if (arg_num == 1)
 		std::cout << "Running with default parameters (use '-help' option to see how to override them)\n";
 	else
 	{
-		for (int32_t i = 1; i < arg_num; i++)
+		for (std::int32_t i = 1; i < arg_num; i++)
 		{
 			if (!strcmp(arg_vet[i], "-buffer")) buffer_depth = atoi(arg_vet[++i]);
 			else if (!strcmp(arg_vet[i], "-flit")) flit_size = atoi(arg_vet[++i]);
@@ -682,19 +682,19 @@ const TrafficManager& Configuration::Traffic() const
 	return traffic;
 }
 
-int32_t Configuration::BufferDepth() const
+std::int32_t Configuration::BufferDepth() const
 {
 	return buffer_depth;
 }
-int32_t Configuration::FlitSize() const
+std::int32_t Configuration::FlitSize() const
 {
 	return flit_size;
 }
-int32_t Configuration::MinPacketSize() const
+std::int32_t Configuration::MinPacketSize() const
 {
 	return min_packet_size;
 }
-int32_t Configuration::MaxPacketSize() const
+std::int32_t Configuration::MaxPacketSize() const
 {
 	return max_packet_size;
 }
@@ -730,23 +730,23 @@ const std::string& Configuration::TrafficTableFilename() const
 {
 	return traffic_table_filename;
 }
-int32_t Configuration::ClockPeriodPS() const
+std::int32_t Configuration::ClockPeriodPS() const
 {
 	return clock_period_ps;
 }
-int32_t Configuration::SimulationTime() const
+std::int32_t Configuration::SimulationTime() const
 {
 	return simulation_time;
 }
-int32_t Configuration::ResetTime() const
+std::int32_t Configuration::ResetTime() const
 {
 	return reset_time;
 }
-int32_t Configuration::StatsWarmUpTime() const
+std::int32_t Configuration::StatsWarmUpTime() const
 {
 	return stats_warm_up_time;
 }
-int32_t Configuration::RndGeneratorSeed() const
+std::int32_t Configuration::RndGeneratorSeed() const
 {
 	return rnd_generator_seed;
 }
@@ -767,15 +767,15 @@ bool Configuration::ReportRoutingTable() const
 	return report_routing_table;
 }
 
-int32_t Configuration::DimX() const
+std::int32_t Configuration::DimX() const
 {
 	return dim_x;
 }
-int32_t Configuration::DimY() const
+std::int32_t Configuration::DimY() const
 {
 	return dim_y;
 }
-int32_t Configuration::ChannelsCount() const
+std::int32_t Configuration::ChannelsCount() const
 {
 	return channels_count;
 }

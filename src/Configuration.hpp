@@ -14,10 +14,10 @@ class Configuration
 public:
 	struct BufferPower
 	{
-		std::map<std::pair<int32_t, int32_t>, double> front;
-		std::map<std::pair<int32_t, int32_t>, double> pop;
-		std::map<std::pair<int32_t, int32_t>, double> push;
-		std::map<std::pair<int32_t, int32_t>, double> leakage;
+		std::map<std::pair<std::int32_t, std::int32_t>, double> front;
+		std::map<std::pair<std::int32_t, std::int32_t>, double> pop;
+		std::map<std::pair<std::int32_t, std::int32_t>, double> push;
+		std::map<std::pair<std::int32_t, std::int32_t>, double> leakage;
 	};
 
 	struct RouterPower
@@ -40,10 +40,10 @@ private:
 	std::string topology;
 	std::string topology_args;
 
-	int32_t buffer_depth;
-	int32_t flit_size;
-	int32_t min_packet_size;
-	int32_t max_packet_size;
+	std::int32_t buffer_depth;
+	std::int32_t flit_size;
+	std::int32_t min_packet_size;
+	std::int32_t max_packet_size;
 	std::string router_type;
 	std::string routing_algorithm;
 	std::string selection_strategy;
@@ -52,14 +52,14 @@ private:
 	double locality;
 	std::string traffic_distribution;
 	std::string traffic_table_filename;
-	int32_t clock_period_ps;
-	int32_t simulation_time;
-	int32_t reset_time;
-	int32_t stats_warm_up_time;
-	int32_t rnd_generator_seed;
+	std::int32_t clock_period_ps;
+	std::int32_t simulation_time;
+	std::int32_t reset_time;
+	std::int32_t stats_warm_up_time;
+	std::int32_t rnd_generator_seed;
 	Power power_configuration;
-	int32_t dim_x, dim_y;
-	int32_t channels_count;
+	std::int32_t dim_x, dim_y;
+	std::int32_t channels_count;
 	bool report_progress;
 	bool report_buffers;
 	bool report_routing_table;
@@ -74,8 +74,8 @@ public:
 
 	static void ShowHelp(const std::string& selfname);
 
-	Configuration(int32_t arg_num, char* arg_vet[]);
-	void ParseArgs(int32_t arg_num, char* arg_vet[]);
+	Configuration(std::int32_t arg_num, char* arg_vet[]);
+	void ParseArgs(std::int32_t arg_num, char* arg_vet[]);
 	void Check();
 
 	void Show() const;
@@ -84,10 +84,10 @@ public:
 	const RoutingTable& GRTable() const;
 	const TrafficManager& Traffic() const;
 
-	int32_t BufferDepth() const;
-	int32_t FlitSize() const;
-	int32_t MinPacketSize() const;
-	int32_t MaxPacketSize() const;
+	std::int32_t BufferDepth() const;
+	std::int32_t FlitSize() const;
+	std::int32_t MinPacketSize() const;
+	std::int32_t MaxPacketSize() const;
 
 	const std::string& RouterType() const;
 	const std::string& RoutingAlgorithm() const;
@@ -97,19 +97,19 @@ public:
 	double Locality() const;
 	const std::string& TrafficDistribution() const;
 	const std::string& TrafficTableFilename() const;
-	int32_t ClockPeriodPS() const;
-	int32_t SimulationTime() const;
-	int32_t ResetTime() const;
-	int32_t StatsWarmUpTime() const;
-	int32_t RndGeneratorSeed() const;
+	std::int32_t ClockPeriodPS() const;
+	std::int32_t SimulationTime() const;
+	std::int32_t ResetTime() const;
+	std::int32_t StatsWarmUpTime() const;
+	std::int32_t RndGeneratorSeed() const;
 	const Power& PowerConfiguration() const;
 	bool ReportProgress() const;
 	bool ReportBuffers() const;
 	bool ReportRoutingTable() const;
 
-	int32_t DimX() const;
-	int32_t DimY() const;
-	int32_t ChannelsCount() const;
+	std::int32_t DimX() const;
+	std::int32_t DimY() const;
+	std::int32_t ChannelsCount() const;
 
 	double TimeStamp() const;
 };

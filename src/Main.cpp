@@ -62,7 +62,7 @@ int sc_main(int arg_num, char* arg_vet[])
 	
 	// Close the simulation
 	std::cout << "Noxim simulation completed.";
-	std::cout << " (" << static_cast<int32_t>(Timer.SystemTime()) << " cycles executed)\n";
+	std::cout << " (" << static_cast<std::int32_t>(Timer.SystemTime()) << " cycles executed)\n";
 	std::cout << '\n';
 
 	// Show statistics

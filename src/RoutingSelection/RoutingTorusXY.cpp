@@ -2,15 +2,15 @@
 
 
 
-int32_t RoutingTorusXY::GetXFromID(int32_t id)
+std::int32_t RoutingTorusXY::GetXFromID(std::int32_t id) const
 {
     return id % TorusW;
 }
-int32_t RoutingTorusXY::GetYFromID(int32_t id)
+std::int32_t RoutingTorusXY::GetYFromID(std::int32_t id) const
 {
     return id / TorusW;
 }
-int32_t RoutingTorusXY::GetIDFromXY(int32_t x, int32_t y)
+std::int32_t RoutingTorusXY::GetIDFromXY(std::int32_t x, std::int32_t y) const
 {
     if (x >= TorusW) x = 0;
     if (x < 0) x = TorusW - 1;
@@ -18,33 +18,33 @@ int32_t RoutingTorusXY::GetIDFromXY(int32_t x, int32_t y)
     if (y < 0) y = TorusH - 1;
     return x + y * TorusW;
 }
-std::vector<int32_t> RoutingTorusXY::GetLinksTo(int32_t id, int32_t x, int32_t y)
+std::vector<std::int32_t> RoutingTorusXY::GetLinksTo(std::int32_t id, std::int32_t x, std::int32_t y) const
 {
     return TorusGraph[id].links_to(GetIDFromXY(x, y));
 }
 
-RoutingTorusXY::RoutingTorusXY(int32_t w, int32_t h, const Graph& graph) :
+RoutingTorusXY::RoutingTorusXY(std::int32_t w, std::int32_t h, const Graph& graph) :
     TorusW(w), TorusH(h), TorusGraph(graph)
 {
 }
 
-std::vector<int32_t> RoutingTorusXY::Route(Router& router, const RouteData& route_data)
+std::vector<std::int32_t> RoutingTorusXY::Route(Router& router, const RouteData& route_data) const
 {
-    int32_t prev_id = route_data.current_id;
+    std::int32_t prev_id = route_data.current_id;
     if (route_data.dir_in < TorusGraph[route_data.current_id].size())
         prev_id = TorusGraph[route_data.current_id][route_data.dir_in];
-    int32_t prev_vc = 0;
-    for (int32_t i = 0; i < TorusGraph[route_data.current_id].links_to(prev_id).size(); i++)
+    std::int32_t prev_vc = 0;
+    for (std::int32_t i = 0; i < TorusGraph[route_data.current_id].links_to(prev_id).size(); i++)
         if (TorusGraph[route_data.current_id].links_to(prev_id)[i] == route_data.dir_in) prev_vc = i;
 
-    int32_t id = route_data.current_id;
-    int32_t x = GetXFromID(route_data.current_id);
-    int32_t y = GetYFromID(route_data.current_id);
-    int32_t dx = GetXFromID(route_data.dst_id) - x;
-    int32_t dy = GetYFromID(route_data.dst_id) - y;
+    std::int32_t id = route_data.current_id;
+    std::int32_t x = GetXFromID(route_data.current_id);
+    std::int32_t y = GetYFromID(route_data.current_id);
+    std::int32_t dx = GetXFromID(route_data.dst_id) - x;
+    std::int32_t dy = GetYFromID(route_data.dst_id) - y;
 
-    int32_t ax = abs(dx) * 2;
-    int32_t ay = abs(dy) * 2;
+    std::int32_t ax = abs(dx) * 2;
+    std::int32_t ay = abs(dy) * 2;
 
     if (ax > TorusW)
     {
@@ -55,7 +55,7 @@ std::vector<int32_t> RoutingTorusXY::Route(Router& router, const RouteData& rout
         dy = -dy;
     }
 
-    std::vector<int32_t> result; 
+    std::vector<std::int32_t> result; 
     if (dx > 0)
     {
         if (x + 1 >= TorusW) prev_vc += 1;

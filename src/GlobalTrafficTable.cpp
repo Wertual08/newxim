@@ -1,14 +1,6 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the implementation of the global traffic table
- */
-
 #include "GlobalTrafficTable.hpp"
+#include <fstream>
+#include <cassert>
 
 
 
@@ -20,7 +12,7 @@ GlobalTrafficTable::GlobalTrafficTable(double reset_time, double simulation_time
 bool GlobalTrafficTable::load(const char* fname)
 {
 	// Open file
-	ifstream fin(fname, ios::in);
+	std::ifstream fin(fname, std::ios::in);
 	if (!fin)
 		return false;
 

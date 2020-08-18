@@ -23,10 +23,10 @@ private:
 	const NoC& Network;
 	void updatePowerBreakDown(std::map<std::string, double>& dst, PowerBreakdown* src) const;
 
-	int32_t GetMaxBufferStuckDelay() const;
-	double GetAverageBufferLoad(int32_t channel) const;
+	std::int32_t GetMaxBufferStuckDelay() const;
+	double GetAverageBufferLoad(std::int32_t channel) const;
 	double GetAverageBufferLoad() const;
-	int32_t getLastReceivedFlitTime() const;
+	std::int32_t getLastReceivedFlitTime() const;
 	// Returns the aggregated average delay (cycles)
 	double getAverageDelay() const;
 	// Returns the aggragated average delay (cycles) for communication src_id->dst_id
@@ -36,7 +36,7 @@ private:
 	// Returns the max delay (cycles) experimented by destination
 	// node_id. Returns -1 if node_id is not destination of any
 	// communication
-	double getMaxDelay(int32_t node_id) const;
+	double getMaxDelay(std::int32_t node_id) const;
 	// Returns the max delay (cycles) for communication src_id->dst_id
 	double getMaxDelay(int src_id, int dst_id) const;
 	// Returns the aggregated average throughput (flits/cycles)
@@ -63,7 +63,7 @@ private:
 	double getTotalPower() const { return getDynamicPower() + getStaticPower(); }
 	double getReceivedIdealFlitRatio() const;
 
-	int32_t GetTotalFlitsGenerated() const;
+	std::int32_t GetTotalFlitsGenerated() const;
 
 	void ShowBuffers(std::ostream& out) const;
 

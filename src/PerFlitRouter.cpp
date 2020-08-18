@@ -4,9 +4,9 @@
 
 void PerFlitRouter::TXProcess()
 {
-	for (int32_t j = 0; j < Relays.size(); j++)
+	for (std::int32_t j = 0; j < Relays.size(); j++)
 	{
-		int32_t i = (start_from_port + j) % Relays.size();
+		std::int32_t i = (start_from_port + j) % Relays.size();
 		Relay& rel = Relays[i];
 
 		if (!rel.buffer.IsEmpty())
@@ -20,10 +20,10 @@ void PerFlitRouter::TXProcess()
 			route_data.dst_id = flit.dst_id;
 			route_data.dir_in = i;
 			route_data.sequence_length = flit.sequence_length;
-			int32_t res = PerformRoute(route_data);
+			std::int32_t res = PerformRoute(route_data);
 			if (res < 0) continue;
 
-			int32_t out_port = res;
+			std::int32_t out_port = res;
 			Relay& out_rel = Relays[out_port];
 
 			bool buf_stat = out_rel.tx_buffer_full_status.read();
@@ -105,8 +105,7 @@ void PerFlitRouter::RXProcess()
 	}
 }
 
-PerFlitRouter::PerFlitRouter(sc_module_name mname, const SimulationTimer& timer, int32_t id, size_t relays,
-	int32_t max_buffer_size, RoutingAlgorithm& alg, SelectionStrategy& sel) :
-	Router(mname, timer, id, relays, max_buffer_size, alg, sel)
+PerFlitRouter::PerFlitRouter(const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size) :
+	Router(timer, id, relays, max_buffer_size)
 {
 }

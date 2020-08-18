@@ -6,15 +6,15 @@ void ProgressBar::Update()
 {
 	if (Timer.SimulationTime() >= 0.0)
 	{
-		int32_t level = BarUnits * Timer.Progress();
-		int32_t percent = std::round(100.0 * Timer.Progress());
+		std::int32_t level = BarUnits * Timer.Progress();
+		std::int32_t percent = std::round(100.0 * Timer.Progress());
 		if (level > CurrentLevel || percent > CurrentPercent)
 		{
 			if (CurrentLevel < 0)
 			{
 				std::string percent_str = std::to_string(percent) + '%';
 				Output << '[';
-				for (int32_t i = 0; i < BarUnits; i++)
+				for (std::int32_t i = 0; i < BarUnits; i++)
 				{
 					if (i == BarUnits / 2 - percent_str.size() / 2)
 					{
@@ -32,10 +32,10 @@ void ProgressBar::Update()
 			else
 			{
 				std::string percent_str = std::to_string(percent) + '%';
-				int32_t start = std::min(CurrentLevel, BarUnits / 2 - static_cast<int32_t>(percent_str.size()) / 2);
-				for (int32_t i = start; i <= BarUnits; i++) Output << '\b';
+				std::int32_t start = std::min(CurrentLevel, BarUnits / 2 - static_cast<std::int32_t>(percent_str.size()) / 2);
+				for (std::int32_t i = start; i <= BarUnits; i++) Output << '\b';
 			
-				for (int32_t i = start; i < BarUnits; i++)
+				for (std::int32_t i = start; i < BarUnits; i++)
 				{
 					if (i == BarUnits / 2 - percent_str.size() / 2)
 					{
@@ -56,13 +56,13 @@ void ProgressBar::Update()
 	}
 }
 
-ProgressBar::ProgressBar(sc_module_name, std::ostream& os, const SimulationTimer& timer, int32_t units, const sc_clock& clk) :
+ProgressBar::ProgressBar(sc_module_name, std::ostream& os, const SimulationTimer& timer, std::int32_t units, const sc_clock& clk) :
 	Output(os), Timer(timer), BarUnits(units), CurrentLevel(-1), CurrentPercent(-1)
 {
 	clock(clk);
 }
 
-ProgressBar::ProgressBar(std::ostream& os, const SimulationTimer& timer, int32_t units, const sc_clock& clk) :
+ProgressBar::ProgressBar(std::ostream& os, const SimulationTimer& timer, std::int32_t units, const sc_clock& clk) :
 	ProgressBar("ProgressBar", os, timer, units, clk)
 {
 	SC_METHOD(Update);

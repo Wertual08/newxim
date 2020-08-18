@@ -1,15 +1,8 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the declaration of the top-level of Noxim
- */
-
 #pragma once
-#include <systemc.h>
+#include <cstdint>
+#include <ostream>
+
+
 
 // FlitType -- Flit type enumeration
 enum FlitType 
@@ -17,17 +10,6 @@ enum FlitType
 	FLIT_TYPE_HEAD,
 	FLIT_TYPE_BODY, 
 	FLIT_TYPE_TAIL
-};
-
-// Payload -- Payload definition
-struct Payload 
-{
-	sc_uint<32> data;	// Bus for the data to be exchanged
-
-	inline bool operator==(const Payload& payload) const 
-	{
-		return (payload.data == data);
-	}
 };
 
 // Packet -- Packet definition
@@ -64,13 +46,13 @@ struct Packet
 // RouteData -- data required to perform routing
 struct RouteData 
 {
-	int32_t hop_no;
-	int32_t current_id;
-	int32_t src_id;
-	int32_t dst_id;
-	int32_t dir_in;			// direction from which the packet comes from
-	int32_t vc_id;
-	int32_t sequence_length;
+	std::int32_t hop_no;
+	std::int32_t current_id;
+	std::int32_t src_id;
+	std::int32_t dst_id;
+	std::int32_t dir_in;			// direction from which the packet comes from
+	std::int32_t vc_id;
+	std::int32_t sequence_length;
 };
 
 // Flit -- Flit definition
@@ -82,7 +64,6 @@ struct Flit
 	FlitType flit_type;		// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
 	int sequence_no;		// The sequence number of the flit inside the packet
 	int sequence_length;
-	Payload payload;		// Optional payload
 	double timestamp;		// Unix timestamp at packet generation
 	int hop_no;				// Current number of hops from source to destination
 	bool use_low_voltage_path;
@@ -95,14 +76,13 @@ struct Flit
 			&& flit.vc_id == vc_id
 			&& flit.sequence_no == sequence_no
 			&& flit.sequence_length == sequence_length
-			&& flit.payload == payload 
 			&& flit.timestamp == timestamp
 			&& flit.hop_no == hop_no
 			&& flit.use_low_voltage_path == use_low_voltage_path;
 	}
 };
 
-inline ostream& operator <<(ostream& os, const Flit& flit)
+inline std::ostream& operator <<(std::ostream& os, const Flit& flit)
 {
 	os << '(';
 	switch (flit.flit_type) {
@@ -111,7 +91,7 @@ inline ostream& operator <<(ostream& os, const Flit& flit)
 	case FLIT_TYPE_TAIL: os << 'T'; break;
 	}
 
-	return os << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ")";
+	return os << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ')';
 }
 
 

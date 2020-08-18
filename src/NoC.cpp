@@ -58,26 +58,25 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 	// Create and configure tiles
 	auto& graph = config.Topology();
 	Tiles.resize(graph.size());
-	for (int32_t id = 0; id < Tiles.size(); id++)
+	for (std::int32_t id = 0; id < Tiles.size(); id++)
 	{
-		char name[32];
-
-
-		sprintf(name, "Router[%002d]", id);
 		std::unique_ptr<Router> RouterDevice;
 
 		if (config.RouterType() == "WORMHOLE") RouterDevice = std::make_unique<WormholeRouter>(
-			name, Timer, id, graph[id].size(), config.BufferDepth(), *Algorithm, *Strategy);
+			Timer, id, graph[id].size(), config.BufferDepth());
 		else if (config.RouterType() == "PER_FLIT") RouterDevice = std::make_unique<PerFlitRouter>(
-			name, Timer, id, graph[id].size(), config.BufferDepth(), *Algorithm, *Strategy);
+			Timer, id, graph[id].size(), config.BufferDepth());
 
+		RouterDevice->SetRoutingAlgorithm(*Algorithm);
+		RouterDevice->SetSelectionStrategy(*Strategy);
 ;
-		sprintf(name, "Processor[%002d]", id);
 		std::unique_ptr<Processor> ProcessorDevice = std::make_unique<Processor>(
-			name, Timer, config.TrafficDistribution() == "TRAFFIC_TABLE_BASED",
+			Timer, id, config.TrafficDistribution() == "TRAFFIC_TABLE_BASED",
 			config.PacketInjectionRate(), config.ProbabilityOfRetransmission(), config.MinPacketSize(), 
-			config.MaxPacketSize(), config.Topology().size() - 1, config.Traffic());
-		ProcessorDevice->local_id = id;
+			config.MaxPacketSize(), config.Topology().size() - 1);
+
+		ProcessorDevice->SetTrafficManager(config.Traffic());
+
 		if (config.TrafficDistribution() == "TRAFFIC_TABLE_BASED")
 		{
 			ProcessorDevice->traffic_table = &GTTable;
@@ -85,9 +84,9 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 		}
 		else ProcessorDevice->never_transmit = false;
 
-
+		char name[32];
 		sprintf(name, "Tile[%002d]", id);
-		Tiles[id] = new Tile(name, graph[id].size());
+		Tiles[id] = new Tile(name);
 		auto& tile = *Tiles[id];
 
 		tile.SetRouter(RouterDevice);
@@ -100,23 +99,29 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 	}
 
 	// Connect tiles
-	for (int32_t id = 0; id < Tiles.size(); id++)
+	for (std::int32_t id = 0; id < Tiles.size(); id++)
 	{
 		auto& tile = *Tiles[id];
+		auto& router = *tile.RouterDevice;
+		auto& processor = *tile.ProcessorDevice;
 		auto& node = graph[id];
-		for (int32_t relay = 0; relay < node.size(); relay++)
+
+		router.LocalRelay.Bind(processor.relay);
+
+		for (std::int32_t relay = 0; relay < node.size(); relay++)
 		{
-			if (tile.Relays[relay].Bound()) continue;
-			int32_t connected_id = node[relay];
+			if (router.Relays[relay].Bound()) continue;
+			std::int32_t connected_id = node[relay];
 
 			auto& connected_tile = *Tiles[connected_id];
+			auto& connected_router = *connected_tile.RouterDevice;
 			auto& connected_node = graph[connected_id];
-			std::vector<int32_t> connected_relays = connected_node.links_to(id);
-			for (int32_t rel : connected_relays)
+			std::vector<std::int32_t> connected_relays = connected_node.links_to(id);
+			for (std::int32_t rel : connected_relays)
 			{
-				if (!connected_tile.Relays[rel].Bound())
+				if (!connected_router.Relays[rel].Bound())
 				{
-					tile.Relays[relay].Bind(connected_tile.Relays[rel]);
+					router.Relays[relay].Bind(connected_router.Relays[rel]);
 					break;
 				}
 			}

@@ -17,17 +17,17 @@ Buffer::Buffer()
 {
 }
 
-void Buffer::SetMaxBufferSize(int32_t bms)
+void Buffer::SetMaxBufferSize(std::int32_t bms)
 {
 	assert(bms > 0);
 
 	max_buffer_size = bms;
 }
-int32_t Buffer::GetMaxBufferSize() const
+std::int32_t Buffer::GetMaxBufferSize() const
 {
 	return max_buffer_size;
 }
-int32_t Buffer::GetCurrentFreeSlots() const
+std::int32_t Buffer::GetCurrentFreeSlots() const
 {
 	return (GetMaxBufferSize() - Size());
 }
@@ -77,7 +77,7 @@ Flit Buffer::Front() const
 
 	return f;
 }
-int32_t Buffer::Size() const
+std::int32_t Buffer::Size() const
 {
 	return buffer.size();
 }

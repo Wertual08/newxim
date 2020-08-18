@@ -226,14 +226,14 @@ void Power::printBreakDown(std::ostream & out)
 void Power::rxSleep(int cycles)
 {
 
-    int sleep_start_cycle = static_cast<int32_t>(Timer.SystemTime());
+    int sleep_start_cycle = static_cast<std::int32_t>(Timer.SystemTime());
     sleep_end_cycle = sleep_start_cycle + cycles;
 }
 
 
 bool Power::isSleeping()
 {
-    int now = static_cast<int32_t>(Timer.SystemTime());
+    int now = static_cast<std::int32_t>(Timer.SystemTime());
 
     return (now<sleep_end_cycle);
 
