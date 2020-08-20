@@ -266,7 +266,7 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 			for (std::int32_t i = 0; i < args.size(); i++)
 			{
 				const auto& branch = args[i];
-				Graph::Node gnode;
+				GraphNode gnode;
 				for (std::int32_t j = 0; j < branch.size(); j++)
 					gnode.push_back(branch[j].as<std::int32_t>());
 				graph.push_back(std::move(gnode));

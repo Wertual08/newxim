@@ -78,10 +78,8 @@ bool GlobalTrafficTable::load(const char* fname)
 	return true;
 }
 
-double GlobalTrafficTable::getCumulativePirPor(const int src_id,
-	const int ccycle,
-	const bool pir_not_por,
-	std::vector<std::pair<int, double>>& dst_prob)
+double GlobalTrafficTable::getCumulativePirPor(int src_id, int ccycle, bool pir_not_por,
+	std::vector<std::pair<int, double>>& dst_prob) const
 {
 	double cpirnpor = 0.0;
 
@@ -102,7 +100,7 @@ double GlobalTrafficTable::getCumulativePirPor(const int src_id,
 	return cpirnpor;
 }
 
-int GlobalTrafficTable::occurrencesAsSource(const int src_id)
+int GlobalTrafficTable::occurrencesAsSource(int src_id) const
 {
 	int count = 0;
 

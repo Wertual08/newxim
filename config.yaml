@@ -22,7 +22,7 @@ topology_channels: 1
 # Router types:
 #   WORMHOLE
 #   PER_FLIT
-#   PER_FLIT_TREE_REROUTE
+#   TREE_BASED_REROUTE
 router_type: PER_FLIT 
 
 # number of flits for each router buffer
@@ -41,7 +41,7 @@ flit_size: 32
 #   CIRCULANT_CLOCKWISE
 #   CIRCULANT_ADAPTIVE
 #   just table
-routing_table: CIRCULANT_MULTIPLICATIVE
+routing_table: DIJKSTRA_MULTIPATH
 routing_table_id_based: true
 
 # Routing algorithms:
@@ -59,7 +59,7 @@ routing_algorithm: TABLE_BASED
 #   RANDOM_KEEP_SPACE
 # Each of the above labels should match a corresponding
 # implementation in the selectionStrategies source code directory
-selection_strategy: KEEP_SPACE
+selection_strategy: RANDOM_KEEP_SPACE
 
 # SIMULATION PARAMETERS
 #

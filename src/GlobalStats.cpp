@@ -13,10 +13,10 @@ std::int32_t GlobalStats::GetMaxBufferStuckDelay() const
 {
 	double max_delay = 0.0;
 	int i = -1, r;
-	for (auto t : Network.Tiles)
+	for (const auto& t : Network.Tiles)
 	{
 		i++;
-		double min_pop_time = t->RouterDevice->stats.GetMinBufferPopOrEmptyTime();
+		double min_pop_time = t.RouterDevice->stats.GetMinBufferPopOrEmptyTime();
 
 		if (Config.SimulationTime() + Config.ResetTime() - min_pop_time > max_delay)
 		{
@@ -29,8 +29,8 @@ std::int32_t GlobalStats::GetMaxBufferStuckDelay() const
 double GlobalStats::GetAverageBufferLoad(std::int32_t channel) const
 {
 	double sum = 0.0;
-	for (auto t : Network.Tiles)
-		sum += t->RouterDevice->stats.GetAVGBufferLoad(channel, Config.ChannelsCount());
+	for (const auto& t : Network.Tiles)
+		sum += t.RouterDevice->stats.GetAVGBufferLoad(channel, Config.ChannelsCount());
 	return sum / Network.Tiles.size();
 }
 double GlobalStats::GetAverageBufferLoad() const
@@ -43,8 +43,8 @@ double GlobalStats::GetAverageBufferLoad() const
 std::int32_t GlobalStats::getLastReceivedFlitTime() const
 {
 	double result = 0.0;
-	for (auto t : Network.Tiles) if (t->RouterDevice->stats.getLastReceivedFlitTime() > result)
-		result = t->RouterDevice->stats.getLastReceivedFlitTime();
+	for (const auto& t : Network.Tiles) if (t.RouterDevice->stats.getLastReceivedFlitTime() > result)
+		result = t.RouterDevice->stats.getLastReceivedFlitTime();
 	return static_cast<std::int32_t>(result);
 }
 double GlobalStats::getAverageDelay() const
@@ -52,12 +52,12 @@ double GlobalStats::getAverageDelay() const
 	unsigned int total_packets = 0;
 	double avg_delay = 0.0;
 
-	for (auto t : Network.Tiles)
+	for (const auto& t : Network.Tiles)
 	{
-		uint32_t received_packets = t->RouterDevice->stats.getReceivedPackets();
+		uint32_t received_packets = t.RouterDevice->stats.getReceivedPackets();
 		if (received_packets)
 		{
-			avg_delay += received_packets * t->RouterDevice->stats.getAverageDelay();
+			avg_delay += received_packets * t.RouterDevice->stats.getAverageDelay();
 			total_packets += received_packets;
 		}
 	}
@@ -68,7 +68,7 @@ double GlobalStats::getAverageDelay() const
 }
 double GlobalStats::getAverageDelay(int src_id, int dst_id) const
 {
-	return Network.Tiles[dst_id]->RouterDevice->stats.getAverageDelay(src_id);
+	return Network.Tiles[dst_id].RouterDevice->stats.getAverageDelay(src_id);
 }
 double GlobalStats::getMaxDelay() const
 {
@@ -84,17 +84,17 @@ double GlobalStats::getMaxDelay() const
 }
 double GlobalStats::getMaxDelay(std::int32_t node_id) const
 {
-	unsigned int received_packets = Network.Tiles[node_id]->RouterDevice->stats.getReceivedPackets();
-	if (received_packets) return Network.Tiles[node_id]->RouterDevice->stats.getMaxDelay();
+	unsigned int received_packets = Network.Tiles[node_id].RouterDevice->stats.getReceivedPackets();
+	if (received_packets) return Network.Tiles[node_id].RouterDevice->stats.getMaxDelay();
 	else return -1.0;
 }
 double GlobalStats::getMaxDelay(int src_id, int dst_id) const
 {
-	return Network.Tiles[dst_id]->RouterDevice->stats.getMaxDelay(src_id);
+	return Network.Tiles[dst_id].RouterDevice->stats.getMaxDelay(src_id);
 }
 double GlobalStats::getAverageThroughput(int src_id, int dst_id)
 {
-	return Network.Tiles[dst_id]->RouterDevice->stats.getAverageThroughput(src_id);
+	return Network.Tiles[dst_id].RouterDevice->stats.getAverageThroughput(src_id);
 }
 double GlobalStats::getAggregatedProduction() const
 {
@@ -115,21 +115,21 @@ unsigned int GlobalStats::getReceivedPackets() const
 {
 	unsigned int n = 0;
 
-	for (auto t : Network.Tiles)
-		n += t->RouterDevice->stats.getReceivedPackets();
+	for (const auto& t : Network.Tiles)
+		n += t.RouterDevice->stats.getReceivedPackets();
 
 	return n;
 }
 unsigned int GlobalStats::getReceivedFlits() const
 {
 	uint32_t n = 0;
-	for (auto t : Network.Tiles) n += t->RouterDevice->stats.getReceivedFlits();
+	for (const auto& t : Network.Tiles) n += t.RouterDevice->stats.getReceivedFlits();
 	return n;
 }
 unsigned int GlobalStats::getAcceptedFlits() const
 {
 	uint32_t n = 0;
-	for (auto t : Network.Tiles) n += t->RouterDevice->stats.GetAcceptedFlits();
+	for (const auto& t : Network.Tiles) n += t.RouterDevice->stats.GetAcceptedFlits();
 	return n;
 }
 double GlobalStats::getThroughput() const
@@ -144,9 +144,9 @@ double GlobalStats::getActiveThroughput() const
 	unsigned int trf = 0;
 	unsigned int rf;
 
-	for (auto t : Network.Tiles)
+	for (const auto& t : Network.Tiles)
 	{
-		rf = t->RouterDevice->stats.getReceivedFlits();
+		rf = t.RouterDevice->stats.getReceivedFlits();
 		if (rf != 0) n++;
 		trf += rf;
 	}
@@ -156,9 +156,9 @@ double GlobalStats::getActiveThroughput() const
 double GlobalStats::getDynamicPower() const
 {
 	double power = 0.0;
-	for (auto t : Network.Tiles)
+	for (const auto& t : Network.Tiles)
 	{
-		power += t->RouterDevice->power.getDynamicPower();
+		power += t.RouterDevice->power.getDynamicPower();
 	}
 	return power;
 }
@@ -166,9 +166,9 @@ double GlobalStats::getStaticPower() const
 {
 	double power = 0.0;
 
-	for (auto t : Network.Tiles)
+	for (const auto& t : Network.Tiles)
 	{
-		power += t->RouterDevice->power.getStaticPower();
+		power += t.RouterDevice->power.getStaticPower();
 	}
 	return power;
 }
@@ -189,7 +189,7 @@ double GlobalStats::getReceivedIdealFlitRatio() const
 std::int32_t GlobalStats::GetTotalFlitsGenerated() const
 {
 	std::int32_t result = 0;
-	for (auto t : Network.Tiles) result += t->ProcessorDevice->GetTotalFlitsGenerated();
+	for (const auto& t : Network.Tiles) result += t.ProcessorDevice->GetTotalFlitsGenerated();
 	return result;
 }
 void GlobalStats::ShowBuffers(std::ostream& out) const
@@ -198,8 +198,8 @@ void GlobalStats::ShowBuffers(std::ostream& out) const
 	for (std::int32_t i = 0; i < Config.Topology().size(); i++)
 	{
 		const auto& node = Config.Topology()[i];
-		const auto& relays = Network.Tiles[i]->RouterDevice->Relays;
-		const auto& stats = Network.Tiles[i]->RouterDevice->stats;
+		const auto& relays = Network.Tiles[i].RouterDevice->Relays;
+		const auto& stats = Network.Tiles[i].RouterDevice->stats;
 		for (std::int32_t r = 0; r < relays.size(); r++)
 		{
 			out << '[';
@@ -217,10 +217,10 @@ void GlobalStats::showPowerBreakDown(std::ostream& out)
 	std::map<std::string, double> power_dynamic;
 	std::map<std::string, double> power_static;
 
-	for (auto t : Network.Tiles)
+	for (const auto& t : Network.Tiles)
 	{
-		updatePowerBreakDown(power_dynamic, t->RouterDevice->power.getDynamicPowerBreakDown());
-		updatePowerBreakDown(power_static, t->RouterDevice->power.getStaticPowerBreakDown());
+		updatePowerBreakDown(power_dynamic, t.RouterDevice->power.getDynamicPowerBreakDown());
+		updatePowerBreakDown(power_static, t.RouterDevice->power.getStaticPowerBreakDown());
 	}
 	printMap("power_dynamic", power_dynamic, out);
 	printMap("power_static", power_static, out);

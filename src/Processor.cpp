@@ -15,16 +15,17 @@ static std::int32_t randInt(std::int32_t min, std::int32_t max)
 }
 
 
-Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id, bool table_based, double packet_injection_rate,
+Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id, double packet_injection_rate,
 	double probability_of_retransmission, std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id) :
-	Timer(timer), local_id(id), TableBased(table_based), PacketInjectionRate(packet_injection_rate),
+	Timer(timer), local_id(id), TableBased(false), PacketInjectionRate(packet_injection_rate),
 	ProbabilityOfRetransmission(probability_of_retransmission), MinPacketSize(min_packet_size),
-	MaxPacketSize(max_packet_size), MaxID(max_id), Traffic(nullptr)
+	MaxPacketSize(max_packet_size), MaxID(max_id), Traffic(nullptr), never_transmit(false)
 {
 	SC_METHOD(rxProcess);
 	sensitive << reset << clock.pos();
 	SC_METHOD(txProcess);
 	sensitive << reset << clock.pos();
+	relay.buffer.SetMaxBufferSize(128);
 }
 
 void Processor::UpdateCurrentPacket()
@@ -75,10 +76,10 @@ size_t Processor::PacketQueueSize() const
 	return packets_in_queue;
 }
 
-Processor::Processor(const SimulationTimer& timer, std::int32_t id, bool table_based, 
+Processor::Processor(const SimulationTimer& timer, std::int32_t id, 
 	double packet_injection_rate, double probability_of_retransmission, 
 	std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id) :
-	Processor(GetProcessorName(id).c_str(), timer, id, table_based,
+	Processor(GetProcessorName(id).c_str(), timer, id,
 		packet_injection_rate, probability_of_retransmission,
 		min_packet_size, max_packet_size, max_id)
 {
@@ -87,6 +88,12 @@ void Processor::SetTrafficManager(const TrafficManager& traffic)
 {
 	Traffic = &traffic;
 }
+void Processor::SetTrafficTable(const GlobalTrafficTable& table)
+{
+	TableBased = true;
+	traffic_table = &table;
+	never_transmit = table.occurrencesAsSource(local_id) == 0;
+}
 
 void Processor::rxProcess()
 {
@@ -94,6 +101,7 @@ void Processor::rxProcess()
 	{
 		relay.rx_ack.write(0);
 		current_level_rx = 0;
+		relay.free_slots.write(relay.buffer.GetCurrentFreeSlots());
 	}
 	else 
 	{
@@ -103,6 +111,7 @@ void Processor::rxProcess()
 			current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
 		}
 		relay.rx_ack.write(current_level_rx);
+		relay.free_slots.write(relay.buffer.GetCurrentFreeSlots());
 	}
 }
 void Processor::txProcess()

@@ -15,7 +15,7 @@
 
 
 
-class Tile : public sc_module
+class Tile
 {
 public:
 	// I/O Ports
@@ -25,11 +25,9 @@ public:
 	// Instances
 	std::unique_ptr<Router> RouterDevice;
 	std::unique_ptr<Processor> ProcessorDevice;
-		
-	// Constructor
-	Tile(sc_module_name nm)
-	{
-	}
+
+	Tile() {}
+
 	void SetRouter(std::unique_ptr<Router>& router)
 	{
 		if (!router) throw std::runtime_error("Tile error: Router can not be null.");
@@ -48,12 +46,5 @@ public:
 		// Processing Element pin assignments
 		ProcessorDevice->clock(clock);
 		ProcessorDevice->reset(reset);
-	}
-
-	void ConfigureRotuerPower(const Configuration::Power& config, std::int32_t flit_size, std::int32_t buffer_depth, const std::string& routing_algorithm)
-	{
-		RouterDevice->power.configureRouter(config, 
-			flit_size, buffer_depth, flit_size,
-			routing_algorithm, "default");
 	}
 };

@@ -10,12 +10,12 @@ void Graph::find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector
 	PathNode node = path[path.size() - 1];
 
 	PathNode new_node;
-	new_node.NodeID = Nodes[node.NodeID][node.ORelay];
+	new_node.NodeID = at(node.NodeID)[node.ORelay];
 
-	auto links_to = Nodes[node.NodeID].links_to(new_node.NodeID);
+	auto links_to = at(node.NodeID).links_to(new_node.NodeID);
 	std::int32_t i = 0;
 	while (links_to[i] != node.ORelay) i++;
-	new_node.IRelay = Nodes[new_node.NodeID].links_to(node.NodeID)[i];
+	new_node.IRelay = at(new_node.NodeID).links_to(node.NodeID)[i];
 
 	if (new_node.NodeID == dest)
 	{
@@ -26,9 +26,9 @@ void Graph::find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector
 	}
 
 	std::int32_t required_weight = weights[new_node.NodeID] - 1;
-	for (std::int32_t i = 0; i < Nodes[new_node.NodeID].size(); i++)
+	for (std::int32_t i = 0; i < at(new_node.NodeID).size(); i++)
 	{
-		if (weights[Nodes[new_node.NodeID][i]] == required_weight)
+		if (weights[at(new_node.NodeID)[i]] == required_weight)
 		{
 			auto new_path = path;
 			new_node.ORelay = i;
@@ -42,68 +42,42 @@ void Graph::find_shortest(std::vector<std::vector<std::int32_t>>& paths, std::ve
 	std::int32_t node = path[path.size() - 1];
 
 	std::int32_t required_weight = weights[node] - 1;
-	for (std::int32_t i = 0; i < Nodes[node].size(); i++)
+	for (std::int32_t i = 0; i < at(node).size(); i++)
 	{
-		if (weights[Nodes[node][i]] == required_weight)
+		if (weights[at(node)[i]] == required_weight)
 		{
 			auto new_path = path;
-			new_path.push_back(Nodes[node][i]);
-			if (Nodes[node][i] == dest) paths.push_back(new_path);
+			new_path.push_back(at(node)[i]);
+			if (at(node)[i] == dest) paths.push_back(new_path);
 			else find_shortest(paths, new_path, weights, dest);
 		}
 	}
 }
 
-Graph::Graph(const std::string& path)
+std::istream& operator>>(std::istream& is, Graph& g)
 {
-	std::ifstream fin(path);
 	std::string line;
 	std::int32_t l = 0;
-	while (std::getline(fin, line))
+	while (std::getline(is, line))
 	{
 		if (line.empty() || line[0] == '#') continue;
+		if (line == "[GRAPH_END]") break;
+
 		l++;
 		std::istringstream sin(line);
-		Node node;
+		GraphNode node;
 		std::int32_t val;
 		while (!sin.eof() && sin >> val) node.push_back(val);
-		if (sin.fail()) throw std::runtime_error("Error reading topology[line=" + std::to_string(l) + "]: Bad graph format." );
-		Nodes.push_back(std::move(node));
+		if (sin.fail()) throw std::runtime_error("Error reading topology [line=" + std::to_string(l) + "]: Bad graph format.");
+		g.push_back(std::move(node));
 	}
-	fin.close();
-}
 
-Graph::Graph()
-{
+	return is;
 }
-
-void Graph::resize(std::int32_t size)
-{
-	Nodes.resize(size);
-}
-void Graph::push_back(Node&& node)
-{
-	Nodes.push_back(std::move(node));
-}
-
-std::int32_t Graph::size() const
-{
-	return Nodes.size();
-}
-
-Graph::Node& Graph::operator[](std::int32_t i)
-{
-	return Nodes[i];
-}
-const Graph::Node& Graph::operator[](std::int32_t i) const
-{
-	return Nodes[i];
-}
-
 std::ostream& operator<<(std::ostream& os, const Graph& g)
 {
 	os << "[\n";
-	for (auto& n : g.Nodes)
+	for (auto& n : g)
 	{
 		os << '[';
 		for (std::int32_t i = 0; i < n.size() - 1; i++) os << n[i] << ", ";
@@ -117,8 +91,8 @@ std::ostream& operator<<(std::ostream& os, const Graph& g)
 std::vector<std::vector<Graph::PathNode>> Graph::get_paths(std::int32_t from, std::int32_t to) const
 {
 	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
-	std::vector<std::int32_t> weights(Nodes.size(), inf);
-	std::vector<bool> visited(Nodes.size(), false);
+	std::vector<std::int32_t> weights(size(), inf);
+	std::vector<bool> visited(size(), false);
 	weights[to] = 0;
 
 	std::int32_t min_index, min;
@@ -126,7 +100,7 @@ std::vector<std::vector<Graph::PathNode>> Graph::get_paths(std::int32_t from, st
 	{
 		min_index = min = inf;
 
-		for (std::int32_t j = 0; j < Nodes.size(); j++)
+		for (std::int32_t j = 0; j < size(); j++)
 		{
 			if (!visited[j] && weights[j] < min)
 			{
@@ -137,9 +111,9 @@ std::vector<std::vector<Graph::PathNode>> Graph::get_paths(std::int32_t from, st
 
 		if (min_index != inf)
 		{
-			for (std::int32_t j = 0; j < Nodes[min_index].size(); j++)
+			for (std::int32_t j = 0; j < at(min_index).size(); j++)
 			{
-				std::int32_t id = Nodes[min_index][j];
+				std::int32_t id = at(min_index)[j];
 				if (id >= 0)
 				{
 					std::int32_t t = min + 1; // 1 distance may be here...
@@ -152,9 +126,9 @@ std::vector<std::vector<Graph::PathNode>> Graph::get_paths(std::int32_t from, st
 
 	std::vector<std::vector<PathNode>> paths;
 	std::int32_t required_weight = weights[from] - 1;
-	for (std::int32_t i = 0; i < Nodes[from].size(); i++)
+	for (std::int32_t i = 0; i < at(from).size(); i++)
 	{
-		if (weights[Nodes[from][i]] == required_weight)
+		if (weights[at(from)[i]] == required_weight)
 		{
 			find_shortest(paths, std::vector<PathNode>(1, { -1, from, i }), weights, to);
 		}
@@ -165,8 +139,8 @@ std::vector<std::vector<Graph::PathNode>> Graph::get_paths(std::int32_t from, st
 std::vector<std::vector<std::int32_t>> Graph::get_simple_paths(std::int32_t from, std::int32_t to) const
 {
 	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
-	std::vector<std::int32_t> weights(Nodes.size(), inf);
-	std::vector<bool> visited(Nodes.size(), false);
+	std::vector<std::int32_t> weights(size(), inf);
+	std::vector<bool> visited(size(), false);
 	weights[to] = 0;
 
 	std::int32_t min_index, min;
@@ -174,7 +148,7 @@ std::vector<std::vector<std::int32_t>> Graph::get_simple_paths(std::int32_t from
 	{
 		min_index = min = inf;
 
-		for (std::int32_t j = 0; j < Nodes.size(); j++)
+		for (std::int32_t j = 0; j < size(); j++)
 		{
 			if (!visited[j] && weights[j] < min)
 			{
@@ -185,9 +159,9 @@ std::vector<std::vector<std::int32_t>> Graph::get_simple_paths(std::int32_t from
 
 		if (min_index != inf)
 		{
-			for (std::int32_t j = 0; j < Nodes[min_index].size(); j++)
+			for (std::int32_t j = 0; j < at(min_index).size(); j++)
 			{
-				std::int32_t id = Nodes[min_index][j];
+				std::int32_t id = at(min_index)[j];
 				if (id >= 0)
 				{
 					std::int32_t t = min + 1; // 1 distance may be here...
@@ -201,4 +175,56 @@ std::vector<std::vector<std::int32_t>> Graph::get_simple_paths(std::int32_t from
 	std::vector<std::vector<std::int32_t>> paths;
 	find_shortest(paths, std::vector<std::int32_t>(1, from), weights, to);
 	return paths;
+}
+
+Graph Graph::directed_subtree(std::int32_t root_node) const
+{
+	Graph result;
+	result.resize(size());
+	std::vector<bool> visited(size(), false);
+	visited[root_node] = true;
+
+	std::vector<std::int32_t> nodes_to_visit(1, root_node);
+	for (std::size_t i = 0; i < nodes_to_visit.size(); i++)
+	{
+		std::int32_t node = nodes_to_visit[i];
+		
+		for (std::int32_t sub_node : at(node))
+		{
+			if (!visited[sub_node])
+			{
+				visited[sub_node] = true;
+				result[node].push_back(sub_node);
+				nodes_to_visit.push_back(sub_node);
+			}
+		}
+	}
+
+	return result;
+}
+Graph Graph::subtree(std::int32_t root_node) const
+{
+	Graph result;
+	result.resize(size());
+	std::vector<bool> visited(size(), false);
+	visited[root_node] = true;
+
+	std::vector<std::int32_t> nodes_to_visit(1, root_node);
+	for (std::size_t i = 0; i < nodes_to_visit.size(); i++)
+	{
+		std::int32_t node = nodes_to_visit[i];
+
+		for (std::int32_t sub_node : at(node))
+		{
+			if (!visited[sub_node])
+			{
+				visited[sub_node] = true;
+				result[node].push_back(sub_node);
+				result[sub_node].push_back(node);
+				nodes_to_visit.push_back(sub_node);
+			}
+		}
+	}
+
+	return result;
 }

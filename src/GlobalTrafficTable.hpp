@@ -48,14 +48,12 @@ public:
 	// Returns the cumulative pir por along with a vector of pairs. The
 	// first component of the pair is the destination. The second
 	// component is the cumulative shotting probability.
-	double getCumulativePirPor(const int src_id,
-		const int ccycle,
-		const bool pir_not_por,
-		std::vector<std::pair<int, double>>& dst_prob);
+	double getCumulativePirPor(int src_id, int ccycle, bool pir_not_por,
+		std::vector<std::pair<int, double>>& dst_prob) const;
 
 	// Returns the number of occurrences of soruce src_id in the traffic
 	// table
-	int occurrencesAsSource(const int src_id);
+	int occurrencesAsSource(int src_id) const;
 };
 
 #endif

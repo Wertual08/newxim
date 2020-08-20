@@ -22,11 +22,13 @@ protected:
 	std::int32_t start_from_port;			// Port from which to start the reservation cycle
 
 	std::int32_t PerformRoute(const RouteData& route_data);
+	void Route(std::int32_t in_port, std::int32_t out_port);
+
 	virtual void TXProcess() = 0;		// The transmitting process
-	virtual void RXProcess() = 0;		// The receiving process
+	void RXProcess();					// The receiving process
 
 public:
-	sc_vector<Relay> Relays;
+	std::vector<Relay> Relays;
 	Relay& LocalRelay;
 	const std::int32_t LocalRelayID;
 

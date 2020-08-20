@@ -24,13 +24,13 @@ private:
 	double newest_packet_time_stamp = 0.0;
 	Packet current_packet;
 
-	const bool TableBased;
+	bool TableBased;
 	const double PacketInjectionRate;
 	const double ProbabilityOfRetransmission;
 	const std::int32_t MinPacketSize;
 	const std::int32_t MaxPacketSize;
 
-	Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id, bool table_based,
+	Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
 		double packet_injection_rate, double probability_of_retransmission,
 		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
 
@@ -54,10 +54,11 @@ public:
 	bool current_level_tx;	// Current level for Alternating Bit Protocol (ABP)
 	bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
-	Processor(const SimulationTimer& timer, std::int32_t id, bool table_based,
+	Processor(const SimulationTimer& timer, std::int32_t id,
 		double packet_injection_rate, double probability_of_retransmission,
 		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
 	void SetTrafficManager(const TrafficManager& traffic);
+	void SetTrafficTable(const GlobalTrafficTable& table);
 
 	// Functions
 	void rxProcess();				// The receiving process
@@ -65,7 +66,7 @@ public:
 	bool canShot();	// True when the packet must be shot
 	Flit nextFlit();				// Take the next flit of the current packet
 
-	GlobalTrafficTable* traffic_table;	// Reference to the Global traffic Table
+	const GlobalTrafficTable* traffic_table;	// Reference to the Global traffic Table
 	bool never_transmit;				// true if the PE does not transmit any packet 
 	//  (valid only for the table based traffic)
 

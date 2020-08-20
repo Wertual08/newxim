@@ -21,27 +21,24 @@
 
 class NoC : sc_module
 {
-	SC_HAS_PROCESS(NoC);
 private:
+	const Configuration& Config;
 	const SimulationTimer Timer;
 	std::unique_ptr<RoutingAlgorithm> Algorithm;
 	std::unique_ptr<SelectionStrategy> Strategy;
 
-	std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config);
-	std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config);
+	void InitBase();
 
 public:
 	sc_clock clock;
 	sc_signal<bool> reset;
-	std::vector<Tile*> Tiles;
+	std::vector<Tile> Tiles;
 
 	// Global tables
-	RoutingTable GRTable;
 	GlobalTrafficTable GTTable;
 
 	NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name = "NoC");
 	~NoC();
 
-	void Update();
 	friend std::ostream& operator<<(std::ostream& os, const NoC& network);
 };

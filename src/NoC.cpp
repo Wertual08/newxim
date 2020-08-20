@@ -1,13 +1,3 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the implementation of the Network-on-Chip
- */
-
 #include "NoC.hpp"
 #include "RoutingSelection/RoutingTableBased.hpp"
 #include "RoutingSelection/SelectionRandom.hpp"
@@ -20,88 +10,80 @@
 
 #include "WormholeRouter.hpp"
 #include "PerFlitRouter.hpp"
+#include "TreeBasedRerouteRouter.hpp"
 
 
 
-std::unique_ptr<RoutingAlgorithm> NoC::GetAlgorithm(const Configuration& config)
+std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config)
 {
-	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(GRTable);
-	else if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.Topology());
-	else if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.Topology());
-	else return FindTestRouting(config.RoutingAlgorithm(), config, GRTable);
+	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
+	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.Topology());
+	if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.Topology());
+	return FindTestRouting(config.RoutingAlgorithm(), config, config.GRTable());
 }
-std::unique_ptr<SelectionStrategy> NoC::GetStrategy(const Configuration& config)
+std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config)
 {
 	if (config.SelectionStrategy() == "RANDOM") return std::make_unique<SelectionRandom>();
-	else if (config.SelectionStrategy() == "BUFFER_LEVEL") return std::make_unique<SelectionBufferLevel>();
-	else if (config.SelectionStrategy() == "KEEP_SPACE") return std::make_unique<SelectionKeepSpace>();
-	else if (config.SelectionStrategy() == "RANDOM_KEEP_SPACE") return std::make_unique<SelectionRandomKeepSpace>();
-	else return nullptr;
+	if (config.SelectionStrategy() == "BUFFER_LEVEL") return std::make_unique<SelectionBufferLevel>();
+	if (config.SelectionStrategy() == "KEEP_SPACE") return std::make_unique<SelectionKeepSpace>();
+	if (config.SelectionStrategy() == "RANDOM_KEEP_SPACE") return std::make_unique<SelectionRandomKeepSpace>();
+	throw std::runtime_error("Configuration error: Invalid selection strategy [" + config.SelectionStrategy() + "].");
+}
+std::unique_ptr<Router> GetRouter(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
+{
+	if (config.RouterType() == "WORMHOLE") return std::make_unique<WormholeRouter>(timer, id, config.Topology()[id].size(), config.BufferDepth());
+	if (config.RouterType() == "PER_FLIT") return std::make_unique<PerFlitRouter>(timer, id, config.Topology()[id].size(), config.BufferDepth());
+	if (config.RouterType() == "TREE_BASED_REROUTE") return std::make_unique<TreeBasedRerouteRouter>(timer, id, config.Topology()[id].size(), config.BufferDepth());
+	throw std::runtime_error("Configuration error: Invalid router type [" + config.RouterType() + "].");
+}
+std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
+{
+	return std::make_unique<Processor>(
+		timer, 
+		id,
+		config.PacketInjectionRate(),
+		config.ProbabilityOfRetransmission(),
+		config.MinPacketSize(),
+		config.MaxPacketSize(),
+		config.Topology().size() - 1);
 }
 
-NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name) :
-	clock("clock", config.ClockPeriodPS(), SC_PS), 
-	Timer(timer), GRTable(config.GRTable()),
-	GTTable(config.ResetTime(), config.SimulationTime(), config.PacketInjectionRate())
+void NoC::InitBase()
 {
-	srand(config.RndGeneratorSeed());
-	//std::cout << config.Topology() << '\n';
-	//std::cout << config.GRTable() << '\n';
+	srand(Config.RndGeneratorSeed());
 
 	// Check for traffic table availability
-	if (config.TrafficDistribution() == "TRAFFIC_TABLE_BASED")
-		GTTable.load(config.TrafficTableFilename().c_str());
+	if (Config.TrafficDistribution() == "TRAFFIC_TABLE_BASED")
+		GTTable.load(Config.TrafficTableFilename().c_str());
 
-	Algorithm = GetAlgorithm(config);
-	Strategy = GetStrategy(config);
+	Algorithm = GetAlgorithm(Config);
+	Strategy = GetStrategy(Config);
 
 	// Create and configure tiles
-	auto& graph = config.Topology();
-	Tiles.resize(graph.size());
 	for (std::int32_t id = 0; id < Tiles.size(); id++)
 	{
-		std::unique_ptr<Router> RouterDevice;
-
-		if (config.RouterType() == "WORMHOLE") RouterDevice = std::make_unique<WormholeRouter>(
-			Timer, id, graph[id].size(), config.BufferDepth());
-		else if (config.RouterType() == "PER_FLIT") RouterDevice = std::make_unique<PerFlitRouter>(
-			Timer, id, graph[id].size(), config.BufferDepth());
-
+		std::unique_ptr<Router> RouterDevice = GetRouter(Timer, id, Config);
 		RouterDevice->SetRoutingAlgorithm(*Algorithm);
 		RouterDevice->SetSelectionStrategy(*Strategy);
-;
-		std::unique_ptr<Processor> ProcessorDevice = std::make_unique<Processor>(
-			Timer, id, config.TrafficDistribution() == "TRAFFIC_TABLE_BASED",
-			config.PacketInjectionRate(), config.ProbabilityOfRetransmission(), config.MinPacketSize(), 
-			config.MaxPacketSize(), config.Topology().size() - 1);
+		RouterDevice->power.configureRouter(Config.PowerConfiguration(), Config.FlitSize(), Config.BufferDepth(), Config.FlitSize(), Config.RoutingAlgorithm(), "default");
 
-		ProcessorDevice->SetTrafficManager(config.Traffic());
+		std::unique_ptr<Processor> ProcessorDevice = GetProcessor(Timer, id, Config);
+		ProcessorDevice->SetTrafficManager(Config.Traffic());
+		if (Config.TrafficDistribution() == "TRAFFIC_TABLE_BASED") ProcessorDevice->SetTrafficTable(GTTable);
 
-		if (config.TrafficDistribution() == "TRAFFIC_TABLE_BASED")
-		{
-			ProcessorDevice->traffic_table = &GTTable;
-			ProcessorDevice->never_transmit = GTTable.occurrencesAsSource(ProcessorDevice->local_id) == 0;
-		}
-		else ProcessorDevice->never_transmit = false;
-
-		char name[32];
-		sprintf(name, "Tile[%002d]", id);
-		Tiles[id] = new Tile(name);
-		auto& tile = *Tiles[id];
-
+		auto& tile = Tiles[id];
 		tile.SetRouter(RouterDevice);
 		tile.SetProcessor(ProcessorDevice);
-
-		tile.ConfigureRotuerPower(config.PowerConfiguration(), config.FlitSize(), config.BufferDepth(), config.RoutingAlgorithm());
 
 		tile.clock(clock);
 		tile.reset(reset);
 	}
 
-	// Connect tiles
+	// Connect routers
+	auto& graph = Config.Topology();
 	for (std::int32_t id = 0; id < Tiles.size(); id++)
 	{
-		auto& tile = *Tiles[id];
+		auto& tile = Tiles[id];
 		auto& router = *tile.RouterDevice;
 		auto& processor = *tile.ProcessorDevice;
 		auto& node = graph[id];
@@ -113,7 +95,7 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 			if (router.Relays[relay].Bound()) continue;
 			std::int32_t connected_id = node[relay];
 
-			auto& connected_tile = *Tiles[connected_id];
+			auto& connected_tile = Tiles[connected_id];
 			auto& connected_router = *connected_tile.RouterDevice;
 			auto& connected_node = graph[connected_id];
 			std::vector<std::int32_t> connected_relays = connected_node.links_to(id);
@@ -127,16 +109,18 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 			}
 		}
 	}
+}
 
-	SC_METHOD(Update);
-	sensitive << reset << clock.value_changed_event();
+NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name) :
+	Config(config),
+	clock("clock", config.ClockPeriodPS(), SC_PS), 
+	Timer(timer), 
+	GTTable(config.ResetTime(), config.SimulationTime(), config.PacketInjectionRate()),
+	Tiles(config.Topology().size())
+{
+	InitBase();
 }
 NoC::~NoC()
-{
-	for (auto t : Tiles) delete t;
-}
-
-void NoC::Update()
 {
 }
 

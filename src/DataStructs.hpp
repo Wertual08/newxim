@@ -15,23 +15,25 @@ enum FlitType
 // Packet -- Packet definition
 struct Packet 
 {
-	int src_id;
-	int dst_id;
-	int vc_id;
+	std::int32_t src_id;
+	std::int32_t dst_id;
+	std::int32_t vc_id;
 	double timestamp;		// SC timestamp at packet generation
-	int size;
-	int flit_left;		// Number of remaining flits inside the packet
+	std::int32_t size;
+	std::int32_t flit_left;		// Number of remaining flits inside the packet
 	bool use_low_voltage_path;
 
-	// Constructors
-	Packet() { }
-
-	Packet(const int s, const int d, const int vc, const double ts, const int sz) 
+	Packet() 
 	{
-		make(s, d, vc, ts, sz);
+		src_id = -1;
+		dst_id = -1;
+		vc_id = -1;
+		timestamp = -1;
+		size = -1;
+		flit_left = -1;
+		use_low_voltage_path = false;
 	}
-
-	void make(const int s, const int d, const int vc, const double ts, const int sz) 
+	Packet(std::int32_t s, std::int32_t d, std::int32_t vc, double ts, std::int32_t sz)
 	{
 		src_id = s;
 		dst_id = d;
