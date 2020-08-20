@@ -27,6 +27,7 @@ private:
 	std::int32_t id;
 	std::vector<CommHistory> chist;
 	double last_received_flit_time;
+	double max_time_flit_in_network;
 	std::int32_t total_flits_accepted;
 
 	std::vector<std::pair<double, double>> AVGBufferLoad;
@@ -40,6 +41,7 @@ public:
 	void UpdateBufferPopOrEmptyTime(std::int32_t buffer);
 	double GetBufferPopOrEmptyTime(std::int32_t buffer) const;
 	double GetMinBufferPopOrEmptyTime() const;
+	double GetMaxTimeFlitInNetwork() const;
 
 	void AcceptFlit();
 	std::int32_t GetAcceptedFlits() const;

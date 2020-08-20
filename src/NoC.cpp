@@ -14,7 +14,7 @@
 
 #include "WormholeRouter.hpp"
 #include "PerFlitRouter.hpp"
-#include "TreeBasedRerouteRouter.hpp"
+#include "PerFlitTreeBasedRerouteRouter.hpp"
 
 
 
@@ -48,7 +48,7 @@ std::unique_ptr<Router> GetRouter(const SimulationTimer& timer, std::int32_t id,
 	std::size_t relays_count = config.TopologyGraph()[id].size();
 	if (config.RouterType() == "WORMHOLE") return std::make_unique<WormholeRouter>(timer, id, relays_count, config.BufferDepth());
 	if (config.RouterType() == "PER_FLIT") return std::make_unique<PerFlitRouter>(timer, id, relays_count, config.BufferDepth());
-	if (config.RouterType() == "TREE_BASED_REROUTE") return std::make_unique<TreeBasedRerouteRouter>(timer, id, relays_count, config.BufferDepth());
+	if (config.RouterType() == "PER_FLIT_TREE_BASED_REROUTE") return std::make_unique<PerFlitTreeBasedRerouteRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
 	throw std::runtime_error("Configuration error: Invalid router type [" + config.RouterType() + "].");
 }
 std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
@@ -57,8 +57,7 @@ std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32
 		timer, 
 		id,
 		config.MinPacketSize(),
-		config.MaxPacketSize(),
-		config.TopologyGraph().size() - 1);
+		config.MaxPacketSize());
 }
 
 void NoC::InitBase()
@@ -119,6 +118,48 @@ void NoC::InitBase()
 		}
 	}
 }
+void NoC::InitSubNetwork()
+{
+	auto& graph = Config.TopologyGraph();
+	auto& sub_graph = Config.TopologySubGraph();
+	auto& sub_table = Config.SubGRTable();
+
+	for (std::int32_t id = 0; id < Tiles.size(); id++)
+	{
+		auto& tile = Tiles[id];
+		auto& router = *dynamic_cast<PerFlitTreeBasedRerouteRouter*>(tile.RouterDevice.get());
+		auto& node = graph[id];
+		auto& sub_node = sub_graph[id];
+
+		auto sub_table_node = sub_table[id];
+		for (auto& vec : sub_table_node)
+			for (auto& val : vec) val += node.size();
+		router.SetupSubTreeTable(sub_table_node);
+
+		for (std::int32_t i = 0; i < sub_node.size(); i++)
+		{
+			std::int32_t relay = node.size() + i;
+			if (router.Relays[relay].Bound()) continue;
+			std::int32_t connected_id = sub_node[i];
+
+			auto& connected_tile = Tiles[connected_id];
+			auto& connected_router = *connected_tile.RouterDevice;
+			auto& connected_node = graph[connected_id];
+			auto& connected_sub_node = sub_graph[connected_id];
+
+			std::vector<std::int32_t> connected_relays = connected_sub_node.links_to(id);
+			for (std::int32_t rel : connected_relays)
+			{
+				rel += connected_node.size();
+				if (!connected_router.Relays[rel].Bound())
+				{
+					router.Relays[relay].Bind(connected_router.Relays[rel]);
+					break;
+				}
+			}
+		}
+	}
+}
 
 NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name) :
 	Config(config),
@@ -127,6 +168,8 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 	Tiles(config.TopologyGraph().size())
 {
 	InitBase();
+
+	if (config.RouterType() == "PER_FLIT_TREE_BASED_REROUTE") InitSubNetwork();
 }
 NoC::~NoC()
 {

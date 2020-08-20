@@ -13,7 +13,6 @@
 #include "Configuration.hpp"
 #include "Tile.hpp"
 #include "RoutingTable.hpp"
-#include "GlobalTrafficTable.hpp"
 #include "Graph.hpp"
 #include "TrafficManager.hpp"
 
@@ -29,6 +28,7 @@ private:
 	std::unique_ptr<TrafficManager> Traffic;
 
 	void InitBase();
+	void InitSubNetwork();
 
 public:
 	sc_clock clock;

@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <systemc.h>
 
+#include "SimulationTimer.hpp"
 #include "Relay.hpp"
-#include "GlobalTrafficTable.hpp"
 #include "TrafficManager.hpp"
 #include "Utils.hpp"
 #include "ProcessorQueue.hpp"
@@ -26,7 +26,7 @@ private:
 	const std::int32_t MaxPacketSize;
 
 	Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
-		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
+		std::int32_t min_packet_size, std::int32_t max_packet_size);
 
 public:
 	// I/O Ports
@@ -42,7 +42,7 @@ public:
 	bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
 	Processor(const SimulationTimer& timer, std::int32_t id,
-		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
+		std::int32_t min_packet_size, std::int32_t max_packet_size);
 	void SetTrafficManager(const TrafficManager& traffic);
 
 	// Functions

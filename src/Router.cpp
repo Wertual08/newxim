@@ -42,11 +42,9 @@ void Router::Update()
 		{
 			Relays[i].rx_ack.write(0);
 			Relays[i].rx_current_level = 0;
-			Relays[i].rx_buffer_full_status.write(false);
+			Relays[i].free_slots.write(Relays[i].buffer.GetMaxBufferSize());
 		}
 
-		for (size_t i = 0; i < Relays.size(); i++)
-			Relays[i].free_slots.write(Relays[i].buffer.GetMaxBufferSize());
 		return;
 	}
 
@@ -54,9 +52,6 @@ void Router::Update()
 	RXProcess();
 
 	start_from_port = (start_from_port + 1) % static_cast<std::int32_t>(Relays.size());
-
-	for (std::int32_t i = 0; i < Relays.size(); i++)
-		Relays[i].free_slots.write(Relays[i].buffer.GetCurrentFreeSlots());
 
 	power.leakageRouter();
 	for (int i = 0; i < Relays.size(); i++)
@@ -79,9 +74,9 @@ void Router::Route(std::int32_t in_port, std::int32_t out_port)
 {
 	Relay& in_relay = Relays[in_port];
 	Relay& out_relay = Relays[out_port];
-	bool buf_stat = out_relay.tx_buffer_full_status.read();
+	bool buf_stat = out_relay.free_slots_neighbor.read();
 
-	if (out_relay.tx_current_level == out_relay.tx_ack.read() && !buf_stat)
+	if (out_relay.tx_current_level == out_relay.tx_ack.read() && buf_stat)
 	{
 		Flit flit = in_relay.buffer.Pop();
 		flit.hop_no++;
@@ -151,7 +146,7 @@ void Router::RXProcess()
 		}
 		rel.rx_ack.write(rel.rx_current_level);
 		// updates the mask of VCs to prevent incoming data on full buffers
-		rel.rx_buffer_full_status.write(rel.buffer.IsFull());
+		rel.free_slots.write(rel.buffer.GetCurrentFreeSlots());
 	}
 }
 

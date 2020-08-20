@@ -40,9 +40,9 @@ T ReadParam(YAML::Node node, std::string param)
 namespace YAML
 {
 	template<>
-	struct convert<Configuration::BufferPower>
+	struct convert<Configuration::Power::Buffer>
 	{
-		static bool decode(const Node& node, Configuration::BufferPower& bufferPowerConfig)
+		static bool decode(const Node& node, Configuration::Power::Buffer& bufferPowerConfig)
 		{
 			for (YAML::const_iterator buffering_it = node.begin();
 				buffering_it != node.end();
@@ -78,9 +78,9 @@ namespace YAML
 
 
 	template<>
-	struct convert<Configuration::RouterPower>
+	struct convert<Configuration::Power::Router>
 	{
-		static bool decode(const Node& node, Configuration::RouterPower& routerPowerConfig)
+		static bool decode(const Node& node, Configuration::Power::Router& routerPowerConfig)
 		{
 
 			for (YAML::const_iterator crossbar_it = node["crossbar"].begin();
@@ -125,9 +125,9 @@ namespace YAML
 		static bool decode(const Node& node, Configuration::Power& powerConfig)
 		{
 			powerConfig.r2r_link_length = ReadParam<double>(node, "r2r_link_length");
-			powerConfig.bufferPowerConfig = node["Energy"]["Buffer"].as<Configuration::BufferPower>();
+			powerConfig.bufferPowerConfig = node["Energy"]["Buffer"].as<Configuration::Power::Buffer>();
 			powerConfig.linkBitLinePowerConfig = node["Energy"]["LinkBitLine"].as<std::map<double, std::pair<double, double>>>();
-			powerConfig.routerPowerConfig = node["Energy"]["Router"].as<Configuration::RouterPower>();
+			powerConfig.routerPowerConfig = node["Energy"]["Router"].as<Configuration::Power::Router>();
 			return true;
 		}
 	};
@@ -137,125 +137,8 @@ namespace YAML
 std::string Configuration::default_config_filename = "config.yaml";
 std::string Configuration::default_power_config_filename = "power.yaml";
 
-void Configuration::ShowHelp(const std::string& selfname)
+void Configuration::ReadTopologyParams(const YAML::Node& config)
 {
-	std::cout 
-		<< "Usage: " << selfname << " [options]\n"
-		<< "Where [options] is one or more of the following ones:\n"
-		<< "\t-help\t\t\tShow this help and exit\n"
-		<< "\t-config\t\t\tLoad the specified configuration file\n"
-		<< "\t-power\t\t\tLoad the specified power configurations file\n"
-		<< "\t-verbose N\t\tVerbosity level (1=low, 2=medium, 3=high)\n"
-		<< "\t-trace FILENAME\t\tTrace signals to a VCD file named 'FILENAME.vcd'\n"
-		<< "\t-buffer N\t\tSet the depth of router input buffers [flits]\n"
-		<< "\t-vc N\t\t\tNumber of virtual channels\n"
-		<< "\t-size Nmin Nmax\t\tSet the minimum and maximum packet size [flits]\n"
-		<< "\t-flit N\t\t\tSet the flit size [bit]\n"
-		<< "\t-topology TYPE\t\tSet the topology to one of the following:\n"
-		<< "\t\tMESH\t\t2D Mesh\n"
-		<< "\t\tBUTTERFLY\tDelta network Butterfly (radix 2)\n"
-		<< "\t\tBASELINE\tDelta network Baseline\n"
-		<< "\t\tOMEGA\t\tDelta network Omega\n"
-		<< "\t-routing TYPE\t\tSet the routing algorithm to one of the following:\n"
-		<< "\t\tXY\t\tXY routing algorithm\n"
-		<< "\t\tWEST_FIRST\tWest-First routing algorithm\n"
-		<< "\t\tNORTH_LAST\tNorth-Last routing algorithm\n"
-		<< "\t\tNEGATIVE_FIRST\tNegative-First routing algorithm\n"
-		<< "\t\tODD_EVEN\tOdd-Even routing algorithm\n"
-		<< "\t\tDYAD T\t\tDyAD routing algorithm with threshold T\n"
-		<< "\t\tTABLE_BASED FILENAME\tRouting Table Based routing algorithm with table in the specified file\n"
-		<< "\t-sel TYPE\t\tSet the selection strategy to one of the following:\n"
-		<< "\t\tRANDOM\t\tRandom selection strategy\n"
-		<< "\t\tBUFFER_LEVEL\tBuffer-Level Based selection strategy\n"
-		<< "\t\tNOP\t\tNeighbors-on-Path selection strategy\n"
-		<< "\t-pir R TYPE\t\tSet the packet injection rate R [0..1] and the time distribution TYPE where TYPE is one of the following:\n"
-		<< "\t\tpoisson\t\tMemory-less Poisson distribution\n"
-		<< "\t\tburst R\t\tBurst distribution with given real burstness\n"
-		<< "\t\tpareto on off r\tSelf-similar Pareto distribution with given real parameters (alfa-on alfa-off r)\n"
-		<< "\t\tcustom R\tCustom distribution with given real probability of retransmission\n"
-		<< "\t-traffic TYPE\t\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following:\n"
-		<< "\t\trandom\t\tRandom traffic distribution\n"
-		<< "\t\tlocal L\t\tRandom traffic with a fraction L (0..1) of packets having a destination connected to the local hub, i.e. not using wireless\n"
-		<< "\t\tulocal\t\tRandom traffic with locality smooth distribution\n"
-		<< "\t\ttranspose1\tTranspose matrix 1 traffic distribution\n"
-		<< "\t\ttranspose2\tTranspose matrix 2 traffic distribution\n"
-		<< "\t\tbitreversal\tBit-reversal traffic distribution\n"
-		<< "\t\tbutterfly\tButterfly traffic distribution\n"
-		<< "\t\tshuffle\t\tShuffle traffic distribution\n"
-		<< "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file\n"
-		<< "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)\n"
-		<< "\t-warmup N\t\tStart to collect statistics after N cycles\n"
-		<< "\t-seed N\t\t\tSet the seed of the random generator (default time())\n"
-		<< "\t-detailed\t\tShow detailed statistics\n"
-		<< "\t-show_buf_stats\t\tShow buffers statistics\n"
-		<< "\t-volume N\t\tStop the simulation when either the maximum number of cycles has been reached or N flits have\n"
-		<< "\t\t\t\tbeen delivered\n"
-		<< "\t-sim N\t\t\tRun for the specified simulation time [cycles]\n"
-		<< '\n'
-		<< "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>\n"
-		<< "If you find this program useless please feel free to complain with Davide Patti <davide.patti@dieei.unict.it>\n"
-		<< "If you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>\n"
-		<< "and if need to solve any other problem of your life please contact Turi Monteleone <salvatore.monteleone@dieei.unict.it>\n";
-}
-
-Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
-{
-	// TODO: Maybe I should make it beautiful... But later
-
-	for (std::int32_t i = 1; i < arg_num; i++)
-	{
-		if (!strcmp(arg_vet[i], "-help"))
-		{
-			ShowHelp(arg_vet[0]);
-			exit(0);
-		}
-	}
-
-	YAML::Node config;
-	std::string config_filename = default_config_filename;
-	for (std::int32_t i = 1; i < arg_num; i++)
-	{
-		if (!strcmp(arg_vet[i], "-config"))
-		{
-			config_filename = arg_vet[++i];
-			break;
-		}
-	}
-	std::cout << "Loading configuration from file \"" << config_filename << "\"...";
-	try
-	{
-		config = YAML::LoadFile(config_filename);
-		std::cout << " Done\n";
-	}
-	catch (YAML::BadFile& e) {
-		std::cout << " Failed\n";
-		std::cerr << "The specified YAML configuration file was not found!\nUse -config to load examples from config_examples folder.\n";
-		exit(0);
-	}
-	catch (YAML::ParserException& pe) {
-		std::cout << " Failed\n";
-		std::cerr << "ERROR at line " << pe.mark.line + 1 << " column " << pe.mark.column + 1 << ": " << pe.msg << ". Please check identation.\n";
-		exit(0);
-	}
-
-	buffer_depth = ReadParam<std::int32_t>(config, "buffer_depth");
-	flit_size = ReadParam<std::int32_t>(config, "flit_size");
-	min_packet_size = ReadParam<std::int32_t>(config, "min_packet_size");
-	max_packet_size = ReadParam<std::int32_t>(config, "max_packet_size");
-	router_type = ReadParam<std::string>(config, "router_type");
-	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
-	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
-	packet_injection_rate = ReadParam<double>(config, "packet_injection_rate");
-	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
-	clock_period_ps = ReadParam<std::int32_t>(config, "clock_period_ps");
-	simulation_time = ReadParam<std::int32_t>(config, "simulation_time");
-	reset_time = ReadParam<std::int32_t>(config, "reset_time");
-	stats_warm_up_time = ReadParam<std::int32_t>(config, "stats_warm_up_time");
-	rnd_generator_seed = ReadParam<std::int32_t>(config, "rnd_generator_seed", time(0));
-	report_progress = ReadParam<bool>(config, "report_progress", false);
-	report_buffers = ReadParam<bool>(config, "report_buffers", false);
-	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
-
 	std::string topology = ReadParam<std::string>(config, "topology");
 	channels_count = ReadParam<std::int32_t>(config, "topology_channels", 1);
 	try
@@ -364,25 +247,40 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 		}
 		else
 		{
-		std::cerr << "ERROR: Unsupported topology.\n";
-		exit(0);
+			std::cerr << "ERROR: Unsupported topology.\n";
+			exit(0);
 		}
 	}
 	catch (...)
 	{
-		std::cerr << "ERROR: Cannot read topology.\n";
-		exit(0);
+		throw std::runtime_error("Configuration error: Failed to read topology.");
 	}
+}
+void Configuration::ReadRouterParams(const YAML::Node& config)
+{
+	router_type = ReadParam<std::string>(config, "router_type");
+	buffer_depth = ReadParam<std::int32_t>(config, "buffer_depth");
+	flit_size = ReadParam<std::int32_t>(config, "flit_size");
+	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
+	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
+
+	if (router_type == "PER_FLIT_TREE_BASED_REROUTE")
+	{
+		sub_graph = std::make_unique<Graph>(graph.subtree());
+		sub_table = std::make_unique<RoutingTable>(*sub_graph);
+	}
+}
+void Configuration::ReadRoutingTableParams(const YAML::Node& config)
+{
 	try
 	{
-
 		const auto& node = config["routing_table"];
 		if (node.IsDefined())
 		{
 			if (node.IsSequence())
 			{
 				bool id_based = false;
-				if (config["routing_table_id_based"].IsDefined()) 
+				if (config["routing_table_id_based"].IsDefined())
 					id_based = config["routing_table_id_based"].as<bool>();
 				if (id_based)
 				{
@@ -449,9 +347,28 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 	}
 	catch (...)
 	{
-		std::cerr << "ERROR: Cannot read routing table. \n";
-		exit(0);
+		throw std::runtime_error("Configuration error: Failed to read routing table.");
 	}
+}
+void Configuration::ReadSimulationParams(const YAML::Node& config)
+{
+	rnd_generator_seed = ReadParam<std::int32_t>(config, "rnd_generator_seed", time(0));
+	report_progress = ReadParam<bool>(config, "report_progress", false);
+	report_buffers = ReadParam<bool>(config, "report_buffers", false);
+	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
+
+	clock_period_ps = ReadParam<std::int32_t>(config, "clock_period_ps");
+	reset_time = ReadParam<std::int32_t>(config, "reset_time");
+	simulation_time = ReadParam<std::int32_t>(config, "simulation_time");
+	stats_warm_up_time = ReadParam<std::int32_t>(config, "stats_warm_up_time");
+
+	min_packet_size = ReadParam<std::int32_t>(config, "min_packet_size");
+	max_packet_size = ReadParam<std::int32_t>(config, "max_packet_size");
+	packet_injection_rate = ReadParam<double>(config, "packet_injection_rate");
+	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
+}
+void Configuration::ReadTrafficDistributionParams(const YAML::Node& config)
+{
 
 	traffic_distribution = ReadParam<std::string>(config, "traffic_distribution");
 	if (traffic_distribution == "TRAFFIC_TABLE_BASED")
@@ -462,11 +379,118 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 		for (std::int32_t i = 0; i < traffic_hotspots.size(); i++)
 		{
 			const auto& hotspot = traffic_hotspots[i];
-			hotspots.push_back(std::make_pair(hotspot[0].as<std::int32_t>(), 
+			hotspots.push_back(std::make_pair(hotspot[0].as<std::int32_t>(),
 				std::make_pair(hotspot[1].as<std::int32_t>(), hotspot[2].as<std::int32_t>())));
 		}
 	}
+}
 
+void Configuration::ShowHelp(const std::string& selfname)
+{
+	std::cout 
+		<< "Usage: " << selfname << " [options]\n"
+		<< "Where [options] is one or more of the following ones:\n"
+		<< "\t-help\t\t\tShow this help and exit\n"
+		<< "\t-config\t\t\tLoad the specified configuration file\n"
+		<< "\t-power\t\t\tLoad the specified power configurations file\n"
+		<< "\t-verbose N\t\tVerbosity level (1=low, 2=medium, 3=high)\n"
+		<< "\t-trace FILENAME\t\tTrace signals to a VCD file named 'FILENAME.vcd'\n"
+		<< "\t-buffer N\t\tSet the depth of router input buffers [flits]\n"
+		<< "\t-vc N\t\t\tNumber of virtual channels\n"
+		<< "\t-size Nmin Nmax\t\tSet the minimum and maximum packet size [flits]\n"
+		<< "\t-flit N\t\t\tSet the flit size [bit]\n"
+		<< "\t-topology TYPE\t\tSet the topology to one of the following:\n"
+		<< "\t\tMESH\t\t2D Mesh\n"
+		<< "\t\tBUTTERFLY\tDelta network Butterfly (radix 2)\n"
+		<< "\t\tBASELINE\tDelta network Baseline\n"
+		<< "\t\tOMEGA\t\tDelta network Omega\n"
+		<< "\t-routing TYPE\t\tSet the routing algorithm to one of the following:\n"
+		<< "\t\tXY\t\tXY routing algorithm\n"
+		<< "\t\tWEST_FIRST\tWest-First routing algorithm\n"
+		<< "\t\tNORTH_LAST\tNorth-Last routing algorithm\n"
+		<< "\t\tNEGATIVE_FIRST\tNegative-First routing algorithm\n"
+		<< "\t\tODD_EVEN\tOdd-Even routing algorithm\n"
+		<< "\t\tDYAD T\t\tDyAD routing algorithm with threshold T\n"
+		<< "\t\tTABLE_BASED FILENAME\tRouting Table Based routing algorithm with table in the specified file\n"
+		<< "\t-sel TYPE\t\tSet the selection strategy to one of the following:\n"
+		<< "\t\tRANDOM\t\tRandom selection strategy\n"
+		<< "\t\tBUFFER_LEVEL\tBuffer-Level Based selection strategy\n"
+		<< "\t\tNOP\t\tNeighbors-on-Path selection strategy\n"
+		<< "\t-pir R TYPE\t\tSet the packet injection rate R [0..1] and the time distribution TYPE where TYPE is one of the following:\n"
+		<< "\t\tpoisson\t\tMemory-less Poisson distribution\n"
+		<< "\t\tburst R\t\tBurst distribution with given real burstness\n"
+		<< "\t\tpareto on off r\tSelf-similar Pareto distribution with given real parameters (alfa-on alfa-off r)\n"
+		<< "\t\tcustom R\tCustom distribution with given real probability of retransmission\n"
+		<< "\t-traffic TYPE\t\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following:\n"
+		<< "\t\trandom\t\tRandom traffic distribution\n"
+		<< "\t\tlocal L\t\tRandom traffic with a fraction L (0..1) of packets having a destination connected to the local hub, i.e. not using wireless\n"
+		<< "\t\tulocal\t\tRandom traffic with locality smooth distribution\n"
+		<< "\t\ttranspose1\tTranspose matrix 1 traffic distribution\n"
+		<< "\t\ttranspose2\tTranspose matrix 2 traffic distribution\n"
+		<< "\t\tbitreversal\tBit-reversal traffic distribution\n"
+		<< "\t\tbutterfly\tButterfly traffic distribution\n"
+		<< "\t\tshuffle\t\tShuffle traffic distribution\n"
+		<< "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file\n"
+		<< "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)\n"
+		<< "\t-warmup N\t\tStart to collect statistics after N cycles\n"
+		<< "\t-seed N\t\t\tSet the seed of the random generator (default time())\n"
+		<< "\t-detailed\t\tShow detailed statistics\n"
+		<< "\t-show_buf_stats\t\tShow buffers statistics\n"
+		<< "\t-volume N\t\tStop the simulation when either the maximum number of cycles has been reached or N flits have\n"
+		<< "\t\t\t\tbeen delivered\n"
+		<< "\t-sim N\t\t\tRun for the specified simulation time [cycles]\n"
+		<< '\n'
+		<< "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>\n"
+		<< "If you find this program useless please feel free to complain with Davide Patti <davide.patti@dieei.unict.it>\n"
+		<< "If you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>\n"
+		<< "and if need to solve any other problem of your life please contact Turi Monteleone <salvatore.monteleone@dieei.unict.it>\n";
+}
+
+Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
+{
+	// TODO: Maybe I should make it beautiful... But later
+
+	for (std::int32_t i = 1; i < arg_num; i++)
+	{
+		if (!strcmp(arg_vet[i], "-help"))
+		{
+			ShowHelp(arg_vet[0]);
+			exit(0);
+		}
+	}
+
+	YAML::Node config;
+	std::string config_filename = default_config_filename;
+	for (std::int32_t i = 1; i < arg_num; i++)
+	{
+		if (!strcmp(arg_vet[i], "-config"))
+		{
+			config_filename = arg_vet[++i];
+			break;
+		}
+	}
+	std::cout << "Loading configuration from file \"" << config_filename << "\"...";
+	try
+	{
+		config = YAML::LoadFile(config_filename);
+		std::cout << " Done\n";
+	}
+	catch (YAML::BadFile& e) {
+		std::cout << " Failed\n";
+		std::cerr << "The specified YAML configuration file was not found!\nUse -config to load examples from config_examples folder.\n";
+		exit(0);
+	}
+	catch (YAML::ParserException& pe) {
+		std::cout << " Failed\n";
+		std::cerr << "ERROR at line " << pe.mark.line + 1 << " column " << pe.mark.column + 1 << ": " << pe.msg << ". Please check identation.\n";
+		exit(0);
+	}
+
+	ReadTopologyParams(config);
+	ReadRouterParams(config);
+	ReadRoutingTableParams(config);
+	ReadSimulationParams(config);
+	ReadTrafficDistributionParams(config);
 
 	YAML::Node power_config;
 	std::string power_config_filename = default_power_config_filename;
@@ -669,9 +693,17 @@ const Graph& Configuration::TopologyGraph() const
 {
 	return graph;
 }
+const Graph& Configuration::TopologySubGraph() const
+{
+	return *sub_graph;
+}
 const RoutingTable& Configuration::GRTable() const
 {
 	return table;
+}
+const RoutingTable& Configuration::SubGRTable() const
+{
+	return *sub_table;
 }
 const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Configuration::Hotspots() const
 {

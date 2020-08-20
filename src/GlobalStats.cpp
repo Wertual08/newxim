@@ -47,6 +47,13 @@ std::int32_t GlobalStats::getLastReceivedFlitTime() const
 		result = t.RouterDevice->stats.getLastReceivedFlitTime();
 	return static_cast<std::int32_t>(result);
 }
+std::int32_t GlobalStats::GetMaxTimeFlitInNetwork() const
+{
+	double result = 0.0;
+	for (const auto& t : Network.Tiles) if (t.RouterDevice->stats.GetMaxTimeFlitInNetwork() > result)
+		result = t.RouterDevice->stats.GetMaxTimeFlitInNetwork();
+	return static_cast<std::int32_t>(result);
+}
 double GlobalStats::getAverageDelay() const
 {
 	unsigned int total_packets = 0;
@@ -227,6 +234,36 @@ void GlobalStats::showPowerBreakDown(std::ostream& out)
 }
 std::ostream& operator<<(std::ostream& out, const GlobalStats& gs)
 {
+	if (false)
+	{
+		out << "% Last time flit received:                " << gs.getLastReceivedFlitTime() << '\n';
+		out << "% Max buffer stuck delay:                 " << gs.GetMaxBufferStuckDelay() << '\n';
+		out << "% Total produced flits:                   " << gs.GetTotalFlitsGenerated() << '\n';
+		out << "% Total accepted flits:                   " << gs.getAcceptedFlits() << '\n';
+		out << "% Total received flits:                   " << gs.getReceivedFlits() << '\n';
+		out << "% Network production (flits/cycle):       " << gs.getAggregatedProduction() << '\n';
+		out << "% Network acceptance (flits/cycle):       " << gs.getAggregatedAcceptance() << '\n';
+		out << "% Network throughput (flits/cycle):       " << gs.getAggregatedThroughput() << '\n';
+		out << "% Total received packets:                 " << gs.getReceivedPackets() << '\n';
+		out << "% Global average delay (cycles):          " << gs.getAverageDelay() << '\n';
+		out << "% Max flit in network time:               " << '\n';
+		out << "% Max delay (cycles):                     " << gs.getMaxDelay() << '\n';
+		out << "% Received/Ideal flits Ratio:             " << gs.getReceivedIdealFlitRatio() << '\n';
+		out << "% Average IP throughput (flits/cycle/IP): " << gs.getThroughput() << '\n';
+		out << "% Average buffer utilization:             " << gs.GetAverageBufferLoad() << '\n';
+		if (gs.Config.ChannelsCount() > 1)
+		{
+			for (std::int32_t i = 0; i < gs.Config.ChannelsCount(); i++)
+				out << "% Average channel " << i << " utilization: " << gs.GetAverageBufferLoad(i) << '\n';
+		}
+		out << "% Total energy (J):                       " << gs.getTotalPower() << '\n';
+		out << "% Dynamic energy (J):                     " << gs.getDynamicPower() << '\n';
+		out << "% Static energy (J):                      " << gs.getStaticPower() << '\n';
+
+		if (gs.Config.ReportBuffers()) gs.ShowBuffers(out);
+		return out;
+	}
+
 	out << "% Last time flit received: " << gs.getLastReceivedFlitTime() << '\n';
 	out << "% Max buffer stuck delay: " << gs.GetMaxBufferStuckDelay() << '\n';
 	out << "% Total produced flits: " << gs.GetTotalFlitsGenerated() << '\n';
@@ -235,6 +272,7 @@ std::ostream& operator<<(std::ostream& out, const GlobalStats& gs)
 	out << "% Network production (flits/cycle): " << gs.getAggregatedProduction() << '\n';
 	out << "% Network acceptance (flits/cycle): " << gs.getAggregatedAcceptance() << '\n';
 	out << "% Network throughput (flits/cycle): " << gs.getAggregatedThroughput() << '\n';
+	out << "% Max time flit in network (cycles): " << gs.GetMaxTimeFlitInNetwork() << '\n';
 	out << "% Total received packets: " << gs.getReceivedPackets() << '\n';
 	out << "% Global average delay (cycles): " << gs.getAverageDelay() << '\n';
 	out << "% Max delay (cycles): " << gs.getMaxDelay() << '\n';

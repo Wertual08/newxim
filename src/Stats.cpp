@@ -9,6 +9,8 @@ Stats::Stats(const SimulationTimer& timer, std::int32_t node_id, std::int32_t bu
 {
 	id = node_id;
 	total_flits_accepted = 0;
+	last_received_flit_time = 0.0;
+	max_time_flit_in_network = 0.0;
 }
 
 void Stats::UpdateBufferPopOrEmptyTime(std::int32_t buffer)
@@ -28,6 +30,11 @@ double Stats::GetMinBufferPopOrEmptyTime() const
 	for (std::int32_t i = 1; i < LastBufferPopOrEmptyTime.size(); i++)
 		if (min > LastBufferPopOrEmptyTime[i]) min = LastBufferPopOrEmptyTime[i];
 	return min;
+}
+
+double Stats::GetMaxTimeFlitInNetwork() const
+{
+	return max_time_flit_in_network;
 }
 
 void Stats::AcceptFlit()
@@ -71,7 +78,10 @@ void Stats::receivedFlit(const Flit& flit)
 
 	last_received_flit_time = Timer.SimulationTime();
 
-	int i = searchCommHistory(flit.src_id);
+	max_time_flit_in_network = std::max(max_time_flit_in_network, 
+		Timer.StatisticsTime() - flit.accept_timestamp);
+
+	std::int32_t i = searchCommHistory(flit.src_id);
 
 	if (i == -1)
 	{

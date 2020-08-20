@@ -22,9 +22,9 @@ Packet& Processor::GetQueueFront()
 }
 
 Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
-	std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id) :
+	std::int32_t min_packet_size, std::int32_t max_packet_size) :
 	Timer(timer), local_id(id), MinPacketSize(min_packet_size),
-	MaxPacketSize(max_packet_size), MaxID(max_id), Traffic(nullptr)
+	MaxPacketSize(max_packet_size), Traffic(nullptr)
 {
 	SC_METHOD(rxProcess);
 	sensitive << reset << clock.pos();
@@ -34,9 +34,9 @@ Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t 
 }
 
 Processor::Processor(const SimulationTimer& timer, std::int32_t id, 
-	std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id) :
+	std::int32_t min_packet_size, std::int32_t max_packet_size) :
 	Processor(GetProcessorName(id).c_str(), timer, id,
-		min_packet_size, max_packet_size, max_id)
+		min_packet_size, max_packet_size)
 {
 }
 void Processor::SetTrafficManager(const TrafficManager& traffic)
@@ -105,6 +105,7 @@ Flit Processor::nextFlit()
 	flit.dst_id = packet.dst_id;
 	flit.vc_id = packet.vc_id;
 	flit.timestamp = packet.timestamp;
+	flit.accept_timestamp = Timer.StatisticsTime();
 	flit.sequence_no = packet.size - packet.flit_left;
 	flit.sequence_length = packet.size;
 	flit.hop_no = 0;

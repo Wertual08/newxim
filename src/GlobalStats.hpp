@@ -27,6 +27,7 @@ private:
 	double GetAverageBufferLoad(std::int32_t channel) const;
 	double GetAverageBufferLoad() const;
 	std::int32_t getLastReceivedFlitTime() const;
+	std::int32_t GetMaxTimeFlitInNetwork() const;
 	// Returns the aggregated average delay (cycles)
 	double getAverageDelay() const;
 	// Returns the aggragated average delay (cycles) for communication src_id->dst_id

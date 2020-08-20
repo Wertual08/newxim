@@ -15,34 +15,20 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: CIRCULANT
-topology_args: [64, 1, 8]
+topology: TORUS
+topology_args: [8, 8]
 topology_channels: 1
 
 # Router types:
 #   WORMHOLE
 #   PER_FLIT
 #   TREE_BASED_REROUTE
-router_type: PER_FLIT 
+router_type: PER_FLIT_TREE_BASED_REROUTE 
 
 # number of flits for each router buffer
-buffer_depth: 9
+buffer_depth: 1
 # size of flits, in bits
 flit_size: 32
-
-# Default routing table generators:
-#   DIJKSTRA
-#   DIJKSTRA_MULTIPATH
-#   DIJKSTRA_DEADLOCK_FREE (test)
-#   UP_DOWN
-#   MESH_XY
-#   CIRCULANT_PAIR_EXCHANGE
-#   CIRCULANT_MULTIPLICATIVE
-#   CIRCULANT_CLOCKWISE
-#   CIRCULANT_ADAPTIVE
-#   just table
-routing_table: DIJKSTRA_MULTIPATH
-routing_table_id_based: true
 
 # Routing algorithms:
 #   TABLE_BASED
@@ -59,7 +45,21 @@ routing_algorithm: TABLE_BASED
 #   RANDOM_KEEP_SPACE
 # Each of the above labels should match a corresponding
 # implementation in the selectionStrategies source code directory
-selection_strategy: RANDOM_KEEP_SPACE
+selection_strategy: RANDOM
+
+# Default routing table generators:
+#   DIJKSTRA
+#   DIJKSTRA_MULTIPATH
+#   DIJKSTRA_DEADLOCK_FREE (test)
+#   UP_DOWN
+#   MESH_XY
+#   CIRCULANT_PAIR_EXCHANGE
+#   CIRCULANT_MULTIPLICATIVE
+#   CIRCULANT_CLOCKWISE
+#   CIRCULANT_ADAPTIVE
+#   just table
+routing_table: DIJKSTRA_MULTIPATH
+routing_table_id_based: true
 
 # SIMULATION PARAMETERS
 #
@@ -75,8 +75,6 @@ reset_time: 1000
 simulation_time: 10000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
-# stop after a given amount of load has been processed
-max_volume_to_be_drained: 0
 
 min_packet_size: 8
 max_packet_size: 8

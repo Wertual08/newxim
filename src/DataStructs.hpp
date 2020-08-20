@@ -67,6 +67,7 @@ struct Flit
 	int sequence_no;		// The sequence number of the flit inside the packet
 	int sequence_length;
 	double timestamp;		// Unix timestamp at packet generation
+	double accept_timestamp;
 	int hop_no;				// Current number of hops from source to destination
 	bool use_low_voltage_path;
 

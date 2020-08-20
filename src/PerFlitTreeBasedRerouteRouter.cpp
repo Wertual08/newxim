@@ -1,4 +1,4 @@
-#include "TreeBasedRerouteRouter.hpp"
+#include "PerFlitTreeBasedRerouteRouter.hpp"
 
 
 
@@ -6,8 +6,17 @@ static bool VectorContains(const std::vector<std::int32_t>& vec, std::int32_t v)
 {
 	return std::find(vec.begin(), vec.end(), v) != vec.end();
 }
+static bool VectorContains(const std::vector<std::vector<std::int32_t>>& vec, std::int32_t v)
+{
+	for (const auto& sub_vec : vec)
+	{
+		if (std::find(sub_vec.begin(), sub_vec.end(), v) != sub_vec.end())
+			return true;
+	}
+	return false;
+}
 
-void TreeBasedRerouteRouter::TXProcess()
+void PerFlitTreeBasedRerouteRouter::TXProcess()
 {
 	for (std::int32_t j = 0; j < Relays.size(); j++)
 	{
@@ -28,8 +37,9 @@ void TreeBasedRerouteRouter::TXProcess()
 			std::int32_t out_port = PerformRoute(route_data);
 			if (out_port < 0) continue;
 
-			if (Relays[out_port].rx_buffer_full_status.read())
-				out_port = SubTreeTable[flit.dst_id];
+			// TODO: Maybe it should select one of the channels... (Apply selection strategy???)
+			if (Relays[out_port].free_slots_neighbor.read() < 1)
+				out_port = SubTreeTable[flit.dst_id][0];
 
 			Route(in_port, out_port);
 		}
@@ -38,11 +48,11 @@ void TreeBasedRerouteRouter::TXProcess()
 
 }
 
-TreeBasedRerouteRouter::TreeBasedRerouteRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
+PerFlitTreeBasedRerouteRouter::PerFlitTreeBasedRerouteRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
 	Router(timer, id, relays, max_buffer_size)
 {
 }
-void TreeBasedRerouteRouter::SetupSubTreeTable(const std::vector<std::int32_t>& table)
+void PerFlitTreeBasedRerouteRouter::SetupSubTreeTable(const std::vector<std::vector<std::int32_t>>& table)
 {
 	SubTreeTable = table;
 }

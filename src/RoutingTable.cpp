@@ -816,7 +816,7 @@ bool RoutingTable::Load(const std::string& path)
 bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 {
 	Nodes.resize(graph.size(), Node(graph.size()));
-	if (generator == "DEFAULT") return LoadDijkstra(graph);
+	if (generator == "DEFAULT") return LoadDijkstraMultipath(graph);
 	if (generator == "DIJKSTRA") return LoadDijkstra(graph);
 	if (generator == "DIJKSTRA_MULTIPATH") return LoadDijkstraMultipath(graph);
 	if (generator == "DIJKSTRA_DEADLOCK_FREE") return LoadDijkstraDeadlockFree(graph);

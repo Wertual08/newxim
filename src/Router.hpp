@@ -37,7 +37,7 @@ public:
 	sc_in<bool> reset;					// The reset signal for the router
 
 	// Registers
-	const std::int32_t LocalID;				// Unique ID
+	const std::int32_t LocalID;			// Unique ID
 	Stats stats;						// Statistics
 	Power power;
 

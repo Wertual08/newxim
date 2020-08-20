@@ -9,30 +9,34 @@
 
 
 
+namespace YAML
+{
+	class Node;
+}
 class Configuration
 {
 public:
-	struct BufferPower
-	{
-		std::map<std::pair<std::int32_t, std::int32_t>, double> front;
-		std::map<std::pair<std::int32_t, std::int32_t>, double> pop;
-		std::map<std::pair<std::int32_t, std::int32_t>, double> push;
-		std::map<std::pair<std::int32_t, std::int32_t>, double> leakage;
-	};
-
-	struct RouterPower
-	{
-		std::map<std::pair<double, double>, std::pair<double, double> > crossbar_pm;
-		std::map<int, std::pair<double, double> > network_interface;
-		std::map<std::string, std::pair<double, double> > routing_algorithm_pm;
-		std::map<std::string, std::pair<double, double> > selection_strategy_pm;
-	};
-
 	struct Power
 	{
-		BufferPower bufferPowerConfig;
+		struct Buffer
+		{
+			std::map<std::pair<std::int32_t, std::int32_t>, double> front;
+			std::map<std::pair<std::int32_t, std::int32_t>, double> pop;
+			std::map<std::pair<std::int32_t, std::int32_t>, double> push;
+			std::map<std::pair<std::int32_t, std::int32_t>, double> leakage;
+		};
+
+		struct Router
+		{
+			std::map<std::pair<double, double>, std::pair<double, double> > crossbar_pm;
+			std::map<int, std::pair<double, double> > network_interface;
+			std::map<std::string, std::pair<double, double> > routing_algorithm_pm;
+			std::map<std::string, std::pair<double, double> > selection_strategy_pm;
+		};
+
+		Buffer bufferPowerConfig;
 		std::map<double, std::pair<double, double>> linkBitLinePowerConfig;
-		RouterPower routerPowerConfig;
+		Router routerPowerConfig;
 		double r2r_link_length;
 	};
 
@@ -67,7 +71,15 @@ private:
 	std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>> hotspots;
 
 	Graph graph;
+	std::unique_ptr<Graph> sub_graph;
 	RoutingTable table;
+	std::unique_ptr<RoutingTable> sub_table;
+
+	void ReadTopologyParams(const YAML::Node& config);
+	void ReadRouterParams(const YAML::Node& config);
+	void ReadRoutingTableParams(const YAML::Node& config);
+	void ReadSimulationParams(const YAML::Node& config);
+	void ReadTrafficDistributionParams(const YAML::Node& config);
 
 public:
 	static std::string default_config_filename;
@@ -82,7 +94,9 @@ public:
 	void Show() const;
 
 	const Graph& TopologyGraph() const;
+	const Graph& TopologySubGraph() const;
 	const RoutingTable& GRTable() const;
+	const RoutingTable& SubGRTable() const;
 	const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Hotspots() const;
 
 	std::int32_t BufferDepth() const;
