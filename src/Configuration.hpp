@@ -64,9 +64,10 @@ private:
 	bool report_buffers;
 	bool report_routing_table;
 
+	std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>> hotspots;
+
 	Graph graph;
 	RoutingTable table;
-	TrafficManager traffic;
 
 public:
 	static std::string default_config_filename;
@@ -80,9 +81,9 @@ public:
 
 	void Show() const;
 
-	const Graph& Topology() const;
+	const Graph& TopologyGraph() const;
 	const RoutingTable& GRTable() const;
-	const TrafficManager& Traffic() const;
+	const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Hotspots() const;
 
 	std::int32_t BufferDepth() const;
 	std::int32_t FlitSize() const;

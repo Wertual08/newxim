@@ -8,7 +8,7 @@ static std::string GetRouterName(std::int32_t id)
 }
 
 
-Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size) :
+Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
 	stats(timer, id, Relays.size()), power(timer),
 	LocalID(id),
 	Relays(relays + 1),
@@ -53,7 +53,7 @@ void Router::Update()
 	TXProcess();
 	RXProcess();
 
-	start_from_port = (start_from_port + 1) % Relays.size();
+	start_from_port = (start_from_port + 1) % static_cast<std::int32_t>(Relays.size());
 
 	for (std::int32_t i = 0; i < Relays.size(); i++)
 		Relays[i].free_slots.write(Relays[i].buffer.GetCurrentFreeSlots());
@@ -155,7 +155,7 @@ void Router::RXProcess()
 	}
 }
 
-Router::Router(const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size) : 
+Router::Router(const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
 	Router(GetRouterName(id).c_str(), timer, id, relays, max_buffer_size)
 {
 }

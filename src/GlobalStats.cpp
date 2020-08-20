@@ -195,9 +195,9 @@ std::int32_t GlobalStats::GetTotalFlitsGenerated() const
 void GlobalStats::ShowBuffers(std::ostream& out) const
 {
 	out << "% Buffer statuses:\n";
-	for (std::int32_t i = 0; i < Config.Topology().size(); i++)
+	for (std::int32_t i = 0; i < Config.TopologyGraph().size(); i++)
 	{
-		const auto& node = Config.Topology()[i];
+		const auto& node = Config.TopologyGraph()[i];
 		const auto& relays = Network.Tiles[i].RouterDevice->Relays;
 		const auto& stats = Network.Tiles[i].RouterDevice->stats;
 		for (std::int32_t r = 0; r < relays.size(); r++)

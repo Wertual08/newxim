@@ -14,7 +14,7 @@ private:
 	const RoutingAlgorithm* Routing;
 	const SelectionStrategy* Selection;
 
-	Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size);
+	Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size);
 
 	void Update();
 
@@ -41,7 +41,7 @@ public:
 	Stats stats;						// Statistics
 	Power power;
 
-	Router(const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size);
+	Router(const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size);
 	void SetRoutingAlgorithm(const RoutingAlgorithm& alg);
 	void SetSelectionStrategy(const SelectionStrategy& sel);
 };

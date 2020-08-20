@@ -453,7 +453,6 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 		exit(0);
 	}
 
-	traffic.Init(graph.size());
 	traffic_distribution = ReadParam<std::string>(config, "traffic_distribution");
 	if (traffic_distribution == "TRAFFIC_TABLE_BASED")
 		traffic_table_filename = ReadParam<std::string>(config, "traffic_table_filename");
@@ -463,13 +462,10 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 		for (std::int32_t i = 0; i < traffic_hotspots.size(); i++)
 		{
 			const auto& hotspot = traffic_hotspots[i];
-			traffic.SetLoad(
-				hotspot[0].as<std::int32_t>(), 
-				hotspot[1].as<std::int32_t>(), 
-				hotspot[2].as<std::int32_t>());
+			hotspots.push_back(std::make_pair(hotspot[0].as<std::int32_t>(), 
+				std::make_pair(hotspot[1].as<std::int32_t>(), hotspot[2].as<std::int32_t>())));
 		}
 	}
-	traffic.Setup();
 
 
 	YAML::Node power_config;
@@ -669,7 +665,7 @@ void Configuration::Show() const
 		<< "- rnd_generator_seed = " << rnd_generator_seed << '\n';
 }
 
-const Graph& Configuration::Topology() const
+const Graph& Configuration::TopologyGraph() const
 {
 	return graph;
 }
@@ -677,9 +673,9 @@ const RoutingTable& Configuration::GRTable() const
 {
 	return table;
 }
-const TrafficManager& Configuration::Traffic() const
+const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Configuration::Hotspots() const
 {
-	return traffic;
+	return hotspots;
 }
 
 std::int32_t Configuration::BufferDepth() const

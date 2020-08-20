@@ -15,11 +15,16 @@ static std::int32_t randInt(std::int32_t min, std::int32_t max)
 }
 
 
-Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id, double packet_injection_rate,
-	double probability_of_retransmission, std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id) :
-	Timer(timer), local_id(id), TableBased(false), PacketInjectionRate(packet_injection_rate),
-	ProbabilityOfRetransmission(probability_of_retransmission), MinPacketSize(min_packet_size),
-	MaxPacketSize(max_packet_size), MaxID(max_id), Traffic(nullptr), never_transmit(false)
+Packet& Processor::GetQueueFront()
+{
+	if (Queue.UpdateRequired()) Queue.UpdateFrontPacket(local_id, Traffic->FindDestination(local_id), getRandomSize());
+	return Queue.Front();
+}
+
+Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
+	std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id) :
+	Timer(timer), local_id(id), MinPacketSize(min_packet_size),
+	MaxPacketSize(max_packet_size), MaxID(max_id), Traffic(nullptr)
 {
 	SC_METHOD(rxProcess);
 	sensitive << reset << clock.pos();
@@ -28,71 +33,15 @@ Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t 
 	relay.buffer.SetMaxBufferSize(128);
 }
 
-void Processor::UpdateCurrentPacket()
-{
-	current_packet.src_id = local_id;
-
-	// Random destination distribution
-	current_packet.dst_id = Traffic->FindDestination(local_id);
-
-	current_packet.timestamp = oldest_packet_time_stamp;
-	current_packet.size = current_packet.flit_left = getRandomSize();
-	current_packet.vc_id = 0;
-}
-void Processor::PushPacket()
-{
-	double time_stamp = Timer.SystemTime();
-	if (!packets_in_queue)
-	{
-		oldest_packet_time_stamp = time_stamp;
-		newest_packet_time_stamp = time_stamp;
-		UpdateCurrentPacket();
-	}
-	else
-	{
-		oldest_packet_time_stamp = std::min(oldest_packet_time_stamp, time_stamp);
-		newest_packet_time_stamp = std::max(newest_packet_time_stamp, time_stamp);
-	}
-
-	packets_in_queue++;
-}
-void Processor::PopPacket()
-{
-	oldest_packet_time_stamp += (newest_packet_time_stamp - oldest_packet_time_stamp) / packets_in_queue;
-	packets_in_queue--;
-
-	if (packets_in_queue) UpdateCurrentPacket();
-}
-Packet& Processor::FrontPacket()
-{
-	return current_packet;
-}
-bool Processor::PacketQueueEmpty() const
-{
-	return !packets_in_queue;
-}
-size_t Processor::PacketQueueSize() const
-{
-	return packets_in_queue;
-}
-
 Processor::Processor(const SimulationTimer& timer, std::int32_t id, 
-	double packet_injection_rate, double probability_of_retransmission, 
 	std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id) :
 	Processor(GetProcessorName(id).c_str(), timer, id,
-		packet_injection_rate, probability_of_retransmission,
 		min_packet_size, max_packet_size, max_id)
 {
 }
 void Processor::SetTrafficManager(const TrafficManager& traffic)
 {
 	Traffic = &traffic;
-}
-void Processor::SetTrafficTable(const GlobalTrafficTable& table)
-{
-	TableBased = true;
-	traffic_table = &table;
-	never_transmit = table.occurrencesAsSource(local_id) == 0;
 }
 
 void Processor::rxProcess()
@@ -125,10 +74,10 @@ void Processor::txProcess()
 	}
 	else 
 	{
-		if (canShot())
+		if (Traffic->FirePacket(local_id, Timer.SystemTime(), transmittedAtPreviousCycle))
 		{
-			PushPacket();
-			if (Timer.StatisticsTime() > 0.0) TotalFlitsGenerated += FrontPacket().size;
+			Queue.Push(Timer.SystemTime());
+			if (Timer.StatisticsTime() > 0.0) TotalFlitsGenerated += GetQueueFront().size;
 			transmittedAtPreviousCycle = true;
 		}
 		else transmittedAtPreviousCycle = false;
@@ -136,7 +85,7 @@ void Processor::txProcess()
 
 		if (relay.tx_ack.read() == current_level_tx)
 		{
-			if (!PacketQueueEmpty()) 
+			if (!Queue.Empty()) 
 			{
 				Flit flit = nextFlit();	// Generate a new flit
 				relay.tx_flit->write(flit);	// Send the generated flit
@@ -149,9 +98,9 @@ void Processor::txProcess()
 
 Flit Processor::nextFlit()
 {
-	Flit flit;
-	Packet packet = FrontPacket();
+	Packet& packet = GetQueueFront();
 
+	Flit flit;
 	flit.src_id = packet.src_id;
 	flit.dst_id = packet.dst_id;
 	flit.vc_id = packet.vc_id;
@@ -167,52 +116,16 @@ Flit Processor::nextFlit()
 		flit.flit_type = FLIT_TYPE_TAIL;
 	else flit.flit_type = FLIT_TYPE_BODY;
 
-	FrontPacket().flit_left--;
-	if (FrontPacket().flit_left == 0)
-		PopPacket();
+	packet.flit_left--;
+	if (packet.flit_left == 0)
+		Queue.Pop();
 
 	return flit;
-}
-
-bool Processor::canShot()
-{
-	if (never_transmit) return false;
-	bool shot;
-
-	double now = Timer.SystemTime();
-
-	if (TableBased) 
-	{
-		// Table based communication traffic
-		if (never_transmit) return false;
-
-		bool use_pir = !transmittedAtPreviousCycle;
-		std::vector<std::pair<int, double>> dst_prob;
-		double threshold = traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
-
-		double prob = (double)rand() / RAND_MAX;
-		shot = (prob < threshold);
-	}
-	else 
-	{
-		double threshold;
-		if (!transmittedAtPreviousCycle) threshold = PacketInjectionRate;
-		else threshold = ProbabilityOfRetransmission;
-
-		shot = Traffic->FirePacket(local_id, threshold);
-	}
-
-	return shot;
 }
 
 int Processor::getRandomSize()
 {
 	return randInt(MinPacketSize, MaxPacketSize);
-}
-
-unsigned int Processor::getQueueSize() const
-{
-	return PacketQueueSize();
 }
 
 std::int32_t Processor::GetTotalFlitsGenerated() const

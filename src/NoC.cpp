@@ -8,6 +8,10 @@
 #include "RoutingSelection/RoutingTorusXY.hpp"
 #include "RoutingSelection/RoutingTests.hpp"
 
+#include "RandomTrafficManager.hpp"
+#include "HotspotTrafficManager.hpp"
+#include "TableTrafficManager.hpp"
+
 #include "WormholeRouter.hpp"
 #include "PerFlitRouter.hpp"
 #include "TreeBasedRerouteRouter.hpp"
@@ -17,8 +21,8 @@
 std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config)
 {
 	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
-	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.Topology());
-	if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.Topology());
+	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.TopologyGraph());
 	return FindTestRouting(config.RoutingAlgorithm(), config, config.GRTable());
 }
 std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config)
@@ -29,11 +33,22 @@ std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config)
 	if (config.SelectionStrategy() == "RANDOM_KEEP_SPACE") return std::make_unique<SelectionRandomKeepSpace>();
 	throw std::runtime_error("Configuration error: Invalid selection strategy [" + config.SelectionStrategy() + "].");
 }
+std::unique_ptr<TrafficManager> GetTraffic(const Configuration& config)
+{
+	if (config.TrafficDistribution() == "TRAFFIC_RANDOM") return std::make_unique<RandomTrafficManager>(
+		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate(), config.ProbabilityOfRetransmission());
+	if (config.TrafficDistribution() == "TRAFFIC_HOTSPOT") return std::make_unique<HotspotTrafficManager>(
+		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate(), config.ProbabilityOfRetransmission(), config.Hotspots());
+	if (config.TrafficDistribution() == "TRAFFIC_TABLE_BASED") return std::make_unique<TableTrafficManager>(
+		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.TrafficTableFilename(), config.PacketInjectionRate(), config.ProbabilityOfRetransmission());
+	throw std::runtime_error("Configuration error: Invalid traffic distribution [" + config.TrafficDistribution() + "].");
+}
 std::unique_ptr<Router> GetRouter(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
 {
-	if (config.RouterType() == "WORMHOLE") return std::make_unique<WormholeRouter>(timer, id, config.Topology()[id].size(), config.BufferDepth());
-	if (config.RouterType() == "PER_FLIT") return std::make_unique<PerFlitRouter>(timer, id, config.Topology()[id].size(), config.BufferDepth());
-	if (config.RouterType() == "TREE_BASED_REROUTE") return std::make_unique<TreeBasedRerouteRouter>(timer, id, config.Topology()[id].size(), config.BufferDepth());
+	std::size_t relays_count = config.TopologyGraph()[id].size();
+	if (config.RouterType() == "WORMHOLE") return std::make_unique<WormholeRouter>(timer, id, relays_count, config.BufferDepth());
+	if (config.RouterType() == "PER_FLIT") return std::make_unique<PerFlitRouter>(timer, id, relays_count, config.BufferDepth());
+	if (config.RouterType() == "TREE_BASED_REROUTE") return std::make_unique<TreeBasedRerouteRouter>(timer, id, relays_count, config.BufferDepth());
 	throw std::runtime_error("Configuration error: Invalid router type [" + config.RouterType() + "].");
 }
 std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
@@ -41,23 +56,18 @@ std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32
 	return std::make_unique<Processor>(
 		timer, 
 		id,
-		config.PacketInjectionRate(),
-		config.ProbabilityOfRetransmission(),
 		config.MinPacketSize(),
 		config.MaxPacketSize(),
-		config.Topology().size() - 1);
+		config.TopologyGraph().size() - 1);
 }
 
 void NoC::InitBase()
 {
 	srand(Config.RndGeneratorSeed());
 
-	// Check for traffic table availability
-	if (Config.TrafficDistribution() == "TRAFFIC_TABLE_BASED")
-		GTTable.load(Config.TrafficTableFilename().c_str());
-
 	Algorithm = GetAlgorithm(Config);
 	Strategy = GetStrategy(Config);
+	Traffic = GetTraffic(Config);
 
 	// Create and configure tiles
 	for (std::int32_t id = 0; id < Tiles.size(); id++)
@@ -68,8 +78,7 @@ void NoC::InitBase()
 		RouterDevice->power.configureRouter(Config.PowerConfiguration(), Config.FlitSize(), Config.BufferDepth(), Config.FlitSize(), Config.RoutingAlgorithm(), "default");
 
 		std::unique_ptr<Processor> ProcessorDevice = GetProcessor(Timer, id, Config);
-		ProcessorDevice->SetTrafficManager(Config.Traffic());
-		if (Config.TrafficDistribution() == "TRAFFIC_TABLE_BASED") ProcessorDevice->SetTrafficTable(GTTable);
+		ProcessorDevice->SetTrafficManager(*Traffic);
 
 		auto& tile = Tiles[id];
 		tile.SetRouter(RouterDevice);
@@ -80,7 +89,7 @@ void NoC::InitBase()
 	}
 
 	// Connect routers
-	auto& graph = Config.Topology();
+	auto& graph = Config.TopologyGraph();
 	for (std::int32_t id = 0; id < Tiles.size(); id++)
 	{
 		auto& tile = Tiles[id];
@@ -115,8 +124,7 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 	Config(config),
 	clock("clock", config.ClockPeriodPS(), SC_PS), 
 	Timer(timer), 
-	GTTable(config.ResetTime(), config.SimulationTime(), config.PacketInjectionRate()),
-	Tiles(config.Topology().size())
+	Tiles(config.TopologyGraph().size())
 {
 	InitBase();
 }

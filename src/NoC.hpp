@@ -26,16 +26,15 @@ private:
 	const SimulationTimer Timer;
 	std::unique_ptr<RoutingAlgorithm> Algorithm;
 	std::unique_ptr<SelectionStrategy> Strategy;
+	std::unique_ptr<TrafficManager> Traffic;
 
 	void InitBase();
 
 public:
 	sc_clock clock;
 	sc_signal<bool> reset;
-	std::vector<Tile> Tiles;
 
-	// Global tables
-	GlobalTrafficTable GTTable;
+	std::vector<Tile> Tiles;
 
 	NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name = "NoC");
 	~NoC();

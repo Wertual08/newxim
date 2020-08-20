@@ -5,21 +5,21 @@
 
 std::unique_ptr<RoutingAlgorithm> FindTestRouting(const std::string& name, const Configuration& config, const RoutingTable& table)
 {
-    if (name == "TEST_RoutingChannelNextIDGraterCurrent") return std::make_unique<TEST_RoutingChannelNextIDGraterCurrent>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelPrevIDGraterCurrent") return std::make_unique<TEST_RoutingChannelPrevIDGraterCurrent>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelPrevIDGraterNext") return std::make_unique<TEST_RoutingChannelPrevIDGraterNext>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelNextIDGraterCurrentDirectionInverse") return std::make_unique<TEST_RoutingChannelNextIDGraterCurrentDirectionInverse>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse") return std::make_unique<TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelSourceID") return std::make_unique<TEST_RoutingChannelSourceID>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelDestinationID") return std::make_unique<TEST_RoutingChannelDestinationID>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelInputLinkLength") return std::make_unique<TEST_RoutingChannelInputLinkLength>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelHopsGrater0") return std::make_unique<TEST_RoutingChannelHopsGrater0>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelHopsGrater1") return std::make_unique<TEST_RoutingChannelHopsGrater1>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelHopsGrater2") return std::make_unique<TEST_RoutingChannelHopsGrater2>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelHopsSwitchNotMod2") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod2>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelHopsSwitchNotMod3") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod3>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelHopsSwitchNotMod4") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod4>(config.Topology(), table);
-    if (name == "TEST_RoutingChannelSwitchNode0AndNDiv2") return std::make_unique<TEST_RoutingChannelSwitchNode0AndNDiv2>(config.Topology(), table);
+    if (name == "TEST_RoutingChannelNextIDGraterCurrent") return std::make_unique<TEST_RoutingChannelNextIDGraterCurrent>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelPrevIDGraterCurrent") return std::make_unique<TEST_RoutingChannelPrevIDGraterCurrent>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelPrevIDGraterNext") return std::make_unique<TEST_RoutingChannelPrevIDGraterNext>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelNextIDGraterCurrentDirectionInverse") return std::make_unique<TEST_RoutingChannelNextIDGraterCurrentDirectionInverse>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse") return std::make_unique<TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelSourceID") return std::make_unique<TEST_RoutingChannelSourceID>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelDestinationID") return std::make_unique<TEST_RoutingChannelDestinationID>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelInputLinkLength") return std::make_unique<TEST_RoutingChannelInputLinkLength>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelHopsGrater0") return std::make_unique<TEST_RoutingChannelHopsGrater0>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelHopsGrater1") return std::make_unique<TEST_RoutingChannelHopsGrater1>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelHopsGrater2") return std::make_unique<TEST_RoutingChannelHopsGrater2>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelHopsSwitchNotMod2") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod2>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelHopsSwitchNotMod3") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod3>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelHopsSwitchNotMod4") return std::make_unique<TEST_RoutingChannelHopsSwitchNotMod4>(config.TopologyGraph(), table);
+    if (name == "TEST_RoutingChannelSwitchNode0AndNDiv2") return std::make_unique<TEST_RoutingChannelSwitchNode0AndNDiv2>(config.TopologyGraph(), table);
 	return nullptr;
 }
 

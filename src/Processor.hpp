@@ -7,6 +7,7 @@
 #include "GlobalTrafficTable.hpp"
 #include "TrafficManager.hpp"
 #include "Utils.hpp"
+#include "ProcessorQueue.hpp"
 
 
 
@@ -18,28 +19,14 @@ private:
 	std::int32_t TotalFlitsGenerated;
 	std::int32_t MaxID;
 	const TrafficManager* Traffic;
+	ProcessorQueue Queue;
+	Packet& GetQueueFront();
 
-	size_t packets_in_queue = 0;
-	double oldest_packet_time_stamp = 0.0;
-	double newest_packet_time_stamp = 0.0;
-	Packet current_packet;
-
-	bool TableBased;
-	const double PacketInjectionRate;
-	const double ProbabilityOfRetransmission;
 	const std::int32_t MinPacketSize;
 	const std::int32_t MaxPacketSize;
 
 	Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
-		double packet_injection_rate, double probability_of_retransmission,
 		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
-
-	void UpdateCurrentPacket();
-	void PushPacket();
-	void PopPacket();
-	Packet& FrontPacket();
-	bool PacketQueueEmpty() const;
-	size_t PacketQueueSize() const;
 
 public:
 	// I/O Ports
@@ -55,24 +42,15 @@ public:
 	bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
 	Processor(const SimulationTimer& timer, std::int32_t id,
-		double packet_injection_rate, double probability_of_retransmission,
 		std::int32_t min_packet_size, std::int32_t max_packet_size, std::int32_t max_id);
 	void SetTrafficManager(const TrafficManager& traffic);
-	void SetTrafficTable(const GlobalTrafficTable& table);
 
 	// Functions
 	void rxProcess();				// The receiving process
 	void txProcess();				// The transmitting process
-	bool canShot();	// True when the packet must be shot
 	Flit nextFlit();				// Take the next flit of the current packet
 
-	const GlobalTrafficTable* traffic_table;	// Reference to the Global traffic Table
-	bool never_transmit;				// true if the PE does not transmit any packet 
-	//  (valid only for the table based traffic)
-
 	std::int32_t getRandomSize();				// Returns a random size in flits for the packet
-
-	uint32_t getQueueSize() const;
 
 	std::int32_t GetTotalFlitsGenerated() const;
 };

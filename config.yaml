@@ -87,12 +87,7 @@ probability_of_retransmission: 1
 #   TRAFFIC_RANDOM
 #   TRAFFIC_HOTSPOT:
 #     traffic_hotspots: [[node_id, send_factor, receive_factor], ...]
-#   TRAFFIC_TRANSPOSE1
-#   TRAFFIC_TRANSPOSE2
 #   TRAFFIC_TABLE_BASED
-#   TRAFFIC_BIT_REVERSAL
-#   TRAFFIC_SHUFFLE
-#   TRAFFIC_BUTTERFLY
 traffic_distribution: TRAFFIC_RANDOM
 #traffic_hotspots: [
 #  [34, 2, 2], 
