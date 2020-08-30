@@ -70,7 +70,7 @@ Flit Buffer::Pop()
 }
 Flit Buffer::Front() const
 {
-	Flit f;
+	Flit f{};
 
 	if (IsEmpty()) Empty();
 	else f = buffer.front();
@@ -79,7 +79,7 @@ Flit Buffer::Front() const
 }
 std::int32_t Buffer::Size() const
 {
-	return buffer.size();
+	return static_cast<std::int32_t>(buffer.size());
 }
 
 double Buffer::GetOldest() const

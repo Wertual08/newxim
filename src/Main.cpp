@@ -32,10 +32,6 @@ int sc_main(int arg_num, char* arg_vet[])
 	std::cout << "\n\n";
 
 	Configuration Config(arg_num, arg_vet);
-	if (Config.ReportRoutingTable())
-	{
-		std::cout << "Generated routing table: " << Config.GRTable() << '\n';
-	}
 
 	SimulationTimer Timer(Config.ClockPeriodPS(), Config.ResetTime(), Config.StatsWarmUpTime(), Config.SimulationTime());
 	NoC Network(Config, Timer);
@@ -47,18 +43,14 @@ int sc_main(int arg_num, char* arg_vet[])
 	std::cout << "Reset for " << Config.ResetTime() << " cycles... ";
 	sc_start(Config.ResetTime(), SC_NS);
 	Network.reset.write(0);
-	std::cout << " done! " << endl;
+	std::cout << " done!\n";
 
 	// Run the simulation
-	std::cout << " Now running for " << Config.SimulationTime() << " cycles..." << endl;
+	std::cout << " Now running for " << Config.SimulationTime() << " cycles...\n";
 
-	if (Config.ReportProgress())
-	{
-		std::cout << " Progress: ";
-		sc_start(Config.SimulationTime(), SC_NS);
-		std::cout << '\n';
-	}
-	else sc_start(Config.SimulationTime(), SC_NS);
+	if (Config.ReportProgress()) std::cout << " Progress: ";
+	sc_start(Config.SimulationTime(), SC_NS);
+	if (Config.ReportProgress()) std::cout << '\n';
 	
 	// Close the simulation
 	std::cout << "Noxim simulation completed.";

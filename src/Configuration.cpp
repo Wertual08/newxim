@@ -196,14 +196,15 @@ void Configuration::ReadTopologyParams(const YAML::Node& config)
 			{
 				for (std::int32_t y = 0; y < dim_y; y++)
 				{
-					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
-					else graph[y * dim_x + x].push_back(x, channels_count);
-					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1, channels_count);
-					else graph[y * dim_x + x].push_back(y * dim_x + dim_x - 1, channels_count);
-					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x, channels_count);
-					else graph[y * dim_x + x].push_back((dim_y - 1) * dim_x + x, channels_count);
-					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1, channels_count);
-					else graph[y * dim_x + x].push_back(y * dim_x, channels_count);
+					auto& node = graph[y * dim_x + x];
+					if (y + 1 < dim_y) node.push_back((y + 1) * dim_x + x, channels_count);
+					else node.push_back(x, channels_count);
+					if (x - 1 >= 0) node.push_back(y * dim_x + x - 1, channels_count);
+					else node.push_back(y * dim_x + dim_x - 1, channels_count);
+					if (y - 1 >= 0) node.push_back((y - 1) * dim_x + x, channels_count);
+					else node.push_back((dim_y - 1) * dim_x + x, channels_count);
+					if (x + 1 < dim_x) node.push_back(y * dim_x + x + 1, channels_count);
+					else node.push_back(y * dim_x, channels_count);
 				}
 			}
 		}
@@ -266,7 +267,7 @@ void Configuration::ReadRouterParams(const YAML::Node& config)
 
 	if (router_type == "PER_FLIT_TREE_BASED_REROUTE")
 	{
-		sub_graph = std::make_unique<Graph>(graph.subtree());
+		sub_graph = std::make_unique<Graph>(graph.subtree(ReadParam<std::string>(config, "sub_tree_generator", "RECURSION_BASED")));
 		sub_table = std::make_unique<RoutingTable>(*sub_graph);
 	}
 }
@@ -355,7 +356,12 @@ void Configuration::ReadSimulationParams(const YAML::Node& config)
 	rnd_generator_seed = ReadParam<std::int32_t>(config, "rnd_generator_seed", time(0));
 	report_progress = ReadParam<bool>(config, "report_progress", false);
 	report_buffers = ReadParam<bool>(config, "report_buffers", false);
+	report_topology_graph = ReadParam<bool>(config, "report_topology_graph", false);
+	report_topology_graph_adjacency_matrix = ReadParam<bool>(config, "report_topology_graph_adjacency_matrix", false);
 	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
+	report_topology_sub_graph = ReadParam<bool>(config, "report_topology_sub_graph", false);
+	report_topology_sub_graph_adjacency_matrix = ReadParam<bool>(config, "report_topology_sub_graph_adjacency_matrix", false);
+	report_sub_routing_table = ReadParam<bool>(config, "report_sub_routing_table", false);
 
 	clock_period_ps = ReadParam<std::int32_t>(config, "clock_period_ps");
 	reset_time = ReadParam<std::int32_t>(config, "reset_time");
@@ -383,6 +389,16 @@ void Configuration::ReadTrafficDistributionParams(const YAML::Node& config)
 				std::make_pair(hotspot[1].as<std::int32_t>(), hotspot[2].as<std::int32_t>())));
 		}
 	}
+}
+
+void Configuration::ReportData()
+{
+	if (report_topology_graph) std::cout << "Topology graph: " << graph;
+	if (report_topology_graph_adjacency_matrix) std::cout << "Topology graph adjacency matrix:\n" << graph.adjacency_matrix();
+	if (report_routing_table) std::cout << "Routing table: " << table << '\n'; 
+	if (report_topology_sub_graph) std::cout << "Topology sub graph: " << *sub_graph;
+	if (report_topology_sub_graph_adjacency_matrix) std::cout << "Topology sub graph adjacency matrix:\n" << sub_graph->adjacency_matrix();
+	if (report_sub_routing_table) std::cout << "Sub routing table: " << *sub_table << '\n';
 }
 
 void Configuration::ShowHelp(const std::string& selfname)
@@ -492,6 +508,7 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 	ReadSimulationParams(config);
 	ReadTrafficDistributionParams(config);
 
+
 	YAML::Node power_config;
 	std::string power_config_filename = default_power_config_filename;
 	for (std::int32_t i = 1; i < arg_num; i++)
@@ -522,10 +539,11 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 	}
 	power_configuration = power_config.as<Power>();
 
-
-	ParseArgs(arg_num, arg_vet);
+	ParseArgs(arg_num, arg_vet); 
 
 	Check();
+
+	ReportData();
 
 	// Show configuration
 	// Show();
@@ -789,10 +807,6 @@ bool Configuration::ReportProgress() const
 bool Configuration::ReportBuffers() const
 {
 	return report_buffers;
-}
-bool Configuration::ReportRoutingTable() const
-{
-	return report_routing_table;
 }
 
 std::int32_t Configuration::DimX() const

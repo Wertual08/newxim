@@ -1,3 +1,7 @@
+# TESTING
+sub_tree_generator: TGEN_3
+# END_OF_TESTING
+
 # Each parameter is overwritten when corresponding command line value is set
 #
 # NOC & WIRED CONFIGURATION
@@ -15,18 +19,18 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: TORUS
-topology_args: [8, 8]
+topology: MESH
+topology_args: [16, 4]
 topology_channels: 1
 
 # Router types:
 #   WORMHOLE
 #   PER_FLIT
-#   TREE_BASED_REROUTE
+#   PER_FLIT_TREE_BASED_REROUTE
 router_type: PER_FLIT_TREE_BASED_REROUTE 
 
 # number of flits for each router buffer
-buffer_depth: 1
+buffer_depth: 4
 # size of flits, in bits
 flit_size: 32
 
@@ -66,15 +70,20 @@ routing_table_id_based: true
 rnd_generator_seed: 0
 report_progress: true
 report_buffers: false
+report_topology_graph: false
+report_topology_graph_adjacency_matrix: false
 report_routing_table: false
+report_topology_sub_graph: false
+report_topology_sub_graph_adjacency_matrix: true
+report_sub_routing_table: false
 
 clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 10000
+simulation_time: 100000
 # collect stats after a given number of cycles
-stats_warm_up_time: 0
+stats_warm_up_time: 1000
 
 min_packet_size: 8
 max_packet_size: 8

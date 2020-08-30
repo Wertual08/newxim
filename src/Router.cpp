@@ -9,9 +9,10 @@ static std::string GetRouterName(std::int32_t id)
 
 
 Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
-	stats(timer, id, Relays.size()), power(timer),
-	LocalID(id),
 	Relays(relays + 1),
+	stats(timer, id, Relays.size()), 
+	power(timer),
+	LocalID(id),
 	LocalRelay(Relays[relays]),
 	LocalRelayID(relays),
 	Routing(nullptr),
@@ -20,9 +21,9 @@ Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, st
 	SC_METHOD(Update);
 	sensitive << reset << clock.pos();
 
-	start_from_port = LocalRelayID;
+	start_from_port = LocalRelayID;//rand() % Relays.size();
 
-	for (size_t i = 0; i < Relays.size(); i++)
+	for (std::size_t i = 0; i < Relays.size(); i++)
 		Relays[i].buffer.SetMaxBufferSize(max_buffer_size);
 }
 
@@ -31,14 +32,14 @@ void Router::Update()
 	if (reset.read())
 	{
 		// Clear outputs and indexes of transmitting protocol
-		for (size_t i = 0; i < Relays.size(); i++)
+		for (std::size_t i = 0; i < Relays.size(); i++)
 		{
 			Relays[i].tx_req.write(0);
 			Relays[i].tx_current_level = 0;
 		}
 
 		// Clear outputs and indexes of receiving protocol
-		for (size_t i = 0; i < Relays.size(); i++)
+		for (std::size_t i = 0; i < Relays.size(); i++)
 		{
 			Relays[i].rx_ack.write(0);
 			Relays[i].rx_current_level = 0;

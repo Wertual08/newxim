@@ -5,6 +5,18 @@
 
 
 
+std::ostream& operator<<(std::ostream& os, const AdjacencyMatrix& g)
+{
+	for (std::size_t i = 0; i < g.dimension; i++)
+	{
+		for (std::size_t j = 0; j < g.dimension - 1; j++)
+			os << g.matrix[i * g.dimension + j] << ", ";
+		if (g.dimension) os << g.matrix[(i + 1) * g.dimension - 1];
+		os << '\n';
+	}
+	return os;
+}
+
 void Graph::find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector<PathNode> path, const std::vector<std::int32_t>& weights, std::int32_t dest) const
 {
 	PathNode node = path[path.size() - 1];
@@ -80,7 +92,7 @@ std::ostream& operator<<(std::ostream& os, const Graph& g)
 	for (auto& n : g)
 	{
 		os << '[';
-		for (std::int32_t i = 0; i < n.size() - 1; i++) os << n[i] << ", ";
+		for (std::int32_t i = 0; i < static_cast<std::int32_t>(n.size()) - 1; i++) os << n[i] << ", ";
 		if (n.size()) os << n[n.size() - 1];
 		os << "],\n";
 	}
@@ -202,7 +214,42 @@ Graph Graph::directed_subtree(std::int32_t root_node) const
 
 	return result;
 }
-Graph Graph::subtree(std::int32_t root_node) const
+Graph Graph::subtree(const std::string& str)
+{
+	if (str == "TGEN_0") return tgen0_subtree(0);
+	else if (str == "TGEN_1") return tgen1_subtree(0);
+	else if (str == "TGEN_2") return tgen2_subtree(0);
+	else if (str == "TGEN_3") return tgen3_subtree(0);
+	else return Graph();
+}
+Graph Graph::tgen0_subtree(std::int32_t root_node) const
+{
+	Graph result;
+	result.resize(size());
+	std::vector<std::int32_t> visited(size(), false);
+	for (std::int32_t i = 0; i < size(); i++)
+	{
+		if (i == root_node) continue;
+
+		auto path = get_simple_paths(i, root_node)[0];
+
+		for (std::int32_t j = 0; j < path.size() - 1; j++)
+		{
+			std::int32_t node = path[j];
+			if (visited[node]) break;
+
+			visited[node] = true;
+
+			std::int32_t next_node = path[j + 1];
+
+			result[node].push_back(next_node);
+			result[next_node].push_back(node);
+		}
+	}
+
+	return result;
+}
+Graph Graph::tgen1_subtree(std::int32_t root_node) const
 {
 	Graph result;
 	result.resize(size());
@@ -226,5 +273,105 @@ Graph Graph::subtree(std::int32_t root_node) const
 		}
 	}
 
+	return result;
+}
+Graph Graph::tgen2_subtree(std::int32_t root_node) const
+{
+	Graph result;
+	result.resize(size());
+
+	std::vector<bool> visited(size(), false);
+	visited[root_node] = true;
+	std::vector<std::int32_t> nodes_to_visit(1, root_node);
+	for (std::size_t i = 0; i < nodes_to_visit.size(); i++)
+	{
+		std::int32_t node = nodes_to_visit[i];
+		for (std::int32_t sub_node : at(node))
+		{
+			if (!visited[sub_node])
+			{
+				visited[sub_node] = true;
+				nodes_to_visit.push_back(sub_node);
+			}
+		}
+	}
+
+	std::int32_t start_from_path = 0;
+	for (std::int32_t i : nodes_to_visit)
+	{
+		if (i == root_node) continue;
+
+		auto paths = get_simple_paths(i, root_node);
+
+		std::int32_t best_path = start_from_path++ % paths.size();
+		for (std::int32_t j = 0; j < paths.size(); j++)
+		{
+			std::int32_t current_node = paths[best_path][1];
+			std::int32_t new_node = paths[j][1];
+
+			if (at(new_node).size() < at(current_node).size())
+			{
+				current_node = new_node;
+			}
+		}
+
+		std::int32_t dst_node = paths[best_path][1];
+		result[i].push_back(dst_node);
+		result[dst_node].push_back(i);
+	}
+
+	return result;
+}
+Graph Graph::tgen3_subtree(std::int32_t root_node) const
+{
+	Graph result;
+	result.resize(size());
+	std::vector<bool> visited(size(), false);
+	visited[root_node] = true;
+	std::vector<std::int32_t> nodes_to_visit(1, root_node);
+
+	std::int32_t start = 0, length = 1;
+	while (start < size())
+	{
+		bool next_step = true;
+		std::int32_t link = 0;
+		while (next_step)
+		{
+			next_step = false;
+
+			for (std::int32_t i = start; i < start + length; i++)
+			{
+				std::int32_t node = nodes_to_visit[i];
+				if (link < at(node).size())
+				{
+					std::int32_t next_node = at(node)[link];
+					next_step = true;
+
+					if (!visited[next_node])
+					{
+						visited[next_node] = true;
+						nodes_to_visit.push_back(next_node);
+
+						result[node].push_back(next_node);
+						result[next_node].push_back(node);
+					}
+				}
+			}
+
+			link++;
+		}
+
+		start += length;
+		length = nodes_to_visit.size() - start;
+	}
+
+	return result;
+}
+
+AdjacencyMatrix Graph::adjacency_matrix() const
+{
+	AdjacencyMatrix result(size());
+	for (std::int32_t i = 0; i < size(); i++)
+		for (std::int32_t id : at(i)) result.at(i, id) = 1;
 	return result;
 }

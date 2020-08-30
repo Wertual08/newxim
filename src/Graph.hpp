@@ -6,6 +6,19 @@
 
 
 
+class AdjacencyMatrix
+{
+private:
+	const size_t dimension;
+	std::vector<std::int32_t> matrix;
+
+public:
+	friend std::ostream& operator<<(std::ostream& os, const AdjacencyMatrix& g);
+
+	AdjacencyMatrix(std::size_t size) : dimension(size), matrix(size * size, 0) {}
+	std::int32_t& at(int32_t x, int32_t y) { return matrix[y * dimension + x]; }
+};
+
 class GraphNode : public std::vector<std::int32_t>
 {
 public:
@@ -32,7 +45,6 @@ public:
 	};
 
 private:
-
 	void find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector<PathNode> path, const std::vector<std::int32_t>& weights, std::int32_t dest) const;
 	void find_shortest(std::vector<std::vector<std::int32_t>>& paths, std::vector<std::int32_t> path, const std::vector<std::int32_t>& weights, std::int32_t dest) const;
 
@@ -44,6 +56,12 @@ public:
 	std::vector<std::vector<std::int32_t>> get_simple_paths(std::int32_t from, std::int32_t to) const;
 
 	Graph directed_subtree(std::int32_t root_node = 0) const;
-	Graph subtree(std::int32_t root_node = 0) const;
+	Graph subtree(const std::string& str);
+	Graph tgen0_subtree(std::int32_t root_node = 0) const;
+	Graph tgen1_subtree(std::int32_t root_node = 0) const;
+	Graph tgen2_subtree(std::int32_t root_node = 0) const;
+	Graph tgen3_subtree(std::int32_t root_node = 0) const;
+
+	AdjacencyMatrix adjacency_matrix() const;
 };
 

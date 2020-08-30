@@ -67,6 +67,11 @@ private:
 	bool report_progress;
 	bool report_buffers;
 	bool report_routing_table;
+	bool report_topology_graph;
+	bool report_topology_graph_adjacency_matrix;
+	bool report_sub_routing_table;
+	bool report_topology_sub_graph;
+	bool report_topology_sub_graph_adjacency_matrix;
 
 	std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>> hotspots;
 
@@ -80,6 +85,8 @@ private:
 	void ReadRoutingTableParams(const YAML::Node& config);
 	void ReadSimulationParams(const YAML::Node& config);
 	void ReadTrafficDistributionParams(const YAML::Node& config);
+
+	void ReportData();
 
 public:
 	static std::string default_config_filename;
@@ -120,7 +127,6 @@ public:
 	const Power& PowerConfiguration() const;
 	bool ReportProgress() const;
 	bool ReportBuffers() const;
-	bool ReportRoutingTable() const;
 
 	std::int32_t DimX() const;
 	std::int32_t DimY() const;
