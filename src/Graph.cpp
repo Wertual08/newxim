@@ -216,10 +216,13 @@ Graph Graph::directed_subtree(std::int32_t root_node) const
 }
 Graph Graph::subtree(const std::string& str)
 {
+	Graph graph;
 	if (str == "TGEN_0") return tgen0_subtree(0);
 	else if (str == "TGEN_1") return tgen1_subtree(0);
 	else if (str == "TGEN_2") return tgen2_subtree(0);
 	else if (str == "TGEN_3") return tgen3_subtree(0);
+	else if (str == "TGEN_4") return tgen4_subtree(0);
+	else if (str == "TGEN_5") return tgen5_subtree();
 	else return Graph();
 }
 Graph Graph::tgen0_subtree(std::int32_t root_node) const
@@ -366,6 +369,135 @@ Graph Graph::tgen3_subtree(std::int32_t root_node) const
 	}
 
 	return result;
+}
+Graph Graph::tgen4_subtree(std::int32_t root_node) const
+{
+	Graph result;
+	result.resize(size());
+
+	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
+	std::vector<std::int32_t> weights(size(), inf);
+	std::vector<bool> visited(size(), false);
+	weights[root_node] = 0;
+
+	std::int32_t min_index, min;
+	do
+	{
+		min_index = min = inf;
+
+		for (std::int32_t j = 0; j < size(); j++)
+		{
+			if (!visited[j] && weights[j] < min)
+			{
+				min = weights[j];
+				min_index = j;
+			}
+		}
+
+		if (min_index != inf)
+		{
+			for (std::int32_t j = 0; j < at(min_index).size(); j++)
+			{
+				std::int32_t id = at(min_index)[j];
+				if (id >= 0)
+				{
+					std::int32_t t = min + 1; // distance may be here...
+					if (t < weights[id]) weights[id] = t;
+				}
+			}
+			visited[min_index] = true;
+		}
+	} while (min_index != inf);
+
+	for (std::int32_t i = 1; i < size(); i++)
+	{
+		for (std::int32_t j = 0; j < size(); j++)
+		{
+			if (weights[j] == i)
+			{
+				std::int32_t index = inf;
+				Graph new_min;
+				for (std::int32_t n : at(j))
+				{
+					if (weights[n] == i - 1)
+					{
+						Graph presumably_min = result;
+						presumably_min[j].push_back(n);
+						presumably_min[n].push_back(j);
+						std::int32_t new_ind = presumably_min.wiener_index();
+						if (new_ind < index)
+						{
+							index = new_ind;
+							new_min = presumably_min;
+						}
+					}
+				}
+				result = new_min;
+			}
+		}
+	}
+
+	return result;
+}
+Graph Graph::tgen5_subtree() const
+{
+	Graph result = tgen4_subtree(0);
+	std::int32_t index = result.wiener_index();
+	for (std::int32_t i = 1; i < size(); i++) 
+	{
+		Graph new_min = tgen4_subtree(i);
+		std::int32_t new_ind = new_min.wiener_index();
+		if (new_ind < index)
+		{
+			result = new_min;
+			index = new_ind;
+		}
+	}
+	return result;
+}
+
+std::int32_t Graph::wiener_index() const
+{
+	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
+	std::int32_t index = 0;
+	for (std::int32_t i = 0; i < size(); i++)
+	{
+		std::vector<std::int32_t> weights(size(), inf);
+		std::vector<bool> visited(size(), false);
+		weights[i] = 0;
+
+		std::int32_t min_index, min;
+		do
+		{
+			min_index = min = inf;
+
+			for (std::int32_t j = 0; j < size(); j++)
+			{
+				if (!visited[j] && weights[j] < min)
+				{
+					min = weights[j];
+					min_index = j;
+				}
+			}
+
+			if (min_index != inf)
+			{
+				for (std::int32_t j = 0; j < at(min_index).size(); j++)
+				{
+					std::int32_t id = at(min_index)[j];
+					if (id >= 0)
+					{
+						std::int32_t t = min + 1; // distance may be here...
+						if (t < weights[id]) weights[id] = t;
+					}
+				}
+				visited[min_index] = true;
+			}
+		} while (min_index != inf);
+
+		for (std::int32_t w : weights) if (w != inf) index += w;
+	}
+	return index;
 }
 
 AdjacencyMatrix Graph::adjacency_matrix() const

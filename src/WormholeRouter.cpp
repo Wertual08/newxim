@@ -46,7 +46,9 @@ void WormholeRouter::TXProcess()
 			std::int32_t res = reservation_table.Reservation(i);
 			if (res < 0) continue;
 
-			Route(i, res);
+			Flit flit = rel.buffer.Front();
+			if (Route(i, res) && flit.flit_type == FLIT_TYPE_TAIL)
+				reservation_table.Release(i);
 		}
 		else stats.UpdateBufferPopOrEmptyTime(i);
 	} // for loop directions

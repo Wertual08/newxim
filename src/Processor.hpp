@@ -25,6 +25,7 @@ private:
 	const std::int32_t MinPacketSize;
 	const std::int32_t MaxPacketSize;
 
+	void ReceiveFlit(Flit flit);
 	Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
 		std::int32_t min_packet_size, std::int32_t max_packet_size);
 

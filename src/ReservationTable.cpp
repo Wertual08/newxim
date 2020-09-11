@@ -17,7 +17,8 @@ void ReservationTable::Release(std::int32_t port_in)
 }
 bool ReservationTable::Reserved(std::int32_t port_out) const
 {
-	for (std::int32_t r : Table) if (r == port_out) return true;
+	for (std::int32_t r : Table) if (r == port_out) 
+			return true;
 	return false;
 }
 std::int32_t ReservationTable::Reservation(std::int32_t port_in)

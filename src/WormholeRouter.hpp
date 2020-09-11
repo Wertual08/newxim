@@ -7,7 +7,7 @@
 class WormholeRouter : public Router
 {
 private:
-	ReservationTable reservation_table;	// Switch reservation table
+	ReservationTable reservation_table;
 
 protected:
 	virtual void TXProcess() override;

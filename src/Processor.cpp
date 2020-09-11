@@ -21,6 +21,13 @@ Packet& Processor::GetQueueFront()
 	return Queue.Front();
 }
 
+void Processor::ReceiveFlit(Flit flit)
+{
+	if (flit.dst_id != local_id) throw std::runtime_error(
+		"Processor received a flit that does not belong to it. LocalID[" + 
+		std::to_string(local_id) + "] DestinationID[" + std::to_string(flit.dst_id) + "]");
+}
+
 Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
 	std::int32_t min_packet_size, std::int32_t max_packet_size) :
 	Timer(timer), local_id(id), MinPacketSize(min_packet_size),
@@ -56,8 +63,10 @@ void Processor::rxProcess()
 	{
 		if (relay.rx_req.read() == 1 - current_level_rx)
 		{
-			Flit flit_tmp = relay.rx_flit.read();
+			Flit flit = relay.rx_flit.read();
 			current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
+
+			ReceiveFlit(flit);
 		}
 		relay.rx_ack.write(current_level_rx);
 		relay.free_slots.write(relay.buffer.GetCurrentFreeSlots());
@@ -126,7 +135,7 @@ Flit Processor::nextFlit()
 
 int Processor::getRandomSize()
 {
-	return randInt(MinPacketSize, MaxPacketSize);
+	return randInt(MinPacketSize, MaxPacketSize) / (rand() % 2 + 1);
 }
 
 std::int32_t Processor::GetTotalFlitsGenerated() const

@@ -265,9 +265,9 @@ void Configuration::ReadRouterParams(const YAML::Node& config)
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 
-	if (router_type == "PER_FLIT_TREE_BASED_REROUTE")
+	if (router_type == "PER_FLIT_SUBNETWORK" || router_type == "WORMHOLE_SUBNETWORK")
 	{
-		sub_graph = std::make_unique<Graph>(graph.subtree(ReadParam<std::string>(config, "sub_tree_generator", "RECURSION_BASED")));
+		sub_graph = std::make_unique<Graph>(graph.subtree(ReadParam<std::string>(config, "sub_tree_generator", "TGEN_0")));
 		sub_table = std::make_unique<RoutingTable>(*sub_graph);
 	}
 }
@@ -396,9 +396,9 @@ void Configuration::ReportData()
 	if (report_topology_graph) std::cout << "Topology graph: " << graph;
 	if (report_topology_graph_adjacency_matrix) std::cout << "Topology graph adjacency matrix:\n" << graph.adjacency_matrix();
 	if (report_routing_table) std::cout << "Routing table: " << table << '\n'; 
-	if (report_topology_sub_graph) std::cout << "Topology sub graph: " << *sub_graph;
-	if (report_topology_sub_graph_adjacency_matrix) std::cout << "Topology sub graph adjacency matrix:\n" << sub_graph->adjacency_matrix();
-	if (report_sub_routing_table) std::cout << "Sub routing table: " << *sub_table << '\n';
+	if (report_topology_sub_graph && sub_graph) std::cout << "Topology sub graph: " << *sub_graph;
+	if (report_topology_sub_graph_adjacency_matrix && sub_graph) std::cout << "Topology sub graph adjacency matrix:\n" << sub_graph->adjacency_matrix();
+	if (report_sub_routing_table && sub_table) std::cout << "Sub routing table: " << *sub_table << '\n';
 }
 
 void Configuration::ShowHelp(const std::string& selfname)

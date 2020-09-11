@@ -14,7 +14,8 @@
 
 #include "WormholeRouter.hpp"
 #include "PerFlitRouter.hpp"
-#include "PerFlitTreeBasedRerouteRouter.hpp"
+#include "PerFlitSubnetworkRouter.hpp"
+#include "WormholeSubnetworkRouter.hpp"
 
 
 
@@ -48,7 +49,8 @@ std::unique_ptr<Router> GetRouter(const SimulationTimer& timer, std::int32_t id,
 	std::size_t relays_count = config.TopologyGraph()[id].size();
 	if (config.RouterType() == "WORMHOLE") return std::make_unique<WormholeRouter>(timer, id, relays_count, config.BufferDepth());
 	if (config.RouterType() == "PER_FLIT") return std::make_unique<PerFlitRouter>(timer, id, relays_count, config.BufferDepth());
-	if (config.RouterType() == "PER_FLIT_TREE_BASED_REROUTE") return std::make_unique<PerFlitTreeBasedRerouteRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
+	if (config.RouterType() == "PER_FLIT_SUBNETWORK") return std::make_unique<PerFlitSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
+	if (config.RouterType() == "WORMHOLE_SUBNETWORK") return std::make_unique<WormholeSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
 	throw std::runtime_error("Configuration error: Invalid router type [" + config.RouterType() + "].");
 }
 std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
@@ -124,17 +126,19 @@ void NoC::InitSubNetwork()
 	auto& sub_graph = Config.TopologySubGraph();
 	auto& sub_table = Config.SubGRTable();
 
+	//std::cout << "Subtree weiner index: " << sub_graph.weiner_index() << '\n';
+
 	for (std::int32_t id = 0; id < Tiles.size(); id++)
 	{
 		auto& tile = Tiles[id];
-		auto& router = *dynamic_cast<PerFlitTreeBasedRerouteRouter*>(tile.RouterDevice.get());
+		auto& router = *dynamic_cast<SubnetworkRouter*>(tile.RouterDevice.get());
 		auto& node = graph[id];
 		auto& sub_node = sub_graph[id];
 
 		auto sub_table_node = sub_table[id];
 		for (auto& vec : sub_table_node)
 			for (auto& val : vec) val += node.size();
-		router.SetupSubTreeTable(sub_table_node);
+		router.SetupSubnetworkTable(sub_table_node);
 
 		for (std::int32_t i = 0; i < sub_node.size(); i++)
 		{
@@ -169,7 +173,9 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 {
 	InitBase();
 
-	if (config.RouterType() == "PER_FLIT_TREE_BASED_REROUTE") InitSubNetwork();
+	if (config.RouterType() == "PER_FLIT_SUBNETWORK" || 
+		config.RouterType() == "WORMHOLE_SUBNETWORK") 
+		InitSubNetwork();
 }
 NoC::~NoC()
 {

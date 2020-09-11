@@ -71,7 +71,7 @@ std::int32_t Router::PerformRoute(const RouteData& route_data)
 	power.selection();
 	return Selection->Apply(*this, Routing->Route(*this, route_data), route_data);
 }
-void Router::Route(std::int32_t in_port, std::int32_t out_port)
+bool Router::Route(std::int32_t in_port, std::int32_t out_port)
 {
 	Relay& in_relay = Relays[in_port];
 	Relay& out_relay = Relays[out_port];
@@ -99,7 +99,10 @@ void Router::Route(std::int32_t in_port, std::int32_t out_port)
 			stats.receivedFlit(flit);
 		}
 		/* End Power & Stats ------------------------------------------------- */
+
+		return true;
 	}
+	else return false;
 }
 
 void Router::RXProcess()
@@ -146,7 +149,7 @@ void Router::RXProcess()
 
 		}
 		rel.rx_ack.write(rel.rx_current_level);
-		// updates the mask of VCs to prevent incoming data on full buffers
+
 		rel.free_slots.write(rel.buffer.GetCurrentFreeSlots());
 	}
 }
