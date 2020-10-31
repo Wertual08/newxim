@@ -4,7 +4,7 @@
 #include <vector>
 #include "DataStructs.hpp"
 #include "Power.hpp"
-#include "SimulationTimer.hpp"
+#include "Hardware/SimulationTimer.hpp"
 
 
 
@@ -29,6 +29,8 @@ private:
 	double last_received_flit_time;
 	double max_time_flit_in_network;
 	std::int32_t total_flits_accepted;
+	std::int32_t total_simulation_flits_accepted;
+	std::int32_t total_simulation_flits_received;
 
 	std::vector<std::pair<double, double>> AVGBufferLoad;
 	std::vector<double> LastBufferPopOrEmptyTime;
@@ -45,6 +47,7 @@ public:
 
 	void AcceptFlit();
 	std::int32_t GetAcceptedFlits() const;
+	std::int32_t GetSimulationAcceptedFlits() const;
 
 	void UpdateBufferLoad(std::int32_t buffer, double load);
 	double GetAVGBufferLoad(std::int32_t channel, std::int32_t channels_count);
@@ -76,14 +79,15 @@ public:
 	double getAverageThroughput();
 
 	// Returns the number of received packets from current node
-	unsigned int getReceivedPackets();
+	std::int32_t getReceivedPackets();
 
 	// Returns the number of received flits from current node
-	unsigned int getReceivedFlits();
+	std::int32_t getReceivedFlits();
+	std::int32_t getSimulationReceivedFlits();
 
 	// Returns the number of communications whose destination is the
 	// current node
-	unsigned int getTotalCommunications();
+	std::int32_t getTotalCommunications();
 
 	// Returns the energy consumed for communication src_id-->dst_id
 	// under the following assumptions: (i) Minimal routing is

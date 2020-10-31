@@ -26,12 +26,14 @@ topology_channels: 1
 # Router types:
 #   WORMHOLE
 #   PER_FLIT
-#	WORMHOLE_SUBNETWORK
+#   WORMHOLE_SUBNETWORK
 #   PER_FLIT_SUBNETWORK
-router_type: WORMHOLE_SUBNETWORK 
+#   WORMHOLE_FIXED_SUBNETWORK
+#   WORMHOLE_FIT_SUBNETWORK
+router_type: WORMHOLE_FIT_SUBNETWORK 
 
 # number of flits for each router buffer
-buffer_depth: 8
+buffer_depth: 9
 # size of flits, in bits
 flit_size: 32
 
@@ -84,12 +86,14 @@ reset_time: 1000
 # overal simulation lenght, expressed in cycles
 simulation_time: 100000
 # collect stats after a given number of cycles
-stats_warm_up_time: 10000
+stats_warm_up_time: 1000
 
-min_packet_size: 8
-max_packet_size: 8
-packet_injection_rate: 1
-probability_of_retransmission: 1
+min_packet_size: 3
+max_packet_size: 9
+flit_injection_rate: true
+scale_with_nodes: false
+packet_injection_rate: 0.2
+probability_of_retransmission: 0.2
 
 # Traffic distribution:
 #   TRAFFIC_RANDOM

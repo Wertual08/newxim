@@ -9,6 +9,8 @@ Stats::Stats(const SimulationTimer& timer, std::int32_t node_id, std::int32_t bu
 {
 	id = node_id;
 	total_flits_accepted = 0;
+	total_simulation_flits_accepted = 0; 
+	total_simulation_flits_received = 0;
 	last_received_flit_time = 0.0;
 	max_time_flit_in_network = 0.0;
 }
@@ -39,6 +41,7 @@ double Stats::GetMaxTimeFlitInNetwork() const
 
 void Stats::AcceptFlit()
 {
+	total_simulation_flits_accepted++;
 	if (Timer.StatisticsTime() < 0.0) return;
 
 	total_flits_accepted++;
@@ -46,6 +49,11 @@ void Stats::AcceptFlit()
 std::int32_t Stats::GetAcceptedFlits() const
 {
 	return total_flits_accepted;
+}
+
+std::int32_t Stats::GetSimulationAcceptedFlits() const
+{
+	return total_simulation_flits_accepted;
 }
 
 void Stats::UpdateBufferLoad(std::int32_t buffer, double load)
@@ -74,6 +82,7 @@ double Stats::getLastReceivedFlitTime() const
 
 void Stats::receivedFlit(const Flit& flit)
 {
+	total_simulation_flits_received++;
 	if (Timer.StatisticsTime() < 0.0) return;
 
 	last_received_flit_time = Timer.SimulationTime();
@@ -122,7 +131,7 @@ double Stats::getAverageDelay(const int src_id)
 
 	assert(i >= 0);
 
-	//for (unsigned int j = 0; j < chist[i].delays.size(); j++)
+	//for (std::int32_t j = 0; j < chist[i].delays.size(); j++)
 	//	sum += chist[i].delays[j];
 
 	return chist[i].total_packets_delay / chist[i].total_received_packets;// sum / (double)chist[i].delays.size();
@@ -132,8 +141,8 @@ double Stats::getAverageDelay()
 {
 	double avg = 0.0;
 
-	for (unsigned int k = 0; k < chist.size(); k++) {
-		//unsigned int samples = chist[k].delays.size();
+	for (std::int32_t k = 0; k < chist.size(); k++) {
+		//std::int32_t samples = chist[k].delays.size();
 		//if (samples)
 		//	avg += (double)samples * getAverageDelay(chist[k].src_id);
 		avg += chist[k].total_packets_delay;
@@ -150,7 +159,7 @@ double Stats::getMaxDelay(const int src_id)
 
 	assert(i >= 0);
 
-	//for (unsigned int j = 0; j < chist[i].delays.size(); j++)
+	//for (std::int32_t j = 0; j < chist[i].delays.size(); j++)
 	//	if (chist[i].delays[j] > maxd) {
 	//		maxd = chist[i].delays[j];
 	//	}
@@ -162,8 +171,8 @@ double Stats::getMaxDelay()
 {
 	double maxd = -1.0;
 
-	for (unsigned int k = 0; k < chist.size(); k++) {
-		//unsigned int samples = chist[k].delays.size();
+	for (std::int32_t k = 0; k < chist.size(); k++) {
+		//std::int32_t samples = chist[k].delays.size();
 		//if (samples) {
 		if (chist[k].total_received_packets)
 		{
@@ -196,7 +205,7 @@ double Stats::getAverageThroughput()
 {
 	double sum = 0.0;
 
-	for (unsigned int k = 0; k < chist.size(); k++) {
+	for (std::int32_t k = 0; k < chist.size(); k++) {
 		double avg = getAverageThroughput(chist[k].src_id);
 		if (avg > 0.0) sum += avg;
 	}
@@ -204,28 +213,32 @@ double Stats::getAverageThroughput()
 	return sum;
 }
 
-unsigned int Stats::getReceivedPackets()
+std::int32_t Stats::getReceivedPackets()
 {
 	int n = 0;
 
-	for (unsigned int i = 0; i < chist.size(); i++)
-		//n += chist[i].delays.size();
+	for (std::int32_t i = 0; i < chist.size(); i++)
 		n += chist[i].total_received_packets;
 
 	return n;
 }
 
-unsigned int Stats::getReceivedFlits()
+std::int32_t Stats::getReceivedFlits()
 {
 	int n = 0;
 
-	for (unsigned int i = 0; i < chist.size(); i++)
+	for (std::int32_t i = 0; i < chist.size(); i++)
 		n += chist[i].total_received_flits;
 
 	return n;
 }
 
-unsigned int Stats::getTotalCommunications()
+std::int32_t Stats::getSimulationReceivedFlits()
+{
+	return total_simulation_flits_received;
+}
+
+std::int32_t Stats::getTotalCommunications()
 {
 	return chist.size();
 }
@@ -256,7 +269,7 @@ double Stats::getCommunicationEnergy(int src_id, int dst_id)
 
 int Stats::searchCommHistory(int src_id)
 {
-	for (unsigned int i = 0; i < chist.size(); i++)
+	for (std::int32_t i = 0; i < chist.size(); i++)
 		if (chist[i].src_id == src_id)
 			return i;
 
@@ -283,7 +296,7 @@ void Stats::showStats(int curr_node, std::ostream& out, bool header)
 			<< std::setw(13) << "Joule"
 			<< std::setw(12) << "packets" << std::setw(12) << "flits\n";
 	}
-	for (unsigned int i = 0; i < chist.size(); i++) {
+	for (std::int32_t i = 0; i < chist.size(); i++) {
 		out << " "
 			<< std::setw(5) << chist[i].src_id
 			<< std::setw(5) << curr_node

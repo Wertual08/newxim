@@ -5,7 +5,7 @@
 
 #include "SimulationTimer.hpp"
 #include "Relay.hpp"
-#include "TrafficManager.hpp"
+#include "Configuration/TrafficManagers/TrafficManager.hpp"
 #include "Utils.hpp"
 #include "ProcessorQueue.hpp"
 

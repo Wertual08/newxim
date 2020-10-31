@@ -10,7 +10,7 @@
 
 #pragma once
 #include <systemc.h>
-#include "Router.hpp"
+#include "Hardware/Routers/Router.hpp"
 #include "Processor.hpp"
 
 

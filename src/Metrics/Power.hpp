@@ -12,8 +12,8 @@
 #include <cassert>
 #include <map>
 #include "DataStructs.hpp"
-#include "SimulationTimer.hpp"
-#include "Configuration.hpp"
+#include "Hardware/SimulationTimer.hpp"
+#include "Configuration/Configuration.hpp"
 
 #include "yaml-cpp/yaml.h"
 

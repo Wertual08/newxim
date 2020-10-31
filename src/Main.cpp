@@ -8,13 +8,13 @@
  * This file contains the implementation of the top-level of Noxim
  */
 
-#include "SimulationTimer.hpp"
-#include "NoC.hpp"
-#include "GlobalStats.hpp"
+#include "Hardware/SimulationTimer.hpp"
+#include "Hardware/NoC.hpp"
+#include "Metrics/GlobalStats.hpp"
 #include "DataStructs.hpp"
-#include "Graph.hpp"
-#include "Configuration.hpp"
-#include "ProgressBar.hpp"
+#include "Configuration/Graph.hpp"
+#include "Configuration/Configuration.hpp"
+#include "Metrics/ProgressBar.hpp"
 
 const static std::string Version = "0.0.0.3";
 

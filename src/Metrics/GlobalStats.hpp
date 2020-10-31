@@ -11,8 +11,8 @@
 #pragma once
 #include <vector>
 #include <map>
-#include "Configuration.hpp"
-#include "NoC.hpp"
+#include "Configuration/Configuration.hpp"
+#include "Hardware/NoC.hpp"
 
 
 
@@ -52,10 +52,14 @@ private:
 	// communication src_id->dst_id
 	double getAverageThroughput(int src_id, int dst_id);
 	// Returns the total number of received packets
-	unsigned int getReceivedPackets() const;
+	std::int32_t getReceivedPackets() const;
+	std::int32_t getTotalFlitsInBuffers() const;
+	std::int32_t getTotalFlitsLost() const;
 	// Returns the total number of received flits
-	unsigned int getReceivedFlits() const;
-	unsigned int getAcceptedFlits() const;
+	std::int32_t getReceivedFlits() const;
+	std::int32_t getAcceptedFlits() const;
+	std::int32_t getTotalReceivedFlits() const;
+	std::int32_t getTotalAcceptedFlits() const;
 	// Returns the total dyamic power
 	double getDynamicPower() const;
 	// Returns the total static power

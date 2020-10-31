@@ -1,5 +1,5 @@
 #pragma once
-#include "ReservationTable.hpp"
+#include "Hardware/ReservationTable.hpp"
 #include "SubnetworkRouter.hpp"
 
 

@@ -1,7 +1,8 @@
 #pragma once 
 #include <systemc.h>
-#include "Relay.hpp"
-#include "Stats.hpp"
+#include "Hardware/SimulationTimer.hpp"
+#include "Hardware/Relay.hpp"
+#include "Metrics/Stats.hpp"
 #include "RoutingSelection/RoutingAlgorithm.hpp"
 #include "RoutingSelection/SelectionStrategy.hpp"
 

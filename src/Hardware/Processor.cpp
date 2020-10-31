@@ -86,7 +86,6 @@ void Processor::txProcess()
 		if (Traffic->FirePacket(local_id, Timer.SystemTime(), transmittedAtPreviousCycle))
 		{
 			Queue.Push(Timer.SystemTime());
-			if (Timer.StatisticsTime() > 0.0) TotalFlitsGenerated += GetQueueFront().size;
 			transmittedAtPreviousCycle = true;
 		}
 		else transmittedAtPreviousCycle = false;
@@ -128,17 +127,20 @@ Flit Processor::nextFlit()
 
 	packet.flit_left--;
 	if (packet.flit_left == 0)
+	{
+		if (Timer.StatisticsTime() > 0.0) TotalFlitsGenerated += packet.size;
 		Queue.Pop();
+	}
 
 	return flit;
 }
 
 int Processor::getRandomSize()
 {
-	return randInt(MinPacketSize, MaxPacketSize) / (rand() % 2 + 1);
+	return randInt(MinPacketSize, MaxPacketSize);
 }
 
 std::int32_t Processor::GetTotalFlitsGenerated() const
 {
-	return TotalFlitsGenerated;
+	return TotalFlitsGenerated + Queue.Size() * (MaxPacketSize + MinPacketSize) / 2;
 }

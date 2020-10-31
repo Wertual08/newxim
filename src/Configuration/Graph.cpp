@@ -88,13 +88,13 @@ std::istream& operator>>(std::istream& is, Graph& g)
 }
 std::ostream& operator<<(std::ostream& os, const Graph& g)
 {
-	os << "[\n";
+	os << "[";
 	for (auto& n : g)
 	{
 		os << '[';
 		for (std::int32_t i = 0; i < static_cast<std::int32_t>(n.size()) - 1; i++) os << n[i] << ", ";
 		if (n.size()) os << n[n.size() - 1];
-		os << "],\n";
+		os << "],";
 	}
 	os << "]";
 	return os;
@@ -216,7 +216,6 @@ Graph Graph::directed_subtree(std::int32_t root_node) const
 }
 Graph Graph::subtree(const std::string& str)
 {
-	Graph graph;
 	if (str == "TGEN_0") return tgen0_subtree(0);
 	else if (str == "TGEN_1") return tgen1_subtree(0);
 	else if (str == "TGEN_2") return tgen2_subtree(0);

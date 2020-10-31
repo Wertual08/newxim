@@ -5,7 +5,7 @@
 #include <map>
 #include "Graph.hpp"
 #include "RoutingTable.hpp"
-#include "TrafficManager.hpp"
+#include "TrafficManagers/TrafficManager.hpp"
 
 
 
@@ -51,6 +51,8 @@ private:
 	std::string router_type;
 	std::string routing_algorithm;
 	std::string selection_strategy;
+	bool flit_injection_rate;
+	bool scale_with_nodes;
 	double packet_injection_rate;
 	double probability_of_retransmission;
 	double locality;
@@ -104,6 +106,7 @@ public:
 	const Graph& TopologySubGraph() const;
 	const RoutingTable& GRTable() const;
 	const RoutingTable& SubGRTable() const;
+	bool Subnetwork() const;
 	const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Hotspots() const;
 
 	std::int32_t BufferDepth() const;

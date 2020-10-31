@@ -5,7 +5,7 @@
 #include <fstream>
 #include <cassert>
 #include <ctime>
-#include "Buffer.hpp"
+#include "Hardware/Buffer.hpp"
 #include <filesystem>
 
 
@@ -265,7 +265,10 @@ void Configuration::ReadRouterParams(const YAML::Node& config)
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 
-	if (router_type == "PER_FLIT_SUBNETWORK" || router_type == "WORMHOLE_SUBNETWORK")
+	if (router_type == "PER_FLIT_SUBNETWORK" || 
+		router_type == "WORMHOLE_SUBNETWORK" ||
+		router_type == "WORMHOLE_FIXED_SUBNETWORK" ||
+		router_type == "WORMHOLE_FIT_SUBNETWORK")
 	{
 		sub_graph = std::make_unique<Graph>(graph.subtree(ReadParam<std::string>(config, "sub_tree_generator", "TGEN_0")));
 		sub_table = std::make_unique<RoutingTable>(*sub_graph);
@@ -370,6 +373,8 @@ void Configuration::ReadSimulationParams(const YAML::Node& config)
 
 	min_packet_size = ReadParam<std::int32_t>(config, "min_packet_size");
 	max_packet_size = ReadParam<std::int32_t>(config, "max_packet_size");
+	flit_injection_rate = ReadParam<bool>(config, "flit_injection_rate", false);
+	scale_with_nodes = ReadParam<bool>(config, "scale_with_nodes", false);
 	packet_injection_rate = ReadParam<double>(config, "packet_injection_rate");
 	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
 }
@@ -659,9 +664,13 @@ void Configuration::Check()
 		exit(1);
 	}
 
-	if (packet_injection_rate < 0.0 || packet_injection_rate > 1.0) 
+	if (packet_injection_rate < 0.0 || packet_injection_rate > 
+		(flit_injection_rate ? (min_packet_size + max_packet_size) / 2.0 : 1.0) * 
+		(scale_with_nodes ? graph.size() : 1.0)) 
 	{
-		std::cerr << "Error: packet injection rate mmust be in the interval ]0,1]\n";
+		std::cerr << "Error: packet injection rate mmust be in the interval [0," << 
+			(flit_injection_rate ? (min_packet_size + max_packet_size) / 2.0 : 1.0) *
+			(scale_with_nodes ? graph.size() : 1.0) << "]\n";
 		exit(1);
 	}
 
@@ -723,6 +732,10 @@ const RoutingTable& Configuration::SubGRTable() const
 {
 	return *sub_table;
 }
+bool Configuration::Subnetwork() const
+{
+	return sub_graph && sub_table;
+}
 const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Configuration::Hotspots() const
 {
 	return hotspots;
@@ -758,11 +771,13 @@ const std::string& Configuration::SelectionStrategy() const
 }
 double Configuration::PacketInjectionRate() const
 {
-	return packet_injection_rate;
+	if (!flit_injection_rate) return packet_injection_rate / (scale_with_nodes ? graph.size() : 1.0);
+	else return packet_injection_rate * 2.0 / (min_packet_size + max_packet_size) / (scale_with_nodes ? graph.size() : 1.0);
 }
 double Configuration::ProbabilityOfRetransmission() const
 {
-	return probability_of_retransmission;
+	if (!flit_injection_rate) return probability_of_retransmission / (scale_with_nodes ? graph.size() : 1.0);
+	else return probability_of_retransmission * 2.0 / (min_packet_size + max_packet_size) / (scale_with_nodes ? graph.size() : 1.0);
 }
 double Configuration::Locality() const
 {

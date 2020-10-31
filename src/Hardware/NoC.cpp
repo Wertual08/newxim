@@ -8,14 +8,16 @@
 #include "RoutingSelection/RoutingTorusXY.hpp"
 #include "RoutingSelection/RoutingTests.hpp"
 
-#include "RandomTrafficManager.hpp"
-#include "HotspotTrafficManager.hpp"
-#include "TableTrafficManager.hpp"
+#include "Configuration/TrafficManagers/RandomTrafficManager.hpp"
+#include "Configuration/TrafficManagers/HotspotTrafficManager.hpp"
+#include "Configuration/TrafficManagers/TableTrafficManager.hpp"
 
-#include "WormholeRouter.hpp"
-#include "PerFlitRouter.hpp"
-#include "PerFlitSubnetworkRouter.hpp"
-#include "WormholeSubnetworkRouter.hpp"
+#include "Hardware/Routers/WormholeRouter.hpp"
+#include "Hardware/Routers/PerFlitRouter.hpp"
+#include "Hardware/Routers/PerFlitSubnetworkRouter.hpp"
+#include "Hardware/Routers/WormholeSubnetworkRouter.hpp"
+#include "Hardware/Routers/WormholeFixedSubnetworkRouter.hpp"
+#include "Hardware/Routers/WormholeFitSubnetworkRouter.hpp"
 
 
 
@@ -51,6 +53,8 @@ std::unique_ptr<Router> GetRouter(const SimulationTimer& timer, std::int32_t id,
 	if (config.RouterType() == "PER_FLIT") return std::make_unique<PerFlitRouter>(timer, id, relays_count, config.BufferDepth());
 	if (config.RouterType() == "PER_FLIT_SUBNETWORK") return std::make_unique<PerFlitSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
 	if (config.RouterType() == "WORMHOLE_SUBNETWORK") return std::make_unique<WormholeSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
+	if (config.RouterType() == "WORMHOLE_FIXED_SUBNETWORK") return std::make_unique<WormholeFixedSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
+	if (config.RouterType() == "WORMHOLE_FIT_SUBNETWORK") return std::make_unique<WormholeFitSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size(), config.BufferDepth());
 	throw std::runtime_error("Configuration error: Invalid router type [" + config.RouterType() + "].");
 }
 std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
@@ -173,9 +177,7 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 {
 	InitBase();
 
-	if (config.RouterType() == "PER_FLIT_SUBNETWORK" || 
-		config.RouterType() == "WORMHOLE_SUBNETWORK") 
-		InitSubNetwork();
+	if (config.Subnetwork()) InitSubNetwork();
 }
 NoC::~NoC()
 {
