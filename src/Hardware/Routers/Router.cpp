@@ -8,9 +8,9 @@ static std::string GetRouterName(std::int32_t id)
 }
 
 
-Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
+Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
 	Relays(relays + 1),
-	stats(timer, id, Relays.size()), 
+	stats(timer),
 	power(timer),
 	LocalID(id),
 	LocalRelay(Relays[relays]),
@@ -22,9 +22,6 @@ Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, st
 	sensitive << reset << clock.pos();
 
 	start_from_port = LocalRelayID;//rand() % Relays.size();
-
-	for (std::size_t i = 0; i < Relays.size(); i++)
-		Relays[i].buffer.SetMaxBufferSize(max_buffer_size);
 }
 
 void Router::Update()
@@ -33,18 +30,7 @@ void Router::Update()
 	{
 		// Clear outputs and indexes of transmitting protocol
 		for (std::size_t i = 0; i < Relays.size(); i++)
-		{
-			Relays[i].tx_req.write(0);
-			Relays[i].tx_current_level = 0;
-		}
-
-		// Clear outputs and indexes of receiving protocol
-		for (std::size_t i = 0; i < Relays.size(); i++)
-		{
-			Relays[i].rx_ack.write(0);
-			Relays[i].rx_current_level = 0;
-			Relays[i].free_slots.write(Relays[i].buffer.GetMaxBufferSize());
-		}
+			Relays[i].Reset();
 
 		return;
 	}
@@ -52,14 +38,15 @@ void Router::Update()
 	TXProcess();
 	RXProcess();
 
-	start_from_port = (start_from_port + 1) % static_cast<std::int32_t>(Relays.size());
+	start_from_port = (start_from_port + 1) % Relays.size();
 
 	power.leakageRouter();
 	for (int i = 0; i < Relays.size(); i++)
 	{
 		power.leakageBufferRouter();
 		power.leakageLinkRouter2Router();
-		stats.UpdateBufferLoad(i, Relays[i].buffer.GetLoad());
+		for (int j = 0; j < Relays[i].Size(); j++)
+			stats.PushLoad(i, j, Relays[i][j].GetLoad());
 	}
 }
 
@@ -75,18 +62,17 @@ bool Router::Route(std::int32_t in_port, std::int32_t out_port)
 {
 	Relay& in_relay = Relays[in_port];
 	Relay& out_relay = Relays[out_port];
-	bool buf_stat = out_relay.free_slots_neighbor.read();
 
-	if (out_relay.tx_current_level == out_relay.tx_ack.read() && buf_stat)
+	Flit flit = in_relay.Front();
+	flit.hop_no++;
+
+	if (out_relay.Send(flit))
 	{
-		Flit flit = in_relay.buffer.Pop();
-		flit.hop_no++;
-		out_relay.tx_flit.write(flit);
-		out_relay.tx_current_level = 1 - out_relay.tx_current_level;
-		out_relay.tx_req.write(out_relay.tx_current_level);
+		flit = in_relay.Pop();
 
 		/* Power & Stats ------------------------------------------------- */
-		stats.UpdateBufferPopOrEmptyTime(in_port);
+		stats.StopStuckTimer(in_port, flit.vc_id);
+		if (in_relay[flit.vc_id].Size()) stats.StartStuckTimer(in_port, flit.vc_id);
 
 		power.r2rLink();
 
@@ -96,7 +82,6 @@ bool Router::Route(std::int32_t in_port, std::int32_t out_port)
 		if (out_port == LocalRelayID)
 		{
 			power.networkInterface();
-			stats.receivedFlit(flit);
 		}
 		/* End Power & Stats ------------------------------------------------- */
 
@@ -109,53 +94,24 @@ void Router::RXProcess()
 {
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
-	for (size_t i = 0; i < Relays.size(); i++)
+	for (std::size_t i = 0; i < Relays.size(); i++)
 	{
-		Relay& rel = Relays[i];
-		// To accept a new flit, the following conditions must match:
-		// 1) there is an incoming request
-		// 2) there is a free slot in the input buffer of direction i
-
-		if (rel.rx_req.read() == 1 - rel.rx_current_level)
+		if (Relays[i].Receive())
 		{
-			Flit received_flit = rel.rx_flit.read();
-
-			int vc = received_flit.vc_id;
-
-			if (!rel.buffer.IsFull())
+			power.bufferRouterPush();
+			// if a new flit is injected from local PE
+			if (i == LocalRelayID)
 			{
-				// Store the incoming flit in the circular buffer
-				rel.buffer.Push(received_flit);
-
-				power.bufferRouterPush();
-
-				// Negate the old value for Alternating Bit Protocol (ABP)
-				rel.rx_current_level = 1 - rel.rx_current_level;
-
-				// if a new flit is injected from local PE
-				if (received_flit.src_id == LocalID)
-				{
-					stats.AcceptFlit();
-					power.networkInterface();
-				}
+				power.networkInterface();
 			}
-			else  // buffer full
-			{
-				// should not happen with the new TBufferFullStatus control signals    
-				// except for flit coming from local PE, which don't use it 
-
-				assert(i == LocalRelayID);
-			}
-
 		}
-		rel.rx_ack.write(rel.rx_current_level);
 
-		rel.free_slots.write(rel.buffer.GetCurrentFreeSlots());
+		Relays[i].UpdateFreeSlots();
 	}
 }
 
-Router::Router(const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
-	Router(GetRouterName(id).c_str(), timer, id, relays, max_buffer_size)
+Router::Router(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
+	Router(GetRouterName(id).c_str(), timer, id, relays)
 {
 }
 void Router::SetRoutingAlgorithm(const RoutingAlgorithm& alg)
@@ -165,4 +121,17 @@ void Router::SetRoutingAlgorithm(const RoutingAlgorithm& alg)
 void Router::SetSelectionStrategy(const SelectionStrategy& sel)
 {
 	Selection = &sel;
+}
+
+std::size_t Router::TotalBufferedFlits() const
+{
+	std::size_t count = 0;
+	for (std::size_t i = 0; i < Relays.size(); i++)
+	{
+		for (std::size_t vc = 0; vc < Relays[i].Size(); vc++)
+		{
+			count += Relays[i][vc].Size();
+		}
+	}
+	return count;
 }

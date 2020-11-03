@@ -5,12 +5,21 @@
 
 
 // FlitType -- Flit type enumeration
-enum FlitType 
+enum class FlitType : std::int32_t
 {
-	FLIT_TYPE_HEAD,
-	FLIT_TYPE_BODY, 
-	FLIT_TYPE_TAIL
+	None = 0b000,
+	Head = 0b001,
+	Body = 0b010, 
+	Tail = 0b100
 };
+static FlitType operator|(FlitType l, FlitType r)
+{
+	return static_cast<FlitType>(static_cast<std::int32_t>(l) | static_cast<std::int32_t>(r));
+}
+static FlitType operator&(FlitType l, FlitType r)
+{
+	return static_cast<FlitType>(static_cast<std::int32_t>(l) & static_cast<std::int32_t>(r));
+}
 
 // Packet -- Packet definition
 struct Packet 
@@ -60,16 +69,16 @@ struct RouteData
 // Flit -- Flit definition
 struct Flit 
 {
-	int src_id;
-	int dst_id;
-	int vc_id;				// Virtual Channel
-	FlitType flit_type;		// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
-	int sequence_no;		// The sequence number of the flit inside the packet
-	int sequence_length;
-	double timestamp;		// Unix timestamp at packet generation
-	double accept_timestamp;
-	int hop_no;				// Current number of hops from source to destination
-	bool use_low_voltage_path;
+	int src_id = -1;
+	int dst_id = -1;
+	int vc_id = -1;							// Virtual Channel
+	FlitType flit_type = FlitType::None;	// The flit type (FlitType::Head, FlitType::Body, FLIT_TYPE_FlitType::Tail)
+	int sequence_no = -1;					// The sequence number of the flit inside the packet
+	int sequence_length = -1;
+	double timestamp = -1;					// Unix timestamp at packet generation
+	double accept_timestamp = - 1;
+	int hop_no = -1;						// Current number of hops from source to destination
+	bool use_low_voltage_path = false;
 
 	inline bool operator==(const Flit& flit) const 
 	{
@@ -89,9 +98,9 @@ inline std::ostream& operator <<(std::ostream& os, const Flit& flit)
 {
 	os << '(';
 	switch (flit.flit_type) {
-	case FLIT_TYPE_HEAD: os << 'H'; break;
-	case FLIT_TYPE_BODY: os << 'B'; break;
-	case FLIT_TYPE_TAIL: os << 'T'; break;
+	case FlitType::Head: os << 'H'; break;
+	case FlitType::Body: os << 'B'; break;
+	case FlitType::Tail: os << 'T'; break;
 	}
 
 	return os << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ')';

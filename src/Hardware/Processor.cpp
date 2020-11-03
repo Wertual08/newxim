@@ -5,19 +5,23 @@
 
 
 
-static std::string GetProcessorName(std::int32_t id)
+static std::string GetProcessorName(std::size_t id)
 {
 	return (std::stringstream() << "Processor[" << std::setfill('0') << std::setw(3) << id << "]").str();
 }
-static std::int32_t randInt(std::int32_t min, std::int32_t max)
+static std::size_t randInt(std::size_t min, std::size_t max)
 {
-	return min + (int)((double)(max - min + 1) * rand() / (RAND_MAX + 1.0));
+	return min + rand() / (RAND_MAX + 1.0) * (max - min + 1);
 }
 
 
 Packet& Processor::GetQueueFront()
 {
-	if (Queue.UpdateRequired()) Queue.UpdateFrontPacket(local_id, Traffic->FindDestination(local_id), getRandomSize());
+	if (Queue.UpdateRequired()) Queue.UpdateFrontPacket(
+		local_id, 
+		Traffic->FindDestination(local_id),
+		randInt(MinPacketSize, MaxPacketSize)
+	);
 	return Queue.Front();
 }
 
@@ -26,6 +30,58 @@ void Processor::ReceiveFlit(Flit flit)
 	if (flit.dst_id != local_id) throw std::runtime_error(
 		"Processor received a flit that does not belong to it. LocalID[" + 
 		std::to_string(local_id) + "] DestinationID[" + std::to_string(flit.dst_id) + "]");
+
+	if (Timer.StatisticsTime() >= 0)
+	{
+		if ((flit.flit_type & FlitType::Tail) != FlitType::None)
+		{
+			double delay = Timer.SystemTime() - flit.timestamp;
+			TotalPacketsDelay += delay;
+			if (delay > MaxPacketDelay) MaxPacketDelay = delay;
+
+			TotalPacketsReceived++;
+		}
+		TotalFlitsReceived++;
+
+		if (Timer.StatisticsTime() - flit.accept_timestamp > SimulationMaxTimeFlitInNetwork)
+			SimulationMaxTimeFlitInNetwork = Timer.StatisticsTime() - flit.accept_timestamp;
+		SimulationLastTimeFlitReceived = Timer.StatisticsTime();
+	}
+	TotalActualFlitsReceived++;
+}
+void Processor::SendFlit(Flit flit)
+{
+	if (Timer.StatisticsTime() >= 0) TotalFlitsSent++;
+	TotalActualFlitsSent++;
+}
+
+Flit Processor::NextFlit()
+{
+	Packet& packet = GetQueueFront();
+
+	Flit flit;
+	flit.src_id = packet.src_id;
+	flit.dst_id = packet.dst_id;
+	flit.vc_id = packet.vc_id;
+	flit.timestamp = packet.timestamp;
+	flit.accept_timestamp = Timer.StatisticsTime();
+	flit.sequence_no = packet.size - packet.flit_left;
+	flit.sequence_length = packet.size;
+	flit.hop_no = 0;
+
+	if (packet.size == packet.flit_left)
+		flit.flit_type = flit.flit_type | FlitType::Head;
+	else if (packet.flit_left == 1)
+		flit.flit_type = flit.flit_type | FlitType::Tail;
+	else flit.flit_type = flit.flit_type | FlitType::Body;
+
+	return flit;
+}
+void Processor::PopFlit()
+{
+	Packet& packet = GetQueueFront();
+	packet.flit_left--;
+	if (packet.flit_left == 0) Queue.Pop();
 }
 
 Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
@@ -33,11 +89,11 @@ Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t 
 	Timer(timer), local_id(id), MinPacketSize(min_packet_size),
 	MaxPacketSize(max_packet_size), Traffic(nullptr)
 {
-	SC_METHOD(rxProcess);
+	SC_METHOD(Update);
 	sensitive << reset << clock.pos();
-	SC_METHOD(txProcess);
-	sensitive << reset << clock.pos();
-	relay.buffer.SetMaxBufferSize(128);
+
+	relay.SetVirtualChannels(1);
+	relay[0].Reserve(128);
 }
 
 Processor::Processor(const SimulationTimer& timer, std::int32_t id, 
@@ -51,37 +107,25 @@ void Processor::SetTrafficManager(const TrafficManager& traffic)
 	Traffic = &traffic;
 }
 
-void Processor::rxProcess()
+void Processor::Update()
 {
-	if (reset.read()) 
+	if (reset.read())
 	{
-		relay.rx_ack.write(0);
-		current_level_rx = 0;
-		relay.free_slots.write(relay.buffer.GetCurrentFreeSlots());
-	}
-	else 
-	{
-		if (relay.rx_req.read() == 1 - current_level_rx)
-		{
-			Flit flit = relay.rx_flit.read();
-			current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
-
-			ReceiveFlit(flit);
-		}
-		relay.rx_ack.write(current_level_rx);
-		relay.free_slots.write(relay.buffer.GetCurrentFreeSlots());
-	}
-}
-void Processor::txProcess()
-{
-	if (reset.read()) 
-	{
-		TotalFlitsGenerated = 0;
-		relay.tx_req.write(0);
-		current_level_tx = 0;
+		relay.Reset();
 		transmittedAtPreviousCycle = false;
+
+		TotalPacketsReceived = 0;
+		TotalFlitsSent = 0;
+		TotalFlitsReceived = 0;
+		TotalActualFlitsSent = 0;
+		TotalActualFlitsReceived = 0;
+		
+		TotalPacketsDelay = 0;
+		MaxPacketDelay = 0;
+		SimulationMaxTimeFlitInNetwork = 0;
+		SimulationLastTimeFlitReceived = 0;
 	}
-	else 
+	else
 	{
 		if (Traffic->FirePacket(local_id, Timer.SystemTime(), transmittedAtPreviousCycle))
 		{
@@ -90,57 +134,73 @@ void Processor::txProcess()
 		}
 		else transmittedAtPreviousCycle = false;
 
+		TXProcess();
+		RXProcess();
+		relay.UpdateFreeSlots();
+	}
+}
+void Processor::TXProcess()
+{
+	if (!Queue.Empty())
+	{
+		Flit flit = NextFlit();	// Generate a new flit
 
-		if (relay.tx_ack.read() == current_level_tx)
+		if (relay.Send(flit))
 		{
-			if (!Queue.Empty()) 
-			{
-				Flit flit = nextFlit();	// Generate a new flit
-				relay.tx_flit->write(flit);	// Send the generated flit
-				current_level_tx = 1 - current_level_tx;	// Negate the old value for Alternating Bit Protocol (ABP)
-				relay.tx_req.write(current_level_tx);
-			}
+			PopFlit();
+			SendFlit(flit);
+		}
+	}
+}
+void Processor::RXProcess()
+{
+	if (relay.Receive())
+	{
+		if (relay.FlitAvailable())
+		{
+			ReceiveFlit(relay.Pop());
 		}
 	}
 }
 
-Flit Processor::nextFlit()
+std::size_t Processor::FlitsSent() const
 {
-	Packet& packet = GetQueueFront();
-
-	Flit flit;
-	flit.src_id = packet.src_id;
-	flit.dst_id = packet.dst_id;
-	flit.vc_id = packet.vc_id;
-	flit.timestamp = packet.timestamp;
-	flit.accept_timestamp = Timer.StatisticsTime();
-	flit.sequence_no = packet.size - packet.flit_left;
-	flit.sequence_length = packet.size;
-	flit.hop_no = 0;
-	//  flit.payload     = DEFAULT_PAYLOAD;
-
-	if (packet.size == packet.flit_left)
-		flit.flit_type = FLIT_TYPE_HEAD;
-	else if (packet.flit_left == 1)
-		flit.flit_type = FLIT_TYPE_TAIL;
-	else flit.flit_type = FLIT_TYPE_BODY;
-
-	packet.flit_left--;
-	if (packet.flit_left == 0)
-	{
-		if (Timer.StatisticsTime() > 0.0) TotalFlitsGenerated += packet.size;
-		Queue.Pop();
-	}
-
-	return flit;
+	return TotalFlitsSent;
+}
+std::size_t Processor::FlitsReceived() const
+{
+	return TotalFlitsReceived;
+}
+std::size_t Processor::FlitsProduced() const
+{
+	return TotalFlitsSent + Queue.Size() * (MaxPacketSize + MinPacketSize) / 2;
+}
+std::size_t Processor::ActualFlitsSent() const
+{
+	return TotalActualFlitsSent;
+}
+std::size_t Processor::ActualFlitsReceived() const
+{
+	return TotalActualFlitsReceived;
 }
 
-int Processor::getRandomSize()
+std::size_t Processor::PacketsReceived() const
 {
-	return randInt(MinPacketSize, MaxPacketSize);
+	return TotalPacketsReceived;
 }
-
-std::int32_t Processor::GetTotalFlitsGenerated() const
+double Processor::AverageDelay() const
 {
-	return TotalFlitsGenerated + Queue.Size() * (MaxPacketSize + MinPacketSize) / 2;
+	return TotalPacketsDelay / TotalPacketsReceived;
+}
+double Processor::MaxDelay() const
+{
+	return MaxPacketDelay;
+}
+double Processor::MaxTimeFlitInNetwork() const
+{
+	return SimulationMaxTimeFlitInNetwork;
+}
+double Processor::LastReceivedFlitTime() const
+{
+	return SimulationLastTimeFlitReceived;
 }

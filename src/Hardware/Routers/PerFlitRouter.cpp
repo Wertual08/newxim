@@ -9,9 +9,9 @@ void PerFlitRouter::TXProcess()
 		std::int32_t i = (start_from_port + j) % Relays.size();
 		Relay& rel = Relays[i];
 
-		if (!rel.buffer.IsEmpty())
+		if (rel.FlitAvailable())
 		{
-			Flit flit = rel.buffer.Front();
+			Flit flit = rel.Front();
 
 			RouteData route_data;
 			route_data.hop_no = flit.hop_no;
@@ -25,12 +25,11 @@ void PerFlitRouter::TXProcess()
 
 			Route(i, res);
 		}
-		else stats.UpdateBufferPopOrEmptyTime(i);
 	} // for loop directions
 
 }
 
-PerFlitRouter::PerFlitRouter(const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size) :
-	Router(timer, id, relays, max_buffer_size)
+PerFlitRouter::PerFlitRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
+	Router(timer, id, relays)
 {
 }

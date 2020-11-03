@@ -10,12 +10,12 @@ void WormholeRouter::TXProcess()
 		std::int32_t i = (start_from_port + j) % Relays.size();
 		Relay& rel = Relays[i];
 
-		if (!rel.buffer.IsEmpty())
+		if (rel.FlitAvailable())
 		{
-			Flit flit = rel.buffer.Front();
+			Flit flit = rel.Front();
 			power.bufferRouterFront();
 
-			if (flit.flit_type == FLIT_TYPE_HEAD)
+			if (flit.flit_type == FlitType::Head)
 			{
 				// prepare data for routing
 				RouteData route_data;
@@ -41,20 +41,19 @@ void WormholeRouter::TXProcess()
 	{
 		Relay& rel = Relays[i];
 
-		if (!rel.buffer.IsEmpty())
+		if (rel.FlitAvailable())
 		{
 			std::int32_t res = reservation_table.Reservation(i);
 			if (res < 0) continue;
 
-			Flit flit = rel.buffer.Front();
-			if (Route(i, res) && flit.flit_type == FLIT_TYPE_TAIL)
+			Flit flit = rel.Front();
+			if (Route(i, res) && flit.flit_type == FlitType::Tail)
 				reservation_table.Release(i);
 		}
-		else stats.UpdateBufferPopOrEmptyTime(i);
 	} // for loop directions
 }
 
-WormholeRouter::WormholeRouter(const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size) : 
-	Router(timer, id, relays, max_buffer_size), reservation_table(Relays.size())
+WormholeRouter::WormholeRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
+	Router(timer, id, relays), reservation_table(Relays.size())
 {
 }

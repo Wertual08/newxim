@@ -23,9 +23,9 @@ void PerFlitSubnetworkRouter::TXProcess()
 		std::int32_t in_port = (start_from_port + j) % static_cast<std::int32_t>(Relays.size());
 		Relay& in_relay = Relays[in_port];
 
-		if (!in_relay.buffer.IsEmpty())
+		if (in_relay.FlitAvailable())
 		{
-			Flit flit = in_relay.buffer.Front();
+			Flit flit = in_relay.Front();
 
 			RouteData route_data;
 			route_data.hop_no = flit.hop_no;
@@ -38,17 +38,16 @@ void PerFlitSubnetworkRouter::TXProcess()
 			if (out_port < 0) continue;
 
 			// TODO: Maybe it should select one of the channels... (Apply selection strategy???)
-			if (Relays[out_port].free_slots_neighbor.read() < 1)
+			if (Relays[out_port].GetFreeSlots(flit.vc_id) < 1)
 				out_port = SubnetworkTable[flit.dst_id][0];
 
 			Route(in_port, out_port);
 		}
-		else stats.UpdateBufferPopOrEmptyTime(in_port);
 	} // for loop directions
 
 }
 
-PerFlitSubnetworkRouter::PerFlitSubnetworkRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
-	SubnetworkRouter(timer, id, relays, max_buffer_size)
+PerFlitSubnetworkRouter::PerFlitSubnetworkRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
+	SubnetworkRouter(timer, id, relays)
 {
 }

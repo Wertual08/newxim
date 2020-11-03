@@ -23,12 +23,12 @@ void WormholeSubnetworkRouter::TXProcess()
 		std::int32_t in_port = (start_from_port + j) % static_cast<std::int32_t>(Relays.size());
 		Relay& rel = Relays[in_port];
 
-		if (!rel.buffer.IsEmpty())
+		if (rel.FlitAvailable())
 		{
-			Flit flit = rel.buffer.Front();
+			Flit flit = rel.Front();
 			power.bufferRouterFront();
 
-			if (flit.flit_type == FLIT_TYPE_HEAD)
+			if (flit.flit_type == FlitType::Head)
 			{
 				RouteData route_data;
 				route_data.hop_no = flit.hop_no;
@@ -42,9 +42,9 @@ void WormholeSubnetworkRouter::TXProcess()
 				if (out_port < 0) continue;
 
 				// TODO: Maybe it should select one of the channels... (Apply selection strategy???)
-				if (Relays[out_port].free_slots_neighbor.read() < 1)
+				if (Relays[out_port].GetFreeSlots(flit.vc_id) < 1)
 					out_port = SubnetworkTable[flit.dst_id][0];
-				if (Relays[out_port].free_slots_neighbor.read() < 1)
+				if (Relays[out_port].GetFreeSlots(flit.vc_id) < 1)
 					continue;
 
 				if (!reservation_table.Reserved(out_port))
@@ -57,20 +57,19 @@ void WormholeSubnetworkRouter::TXProcess()
 	{
 		Relay& rel = Relays[i];
 
-		if (!rel.buffer.IsEmpty())
+		if (rel.FlitAvailable())
 		{
 			std::int32_t res = reservation_table.Reservation(i);
 			if (res < 0) continue;
 
-			Flit flit = rel.buffer.Front();
-			if (Route(i, res) && flit.flit_type == FLIT_TYPE_TAIL)
+			Flit flit = rel.Front();
+			if (Route(i, res) && flit.flit_type == FlitType::Tail)
 				reservation_table.Release(i);
 		}
-		else stats.UpdateBufferPopOrEmptyTime(i);
 	}
 }
 
-WormholeSubnetworkRouter::WormholeSubnetworkRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays, std::int32_t max_buffer_size) :
-	SubnetworkRouter(timer, id, relays, max_buffer_size), reservation_table(Relays.size())
+WormholeSubnetworkRouter::WormholeSubnetworkRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
+	SubnetworkRouter(timer, id, relays), reservation_table(Relays.size())
 {
 }

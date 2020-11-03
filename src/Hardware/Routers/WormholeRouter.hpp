@@ -13,5 +13,5 @@ protected:
 	virtual void TXProcess() override;
 
 public:
-	WormholeRouter(const SimulationTimer& timer, std::int32_t id, size_t relays, std::int32_t max_buffer_size);
+	WormholeRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays);
 };

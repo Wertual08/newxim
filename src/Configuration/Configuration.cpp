@@ -141,6 +141,7 @@ void Configuration::ReadTopologyParams(const YAML::Node& config)
 {
 	std::string topology = ReadParam<std::string>(config, "topology");
 	channels_count = ReadParam<std::int32_t>(config, "topology_channels", 1);
+	virtual_channels_count = ReadParam<std::size_t>(config, "virtual_channels");
 	try
 	{
 		const auto& args = config["topology_args"];
@@ -455,7 +456,7 @@ void Configuration::ShowHelp(const std::string& selfname)
 		<< "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)\n"
 		<< "\t-warmup N\t\tStart to collect statistics after N cycles\n"
 		<< "\t-seed N\t\t\tSet the seed of the random generator (default time())\n"
-		<< "\t-detailed\t\tShow detailed statistics\n"
+		<< "\t-deFlitType::Tailed\t\tShow deFlitType::Tailed statistics\n"
 		<< "\t-show_buf_stats\t\tShow buffers statistics\n"
 		<< "\t-volume N\t\tStop the simulation when either the maximum number of cycles has been reached or N flits have\n"
 		<< "\t\t\t\tbeen delivered\n"
@@ -835,6 +836,10 @@ std::int32_t Configuration::DimY() const
 std::int32_t Configuration::ChannelsCount() const
 {
 	return channels_count;
+}
+std::size_t Configuration::VirtualChannels() const
+{
+	return virtual_channels_count;
 }
 
 double Configuration::TimeStamp() const

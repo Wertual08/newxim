@@ -66,6 +66,7 @@ private:
 	Power power_configuration;
 	std::int32_t dim_x, dim_y;
 	std::int32_t channels_count;
+	std::size_t virtual_channels_count;
 	bool report_progress;
 	bool report_buffers;
 	bool report_routing_table;
@@ -134,6 +135,7 @@ public:
 	std::int32_t DimX() const;
 	std::int32_t DimY() const;
 	std::int32_t ChannelsCount() const;
+	std::size_t VirtualChannels() const;
 
 	double TimeStamp() const;
 };

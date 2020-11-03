@@ -16,16 +16,31 @@ class Processor : public sc_module
 	SC_HAS_PROCESS(Processor);
 private:
 	const SimulationTimer Timer;
-	std::int32_t TotalFlitsGenerated;
 	std::int32_t MaxID;
 	const TrafficManager* Traffic;
 	ProcessorQueue Queue;
 	Packet& GetQueueFront();
 
-	const std::int32_t MinPacketSize;
-	const std::int32_t MaxPacketSize;
+	const std::size_t MinPacketSize;
+	const std::size_t MaxPacketSize;
+
+	std::size_t TotalPacketsReceived;
+	std::size_t TotalFlitsSent;
+	std::size_t TotalFlitsReceived;
+	std::size_t TotalActualFlitsSent;
+	std::size_t TotalActualFlitsReceived;
+
+	double TotalPacketsDelay;
+	double MaxPacketDelay;
+	double SimulationMaxTimeFlitInNetwork;
+	double SimulationLastTimeFlitReceived;
 
 	void ReceiveFlit(Flit flit);
+	void SendFlit(Flit flit);
+
+	Flit NextFlit();					// Take the next flit of the current packet
+	void PopFlit();
+
 	Processor(sc_module_name, const SimulationTimer& timer, std::int32_t id,
 		std::int32_t min_packet_size, std::int32_t max_packet_size);
 
@@ -38,8 +53,6 @@ public:
 
 	// Registers
 	const std::int32_t local_id;		// Unique identification number
-	bool current_level_rx;	// Current level for Alternating Bit Protocol (ABP)
-	bool current_level_tx;	// Current level for Alternating Bit Protocol (ABP)
 	bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
 	Processor(const SimulationTimer& timer, std::int32_t id,
@@ -47,11 +60,19 @@ public:
 	void SetTrafficManager(const TrafficManager& traffic);
 
 	// Functions
-	void rxProcess();				// The receiving process
-	void txProcess();				// The transmitting process
-	Flit nextFlit();				// Take the next flit of the current packet
+	void Update();
+	void TXProcess();					// The transmitting process
+	void RXProcess();					// The receiving process
 
-	std::int32_t getRandomSize();				// Returns a random size in flits for the packet
+	std::size_t FlitsSent() const;
+	std::size_t FlitsReceived() const;
+	std::size_t FlitsProduced() const;
+	std::size_t ActualFlitsSent() const;
+	std::size_t ActualFlitsReceived() const;
 
-	std::int32_t GetTotalFlitsGenerated() const;
+	std::size_t PacketsReceived() const;
+	double AverageDelay() const;
+	double MaxDelay() const;
+	double MaxTimeFlitInNetwork() const;
+	double LastReceivedFlitTime() const;
 };

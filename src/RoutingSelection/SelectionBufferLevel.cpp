@@ -11,7 +11,7 @@ std::int32_t SelectionBufferLevel::Apply(Router& router, const std::vector<std::
 	{
 		std::int32_t dir = directions[i];
 		
-		std::int32_t free_slots = router.Relays[dir].free_slots_neighbor.read();
+		std::int32_t free_slots = router[dir][route_data.vc_id].GetFreeSlots();
 
 		if (free_slots > max_free_slots) 
 		{

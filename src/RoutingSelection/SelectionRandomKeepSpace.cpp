@@ -9,10 +9,10 @@ std::int32_t SelectionRandomKeepSpace::Apply(Router& router, const std::vector<s
 	for (std::int32_t i = 0; i < directions.size(); i++)
 	{
 		std::int32_t dir = directions[i];
-		std::int32_t free_slots = router.Relays[dir].free_slots_neighbor.read();
+		std::int32_t free_slots = router[dir][route_data.vc_id].GetFreeSlots();;
 
 		if (route_data.dir_in != router.LocalRelayID) best_dirs.push_back(dir);
-		else if (free_slots >= router.Relays[dir].buffer.GetMaxBufferSize() - 0) best_dirs.push_back(dir);
+		else if (free_slots >= router[dir][route_data.vc_id].GetCapacity() - 0) best_dirs.push_back(dir);
 	}
 
 	if (best_dirs.size() > 0) return best_dirs[rand() % best_dirs.size()];
