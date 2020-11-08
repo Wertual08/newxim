@@ -132,6 +132,10 @@ public:
 		}
 		else return false;
 	}
+	bool CanReceive()
+	{
+		return rx_req.read() == !rx_current_level;
+	}
 	bool Receive()
 	{
 		if (rx_req.read() == !rx_current_level)

@@ -33,7 +33,7 @@ void Processor::ReceiveFlit(Flit flit)
 
 	if (Timer.StatisticsTime() >= 0)
 	{
-		if ((flit.flit_type & FlitType::Tail) != FlitType::None)
+		if (HasFlag(flit.flit_type, FlitType::Tail))
 		{
 			double delay = Timer.SystemTime() - flit.timestamp;
 			TotalPacketsDelay += delay;
@@ -69,11 +69,9 @@ Flit Processor::NextFlit()
 	flit.sequence_length = packet.size;
 	flit.hop_no = 0;
 
-	if (packet.size == packet.flit_left)
-		flit.flit_type = flit.flit_type | FlitType::Head;
-	else if (packet.flit_left == 1)
-		flit.flit_type = flit.flit_type | FlitType::Tail;
-	else flit.flit_type = flit.flit_type | FlitType::Body;
+	if (packet.size == packet.flit_left) flit.flit_type = flit.flit_type | FlitType::Head;
+	if (packet.flit_left == 1) flit.flit_type = flit.flit_type | FlitType::Tail;
+	if (packet.flit_left > 1 && packet.flit_left < packet.size) flit.flit_type = flit.flit_type | FlitType::Body;
 
 	return flit;
 }

@@ -647,7 +647,7 @@ void Configuration::Check()
 		exit(1);
 	}
 
-	if (min_packet_size < 2 || max_packet_size < 2) 
+	if (min_packet_size < 1 || max_packet_size < 1) 
 	{
 		std::cerr << "Error: packet size must be >= 2\n";
 		exit(1);

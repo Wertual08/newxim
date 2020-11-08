@@ -28,7 +28,7 @@ void WormholeFitSubnetworkRouter::TXProcess()
 			Flit flit = rel.Front();
 			power.bufferRouterFront();
 
-			if (flit.flit_type == FlitType::Head)
+			if (HasFlag(flit.flit_type, FlitType::Head))
 			{
 				RouteData route_data;
 				route_data.hop_no = flit.hop_no;
@@ -63,7 +63,7 @@ void WormholeFitSubnetworkRouter::TXProcess()
 			if (res < 0) continue;
 
 			Flit flit = rel.Front();
-			if (Route(i, res) && flit.flit_type == FlitType::Tail)
+			if (Route(i, res) && HasFlag(flit.flit_type, FlitType::Tail))
 				reservation_table.Release(i);
 		}
 	}

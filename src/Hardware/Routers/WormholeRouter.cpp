@@ -15,7 +15,7 @@ void WormholeRouter::TXProcess()
 			Flit flit = rel.Front();
 			power.bufferRouterFront();
 
-			if (flit.flit_type == FlitType::Head)
+			if (HasFlag(flit.flit_type, FlitType::Head))
 			{
 				// prepare data for routing
 				RouteData route_data;
@@ -47,7 +47,7 @@ void WormholeRouter::TXProcess()
 			if (res < 0) continue;
 
 			Flit flit = rel.Front();
-			if (Route(i, res) && flit.flit_type == FlitType::Tail)
+			if (Route(i, res) && HasFlag(flit.flit_type, FlitType::Tail))
 				reservation_table.Release(i);
 		}
 	} // for loop directions

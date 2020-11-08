@@ -28,6 +28,18 @@ std::size_t GlobalStats::GetFlitsInBuffers() const
 		count += t.RouterDevice->TotalBufferedFlits();
 	return count;
 }
+std::size_t GlobalStats::GetFlitsInTransmission() const
+{
+	std::size_t count = 0;
+	for (const auto& t : Network.Tiles)
+	{
+		for (std::size_t r = 0; r < t.RouterDevice->Size(); r++)
+			if ((*t.RouterDevice)[r].CanReceive()) count++;
+
+		if ((*t.ProcessorDevice).relay.CanReceive()) count++;
+	}
+	return count;
+}
 
 
 std::size_t GlobalStats::GetFlitsProduced() const
@@ -124,10 +136,11 @@ std::size_t GlobalStats::GetPacketsReceived() const
 }
 std::size_t GlobalStats::GetFlitsLost() const
 {
-	std::int32_t accepted = GetActualFlitsAccepted();
-	std::int32_t received = GetActualFlitsReceived();
-	std::int32_t buffered = GetFlitsInBuffers();
-	return accepted - received - buffered;
+	std::size_t accepted = GetActualFlitsAccepted();
+	std::size_t received = GetActualFlitsReceived();
+	std::size_t buffered = GetFlitsInBuffers();
+	std::size_t transmitting = GetFlitsInTransmission();
+	return accepted - received - buffered - transmitting;
 }
 
 double GlobalStats::GetAverageDelay() const

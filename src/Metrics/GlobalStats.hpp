@@ -25,6 +25,7 @@ private:
 	std::size_t GetActualFlitsReceived() const;
 	std::size_t GetActualFlitsAccepted() const;
 	std::size_t GetFlitsInBuffers() const;
+	std::size_t GetFlitsInTransmission() const;
 
 
 	std::size_t GetFlitsProduced() const;

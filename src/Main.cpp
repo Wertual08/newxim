@@ -16,7 +16,7 @@
 #include "Configuration/Configuration.hpp"
 #include "Metrics/ProgressBar.hpp"
 
-const static std::string Version = "0.0.0.3";
+const static std::string Version = "0.0.0.4";
 
 
 
@@ -39,10 +39,10 @@ int sc_main(int arg_num, char* arg_vet[])
 	if (Config.ReportProgress()) Bar = std::make_unique<ProgressBar>(std::cout, Timer, 20, Network.clock);
 
 	// Reset the chip
-	Network.reset.write(1);
+	Network.reset.write(true);
 	std::cout << "Reset for " << Config.ResetTime() << " cycles... ";
 	sc_start(Config.ResetTime(), SC_NS);
-	Network.reset.write(0);
+	Network.reset.write(false);
 	std::cout << " done!\n";
 
 	// Run the simulation

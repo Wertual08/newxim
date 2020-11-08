@@ -20,6 +20,11 @@ static FlitType operator&(FlitType l, FlitType r)
 {
 	return static_cast<FlitType>(static_cast<std::int32_t>(l) & static_cast<std::int32_t>(r));
 }
+template<typename T>
+static bool HasFlag(T flit, T flag)
+{
+	return (flit & flag) == flag;
+}
 
 // Packet -- Packet definition
 struct Packet 
@@ -72,7 +77,7 @@ struct Flit
 	int src_id = -1;
 	int dst_id = -1;
 	int vc_id = -1;							// Virtual Channel
-	FlitType flit_type = FlitType::None;	// The flit type (FlitType::Head, FlitType::Body, FLIT_TYPE_FlitType::Tail)
+	FlitType flit_type = FlitType::None;	// The flit type (FlitType::Head, FlitType::Body, FlitType::Tail)
 	int sequence_no = -1;					// The sequence number of the flit inside the packet
 	int sequence_length = -1;
 	double timestamp = -1;					// Unix timestamp at packet generation
@@ -97,12 +102,9 @@ struct Flit
 inline std::ostream& operator <<(std::ostream& os, const Flit& flit)
 {
 	os << '(';
-	switch (flit.flit_type) {
-	case FlitType::Head: os << 'H'; break;
-	case FlitType::Body: os << 'B'; break;
-	case FlitType::Tail: os << 'T'; break;
-	}
-
+	if (HasFlag(flit.flit_type, FlitType::Head)) os << 'H';
+	if (HasFlag(flit.flit_type, FlitType::Body)) os << 'B';
+	if (HasFlag(flit.flit_type, FlitType::Tail)) os << 'T';
 	return os << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ')';
 }
 
