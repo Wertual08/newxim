@@ -215,8 +215,8 @@ void GlobalStats::ShowBuffers(std::ostream& out) const
 	out << "% Buffer statuses:\n";
 	for (std::size_t i = 0; i < Config.TopologyGraph().size(); i++)
 	{
-		const auto& node = Config.TopologyGraph()[i];
-		const auto& stats = Network.Tiles[i].RouterDevice->stats;
+		auto& node = Config.TopologyGraph()[i];
+		auto& stats = Network.Tiles[i].RouterDevice->stats;
 		for (std::size_t r = 0; r < Network.Tiles[i].RouterDevice->Size(); r++)
 		{
 			const auto& relay = (*Network.Tiles[i].RouterDevice)[r];

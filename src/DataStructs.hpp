@@ -59,23 +59,12 @@ struct Packet
 	}
 };
 
-// RouteData -- data required to perform routing
-struct RouteData 
-{
-	std::int32_t hop_no;
-	std::int32_t current_id;
-	std::int32_t src_id;
-	std::int32_t dst_id;
-	std::int32_t dir_in;			// direction from which the packet comes from
-	std::int32_t vc_id;
-	std::int32_t sequence_length;
-};
-
 // Flit -- Flit definition
 struct Flit 
 {
 	int src_id = -1;
 	int dst_id = -1;
+	int dir_in = -1;
 	int vc_id = -1;							// Virtual Channel
 	FlitType flit_type = FlitType::None;	// The flit type (FlitType::Head, FlitType::Body, FlitType::Tail)
 	int sequence_no = -1;					// The sequence number of the flit inside the packet

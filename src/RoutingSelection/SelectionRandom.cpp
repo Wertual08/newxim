@@ -2,8 +2,8 @@
 
 
 
-std::int32_t SelectionRandom::Apply(Router& router, const std::vector<std::int32_t>& directions, const RouteData& route_data) const
+std::int32_t SelectionRandom::Apply(Router& router, Flit& flit, const std::vector<std::int32_t>& directions) const
 {
-    assert(directions.size() != 0);
-    return directions[rand() % directions.size()];
+    if (directions.size() == 0) return -1;
+    else return directions[rand() % directions.size()];
 }

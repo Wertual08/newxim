@@ -266,13 +266,12 @@ void Configuration::ReadRouterParams(const YAML::Node& config)
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 
-	if (router_type == "PER_FLIT_SUBNETWORK" || 
-		router_type == "WORMHOLE_SUBNETWORK" ||
-		router_type == "WORMHOLE_FIXED_SUBNETWORK" ||
-		router_type == "WORMHOLE_FIT_SUBNETWORK")
+	std::string generator = ReadParam<std::string>(config, "sub_tree_generator", "NONE");
+	if (generator != "NONE")
 	{
-		sub_graph = std::make_unique<Graph>(graph.subtree(ReadParam<std::string>(config, "sub_tree_generator", "TGEN_0")));
+		sub_graph = std::make_unique<Graph>(graph.subtree(generator));
 		sub_table = std::make_unique<RoutingTable>(*sub_graph);
+		virtual_sub_table = std::make_unique<RoutingTable>(graph, *sub_graph);
 	}
 }
 void Configuration::ReadRoutingTableParams(const YAML::Node& config)
@@ -333,19 +332,11 @@ void Configuration::ReadRoutingTableParams(const YAML::Node& config)
 			else
 			{
 				std::string type = node.as<std::string>();
-				if (type == "TORUS_XY")
-				{
-					const auto& targs = config["topology_args"];
-					table.LoadTorusXY(graph, dim_x, dim_y);
-				}
-				else
-				{
-					if (!table.Load(graph, type))
+				if (!table.Load(graph, type))
 					{
 						std::cerr << "ERROR: Failed to generate routing table. \n";
 						exit(0);
 					}
-				}
 			}
 		}
 		else table.Load(graph);
@@ -649,7 +640,7 @@ void Configuration::Check()
 
 	if (min_packet_size < 1 || max_packet_size < 1) 
 	{
-		std::cerr << "Error: packet size must be >= 2\n";
+		std::cerr << "Error: packet size must be >= 1\n";
 		exit(1);
 	}
 
@@ -732,6 +723,10 @@ const RoutingTable& Configuration::GRTable() const
 const RoutingTable& Configuration::SubGRTable() const
 {
 	return *sub_table;
+}
+const RoutingTable& Configuration::VirtualSubGRTable() const
+{
+	return *virtual_sub_table;
 }
 bool Configuration::Subnetwork() const
 {

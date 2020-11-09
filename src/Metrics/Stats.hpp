@@ -8,14 +8,15 @@
 
 
 
-struct BufferSignature
+struct RelaySignature
 {
 	std::size_t relay_id;
 	std::size_t vc_id;
 
-	bool operator<(const BufferSignature& sig) const
+	bool operator<(const RelaySignature& sig) const
 	{
 		if (relay_id < sig.relay_id) return true;
+		if (relay_id > sig.relay_id) return false;
 		if (vc_id < sig.vc_id) return true;
 		return false;
 	}
@@ -32,9 +33,7 @@ class Stats
 {
 private:
 	const SimulationTimer Timer;
-	
-	
-	std::map<BufferSignature, BufferStats> Buffers;
+	std::map<RelaySignature, BufferStats> Buffers;
 
 public:
 	Stats(const SimulationTimer& timer);
@@ -43,8 +42,8 @@ public:
 	void StopStuckTimer(std::size_t relay, std::size_t vc);
 	void PushLoad(std::size_t relay, std::size_t vc, double load);
 
-	double GetMaxBufferStuckDelay(std::size_t relay, std::size_t vc) const;
-	double GetMaxBufferStuckDelay() const;
+	double GetMaxBufferStuckDelay(std::size_t relay, std::size_t vc);
+	double GetMaxBufferStuckDelay();
 	double GetAverageBufferLoad(std::size_t relay, std::size_t vc) const;
 	double GetAverageBufferLoad() const;
 };

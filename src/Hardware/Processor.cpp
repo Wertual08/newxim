@@ -27,7 +27,12 @@ Packet& Processor::GetQueueFront()
 
 void Processor::ReceiveFlit(Flit flit)
 {
-	if (flit.dst_id != local_id) throw std::runtime_error(
+	if (flit.dst_id == 18 && local_id == 19)
+	{
+		int k = 0;
+	}
+	if (flit.dst_id != local_id) 
+		throw std::runtime_error(
 		"Processor received a flit that does not belong to it. LocalID[" + 
 		std::to_string(local_id) + "] DestinationID[" + std::to_string(flit.dst_id) + "]");
 
@@ -89,9 +94,6 @@ Processor::Processor(sc_module_name, const SimulationTimer& timer, std::int32_t 
 {
 	SC_METHOD(Update);
 	sensitive << reset << clock.pos();
-
-	relay.SetVirtualChannels(1);
-	relay[0].Reserve(128);
 }
 
 Processor::Processor(const SimulationTimer& timer, std::int32_t id, 
@@ -141,7 +143,7 @@ void Processor::TXProcess()
 {
 	if (!Queue.Empty())
 	{
-		Flit flit = NextFlit();	// Generate a new flit
+		Flit flit = NextFlit();	
 
 		if (relay.Send(flit))
 		{

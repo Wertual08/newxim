@@ -21,10 +21,10 @@ private:
 
 protected:
 	std::vector<Relay> Relays;
-	std::size_t start_from_port;			// Port from which to start the reservation cycle
+	std::size_t start_from_port;		// Port from which to start the reservation cycle
 
-	std::int32_t PerformRoute(const RouteData& route_data);
-	bool Route(std::int32_t in_port, std::int32_t out_port);
+	std::int32_t PerformRoute(Flit& flit);
+	bool Route(std::int32_t in_port, std::int32_t out_port, std::int32_t vc);
 
 	virtual void TXProcess() = 0;		// The transmitting process
 	void RXProcess();					// The receiving process

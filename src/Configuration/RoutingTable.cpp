@@ -783,6 +783,32 @@ RoutingTable::RoutingTable(const Graph& graph, const std::string& generator)
 {
 	Load(graph, generator);
 }
+RoutingTable::RoutingTable(const Graph& graph, const Graph& sub_graph, const std::string& generator)
+{
+	RoutingTable sub_table(sub_graph, generator);
+
+	for (std::size_t s = 0; s < graph.size(); s++)
+	{
+		Nodes.push_back(Node());
+		for (std::size_t d = 0; d < graph.size(); d++)
+		{
+			Nodes[s].push_back(std::vector<std::int32_t>());
+			const auto& paths = sub_table[s][d];
+			for (std::int32_t p : paths)
+			{
+				if (p >= sub_graph[s].size())
+				{
+					Nodes[s][d].push_back(graph[s].size());
+				}
+				else
+				{
+					for (std::int32_t l : graph[s].links_to(sub_graph[s][p]))
+						Nodes[s][d].push_back(l);
+				}
+			}
+		}
+	}
+}
 
 bool RoutingTable::Load(const std::string& path)
 {
@@ -827,57 +853,6 @@ bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 	if (generator == "CIRCULANT_CLOCKWISE") return LoadCirculantClockwise(graph);
 	if (generator == "CIRCULANT_ADAPTIVE") return LoadCirculantAdaptive(graph);
 	return false;
-}
-bool RoutingTable::LoadTorusXY(const Graph& graph, std::int32_t w, std::int32_t h)
-{
-	Nodes.resize(graph.size());
-
-	for (std::int32_t x = 0; x < w; x++)
-	{
-		for (std::int32_t y = 0; y < h; y++)
-		{
-			std::int32_t id = y * w + x;
-			std::int32_t du = -1;
-			std::int32_t dl = -1;
-			std::int32_t dd = -1;
-			std::int32_t dr = -1;
-			if (y + 1 < h) du = graph[id].links_to((y + 1) * w + x)[0];
-			else du = graph[id].links_to(x)[0];
-			if (x - 1 >= 0) dl = graph[id].links_to(y * w + x - 1)[0];
-			else dl = graph[id].links_to(y * w + w - 1)[0];
-			if (y - 1 >= 0) dd = graph[id].links_to((y - 1) * w + x)[0];
-			else dd = graph[id].links_to((h - 1) * w + x)[0];
-			if (x + 1 < w) dr = graph[id].links_to(y * w + x + 1)[0];
-			else dr = graph[id].links_to(y * w)[0];
-
-			Nodes[id].resize(graph.size());
-			for (int dy = 0; dy < h; dy++)
-			{
-				for (int dx = 0; dx < w; dx++)
-				{
-					std::int32_t did = dy * w + dx;
-					if (did == id)
-					{
-						Nodes[id][did].push_back(graph[id].size());
-						continue;
-					}
-
-					std::int32_t udist = dy >= y ? dy - y : dy + h - y;
-					std::int32_t ldist = x >= dx ? x - dx : x + w - dx;
-					std::int32_t ddist = y >= dy ? y - dy : y + h - dy;
-					std::int32_t rdist = dx >= x ? dx - x : dx + w - x;
-
-					if (ldist >= rdist && rdist != 0) Nodes[id][did].push_back(dr); //return (int)Direction.East;
-					else if (ldist < rdist) Nodes[id][did].push_back(dl); //return (int)Direction.West;
-					else if (ddist >= udist && udist != 0) Nodes[id][did].push_back(du); //return (int)Direction.South;
-					else Nodes[id][did].push_back(dd); //return (int)Direction.North;
-					//else Nodes[id][did].push_back(graph[id].size());
-				}
-			}
-		}
-	}
-
-	return true;
 }
 
 void RoutingTable::push_back(Node&& node)

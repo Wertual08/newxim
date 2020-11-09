@@ -141,6 +141,7 @@ public:
 		if (rx_req.read() == !rx_current_level)
 		{
 			Flit received_flit = rx_flit.read();
+			received_flit.hop_no++;
 			auto& buffer = buffers[received_flit.vc_id];
 
 			if (buffer.Full()) throw std::runtime_error("Relay error: Buffer overflow.");
@@ -186,11 +187,13 @@ public:
 	}
 	Flit Pop()
 	{
-		std::size_t i = 0;
-		while (i < num_virtual_channels && buffers[(current_virtual_channel + i) % num_virtual_channels].Empty()) i++;
+		std::size_t vc_offset = current_virtual_channel;
 		current_virtual_channel = (current_virtual_channel + 1) % num_virtual_channels;
+		
+		std::size_t i = 0;
+		while (i < num_virtual_channels && buffers[(vc_offset + i) % num_virtual_channels].Empty()) i++;
 
-		if (i < num_virtual_channels) return buffers[(current_virtual_channel + i) % num_virtual_channels].Pop();
+		if (i < num_virtual_channels) return buffers[(vc_offset + i) % num_virtual_channels].Pop();
 		else return Flit();
 	}
 

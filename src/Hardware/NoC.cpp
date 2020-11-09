@@ -1,5 +1,6 @@
 #include "NoC.hpp"
 #include "RoutingSelection/RoutingTableBased.hpp"
+#include "RoutingSelection/RoutingFitSubnetwork.hpp"
 #include "RoutingSelection/SelectionRandom.hpp"
 #include "RoutingSelection/SelectionBufferLevel.hpp"
 #include "RoutingSelection/SelectionKeepSpace.hpp"
@@ -24,6 +25,7 @@
 std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config)
 {
 	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
+	if (config.RoutingAlgorithm() == "FIT_SUBNETWORK") return std::make_unique<RoutingFitSubnetwork>(config.GRTable(), config.VirtualSubGRTable());
 	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.TopologyGraph());
 	if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.TopologyGraph());
 	return FindTestRouting(config.RoutingAlgorithm(), config, config.GRTable());
@@ -92,6 +94,8 @@ void NoC::InitBase()
 
 		std::unique_ptr<Processor> ProcessorDevice = GetProcessor(Timer, id, Config);
 		ProcessorDevice->SetTrafficManager(*Traffic);
+		ProcessorDevice->relay.SetVirtualChannels(Config.VirtualChannels());
+		ProcessorDevice->relay[0].Reserve(Config.BufferDepth());
 
 		auto& tile = Tiles[id];
 		tile.SetRouter(RouterDevice);
@@ -185,7 +189,13 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 {
 	InitBase();
 
-	if (config.Subnetwork()) InitSubNetwork();
+	if (config.RouterType() == "PER_FLIT_SUBNETWORK" ||
+		config.RouterType() == "WORMHOLE_SUBNETWORK" ||
+		config.RouterType() == "WORMHOLE_FIXED_SUBNETWORK" ||
+		config.RouterType() == "WORMHOLE_FIT_SUBNETWORK")
+	{
+		InitSubNetwork();
+	}
 }
 NoC::~NoC()
 {

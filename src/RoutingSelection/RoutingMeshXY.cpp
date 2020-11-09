@@ -1,4 +1,5 @@
 #include "RoutingMeshXY.hpp"
+#include "../Hardware/Routers/Router.hpp"
 
 
 
@@ -28,13 +29,13 @@ RoutingMeshXY::RoutingMeshXY(std::int32_t w, std::int32_t h, const Graph& graph)
 {
 }
 
-std::vector<std::int32_t> RoutingMeshXY::Route(Router& router, const RouteData& route_data) const
+std::vector<std::int32_t> RoutingMeshXY::Route(Router& router, Flit& flit) const
 {
-    std::int32_t id = route_data.current_id;
-    std::int32_t x = GetXFromID(route_data.current_id);
-    std::int32_t y = GetYFromID(route_data.current_id);
-    std::int32_t dx = GetXFromID(route_data.dst_id) - x;
-    std::int32_t dy = GetYFromID(route_data.dst_id) - y;
+    std::int32_t id = router.LocalID;
+    std::int32_t x = GetXFromID(router.LocalID);
+    std::int32_t y = GetYFromID(router.LocalID);
+    std::int32_t dx = GetXFromID(flit.dst_id) - x;
+    std::int32_t dy = GetYFromID(flit.dst_id) - y;
 
     std::vector<std::int32_t> result;
     if (dx > 0) result = std::move(GetLinksTo(id, x + 1, y));

@@ -1,4 +1,5 @@
 #include "RoutingTorusXY.hpp"
+#include "../Hardware/Routers/Router.hpp"
 
 
 
@@ -28,20 +29,20 @@ RoutingTorusXY::RoutingTorusXY(std::int32_t w, std::int32_t h, const Graph& grap
 {
 }
 
-std::vector<std::int32_t> RoutingTorusXY::Route(Router& router, const RouteData& route_data) const
+std::vector<std::int32_t> RoutingTorusXY::Route(Router& router, Flit& flit) const
 {
-    std::int32_t prev_id = route_data.current_id;
-    if (route_data.dir_in < TorusGraph[route_data.current_id].size())
-        prev_id = TorusGraph[route_data.current_id][route_data.dir_in];
+    std::int32_t prev_id = router.LocalID;
+    if (flit.dir_in < TorusGraph[router.LocalID].size())
+        prev_id = TorusGraph[router.LocalID][flit.dir_in];
     std::int32_t prev_vc = 0;
-    for (std::int32_t i = 0; i < TorusGraph[route_data.current_id].links_to(prev_id).size(); i++)
-        if (TorusGraph[route_data.current_id].links_to(prev_id)[i] == route_data.dir_in) prev_vc = i;
+    for (std::int32_t i = 0; i < TorusGraph[router.LocalID].links_to(prev_id).size(); i++)
+        if (TorusGraph[router.LocalID].links_to(prev_id)[i] == flit.dir_in) prev_vc = i;
 
-    std::int32_t id = route_data.current_id;
-    std::int32_t x = GetXFromID(route_data.current_id);
-    std::int32_t y = GetYFromID(route_data.current_id);
-    std::int32_t dx = GetXFromID(route_data.dst_id) - x;
-    std::int32_t dy = GetYFromID(route_data.dst_id) - y;
+    std::int32_t id = router.LocalID;
+    std::int32_t x = GetXFromID(router.LocalID);
+    std::int32_t y = GetYFromID(router.LocalID);
+    std::int32_t dx = GetXFromID(flit.dst_id) - x;
+    std::int32_t dy = GetYFromID(flit.dst_id) - y;
 
     std::int32_t ax = abs(dx) * 2;
     std::int32_t ay = abs(dy) * 2;

@@ -26,22 +26,14 @@ void PerFlitSubnetworkRouter::TXProcess()
 		if (in_relay.FlitAvailable())
 		{
 			Flit flit = in_relay.Front();
-
-			RouteData route_data;
-			route_data.hop_no = flit.hop_no;
-			route_data.current_id = LocalID;
-			route_data.src_id = flit.src_id;
-			route_data.dst_id = flit.dst_id;
-			route_data.dir_in = in_port;
-			route_data.sequence_length = flit.sequence_length;
-			std::int32_t out_port = PerformRoute(route_data);
+			std::int32_t out_port = PerformRoute(flit);
 			if (out_port < 0) continue;
 
 			// TODO: Maybe it should select one of the channels... (Apply selection strategy???)
 			if (Relays[out_port].GetFreeSlots(flit.vc_id) < 1)
 				out_port = SubnetworkTable[flit.dst_id][0];
 
-			Route(in_port, out_port);
+			Route(in_port, out_port, flit.vc_id);
 		}
 	} // for loop directions
 

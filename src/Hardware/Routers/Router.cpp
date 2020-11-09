@@ -28,7 +28,6 @@ void Router::Update()
 {
 	if (reset.read())
 	{
-		// Clear outputs and indexes of transmitting protocol
 		for (std::size_t i = 0; i < Relays.size(); i++)
 			Relays[i].Reset();
 
@@ -50,25 +49,27 @@ void Router::Update()
 	}
 }
 
-std::int32_t Router::PerformRoute(const RouteData& route_data)
+std::int32_t Router::PerformRoute(Flit& flit)
 {
-	if (route_data.dst_id == LocalID) return LocalRelayID;
+	if (flit.dst_id == LocalID) return LocalRelayID;
 
 	power.routing();
 	power.selection();
-	return Selection->Apply(*this, Routing->Route(*this, route_data), route_data);
+	return Selection->Apply(*this, flit, Routing->Route(*this, flit));
 }
-bool Router::Route(std::int32_t in_port, std::int32_t out_port)
+bool Router::Route(std::int32_t in_port, std::int32_t out_port, std::int32_t vc)
 {
 	Relay& in_relay = Relays[in_port];
 	Relay& out_relay = Relays[out_port];
 
 	Flit flit = in_relay.Front();
-	flit.hop_no++;
+	flit.dir_in = in_port;
+	flit.vc_id = vc;
 
 	if (out_relay.Send(flit))
 	{
 		flit = in_relay.Pop();
+		flit.dir_in = in_port;
 
 		/* Power & Stats ------------------------------------------------- */
 		stats.StopStuckTimer(in_port, flit.vc_id);

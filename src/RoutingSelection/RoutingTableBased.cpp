@@ -6,7 +6,7 @@ RoutingTableBased::RoutingTableBased(const RoutingTable& table) : Table(table)
 {
 }
 
-std::vector<std::int32_t> RoutingTableBased::Route(Router& router, const RouteData& route_data) const
+std::vector<std::int32_t> RoutingTableBased::Route(Router& router, Flit& flit) const
 {
-    return Table[route_data.current_id][route_data.dst_id];
+    return Table[router.LocalID][flit.dst_id];
 }
