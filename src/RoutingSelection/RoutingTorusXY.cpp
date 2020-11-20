@@ -29,7 +29,7 @@ RoutingTorusXY::RoutingTorusXY(std::int32_t w, std::int32_t h, const Graph& grap
 {
 }
 
-std::vector<std::int32_t> RoutingTorusXY::Route(Router& router, Flit& flit) const
+std::vector<Connection> RoutingTorusXY::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TorusGraph[router.LocalID].size())
@@ -56,28 +56,28 @@ std::vector<std::int32_t> RoutingTorusXY::Route(Router& router, Flit& flit) cons
         dy = -dy;
     }
 
-    std::vector<std::int32_t> result; 
+    std::vector<Connection> result;
     if (dx > 0)
     {
         if (x + 1 >= TorusW) prev_vc += 1;
-        result.push_back(GetLinksTo(id, x + 1, y)[prev_vc]);
+        result.push_back({ GetLinksTo(id, x + 1, y)[prev_vc], 0 });
     }
     else if (dx < 0)
     {
         if (x - 1 < 0) prev_vc += 1;
-        result.push_back(GetLinksTo(id, x - 1, y)[prev_vc]);
+        result.push_back({ GetLinksTo(id, x - 1, y)[prev_vc], 0 });
     }
     else if (dy > 0)
     {
         if (y + 1 >= TorusH) prev_vc += 1;
-        result.push_back(GetLinksTo(id, x, y + 1)[prev_vc]);
+        result.push_back({ GetLinksTo(id, x, y + 1)[prev_vc], 0 });
     }
     else if (dy < 0)
     {
         if (y - 1 < 0) prev_vc += 1;
-        result.push_back(GetLinksTo(id, x, y - 1)[prev_vc]);
+        result.push_back({ GetLinksTo(id, x, y - 1)[prev_vc], 0 });
     }
-    else result.push_back(TorusGraph[id].size());
+    else result.push_back({ static_cast<std::int32_t>(TorusGraph[id].size()), 0 });
 
     return result;
 }

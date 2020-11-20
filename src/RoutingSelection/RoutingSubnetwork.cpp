@@ -1,14 +1,14 @@
-#include "RoutingFitSubnetwork.hpp"
+#include "RoutingSubnetwork.hpp"
 #include "../Hardware/Routers/Router.hpp"
 
 
 
-RoutingFitSubnetwork::RoutingFitSubnetwork(const RoutingTable& table, const RoutingTable& subnetwork) :
+RoutingSubnetwork::RoutingSubnetwork(const RoutingTable& table, const RoutingTable& subnetwork) :
 	Table(table), SubnetworkTable(subnetwork)
 {
 }
 
-std::vector<Connection> RoutingFitSubnetwork::Route(const Router& router, const Flit& flit) const
+std::vector<Connection> RoutingSubnetwork::Route(const Router& router, const Flit& flit) const
 {
 	std::vector<Connection> result;
 
@@ -16,7 +16,7 @@ std::vector<Connection> RoutingFitSubnetwork::Route(const Router& router, const 
 	for (auto port : ports)
 	{
 		Connection con = { port, 0 };
-		if (router.DestinationFreeSlots(con) >= flit.sequence_length)
+		if (router.DestinationFreeSlots(con) >= 1)
 		{
 			result.push_back(con);
 		}
@@ -28,7 +28,7 @@ std::vector<Connection> RoutingFitSubnetwork::Route(const Router& router, const 
 		for (auto port : ports)
 		{
 			Connection con = { port, 1 };
-			if (router.DestinationFreeSlots(con) >= flit.sequence_length)
+			if (router.DestinationFreeSlots(con) >= 1)
 			{
 				result.push_back(con);
 			}

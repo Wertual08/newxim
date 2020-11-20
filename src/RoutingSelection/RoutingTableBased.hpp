@@ -13,5 +13,5 @@ private:
 public:
 	RoutingTableBased(const RoutingTable& table);
 
-	std::vector<std::int32_t> Route(Router& router, Flit& flit) const override;
+	std::vector<Connection> Route(const Router& router, const Flit& flit) const override;
 };

@@ -17,7 +17,7 @@ std::ostream& operator<<(std::ostream& os, const AdjacencyMatrix& g)
 	return os;
 }
 
-void Graph::find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector<PathNode> path, const std::vector<std::int32_t>& weights, std::int32_t dest) const
+void Graph::find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector<PathNode> path, const std::vector<std::int32_t>& weights, std::int32_t src) const
 {
 	PathNode node = path[path.size() - 1];
 
@@ -29,7 +29,7 @@ void Graph::find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector
 	while (links_to[i] != node.ORelay) i++;
 	new_node.IRelay = at(new_node.NodeID).links_to(node.NodeID)[i];
 
-	if (new_node.NodeID == dest)
+	if (new_node.NodeID == src)
 	{
 		new_node.ORelay = -1;
 		path.push_back(new_node);
@@ -45,11 +45,11 @@ void Graph::find_shortest(std::vector<std::vector<PathNode>>& paths, std::vector
 			auto new_path = path;
 			new_node.ORelay = i;
 			new_path.push_back(new_node);
-			find_shortest(paths, new_path, weights, dest);
+			find_shortest(paths, new_path, weights, src);
 		}
 	}
 }
-void Graph::find_shortest(std::vector<std::vector<std::int32_t>>& paths, std::vector<std::int32_t> path, const std::vector<std::int32_t>& weights, std::int32_t dest) const
+void Graph::find_shortest(std::vector<std::vector<std::int32_t>>& paths, std::vector<std::int32_t> path, const std::vector<std::int32_t>& weights, std::int32_t src) const
 {
 	std::int32_t node = path[path.size() - 1];
 
@@ -60,8 +60,8 @@ void Graph::find_shortest(std::vector<std::vector<std::int32_t>>& paths, std::ve
 		{
 			auto new_path = path;
 			new_path.push_back(at(node)[i]);
-			if (at(node)[i] == dest) paths.push_back(new_path);
-			else find_shortest(paths, new_path, weights, dest);
+			if (at(node)[i] == src) paths.push_back(new_path);
+			else find_shortest(paths, new_path, weights, src);
 		}
 	}
 }

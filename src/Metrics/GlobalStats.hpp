@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include <systemc.h>
 #include <vector>
 #include <map>
 #include "Configuration/Configuration.hpp"
@@ -16,8 +17,10 @@
 
 
 
-class GlobalStats
+class GlobalStats : public sc_module
 {
+	SC_HAS_PROCESS(GlobalStats);
+
 private:
 	const Configuration& Config;
 	const NoC& Network;
@@ -56,8 +59,18 @@ private:
 
 	void ShowBuffers(std::ostream& out) const;
 
+	void Update();
+
+	void FinishStats() const;
+
+	GlobalStats(sc_module_name name, const NoC& network, const Configuration& config);
+
 public:
-	GlobalStats(const NoC& network, const Configuration& config);
+	sc_in_clk clock; 
+	sc_in<bool> reset;
+	
+	GlobalStats(const NoC& network, const Configuration& config) :
+		GlobalStats("GS", network, config) { } 
 
 	// Shows global statistics
 	friend std::ostream& operator<<(std::ostream& out, const GlobalStats& gs);

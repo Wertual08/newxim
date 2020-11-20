@@ -27,10 +27,6 @@ Packet& Processor::GetQueueFront()
 
 void Processor::ReceiveFlit(Flit flit)
 {
-	if (flit.dst_id == 18 && local_id == 19)
-	{
-		int k = 0;
-	}
 	if (flit.dst_id != local_id) 
 		throw std::runtime_error(
 		"Processor received a flit that does not belong to it. LocalID[" + 
@@ -136,7 +132,6 @@ void Processor::Update()
 
 		TXProcess();
 		RXProcess();
-		relay.UpdateFreeSlots();
 	}
 }
 void Processor::TXProcess()
@@ -154,12 +149,10 @@ void Processor::TXProcess()
 }
 void Processor::RXProcess()
 {
-	if (relay.Receive())
+	relay.Receive();
+	if (relay.FlitAvailable())
 	{
-		if (relay.FlitAvailable())
-		{
-			ReceiveFlit(relay.Pop());
-		}
+		ReceiveFlit(relay.Pop());
 	}
 }
 

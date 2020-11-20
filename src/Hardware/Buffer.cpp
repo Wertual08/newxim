@@ -96,19 +96,24 @@ std::ostream& operator<<(std::ostream& os, const Buffer& b)
 {
 	std::queue<Flit> m = b.buffer;
 
-	constexpr char t[] = "HBT";
-
 	os << '[';
 	while (m.size() > 1)
 	{
 		Flit f = m.front();
 		m.pop();
-		os << t[static_cast<std::int32_t>(f.flit_type)] << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << ") | ";
+
+		if (HasFlag(f.flit_type, FlitType::Head)) os << 'H';
+		if (HasFlag(f.flit_type, FlitType::Body)) os << 'B';
+		if (HasFlag(f.flit_type, FlitType::Tail)) os << 'T';
+		os << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << ") | ";
 	}
 	if (!m.empty())
 	{
 		Flit f = m.front();
-		os << t[static_cast<std::int32_t>(f.flit_type)] << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << ')';
+		if (HasFlag(f.flit_type, FlitType::Head)) os << 'H';
+		if (HasFlag(f.flit_type, FlitType::Body)) os << 'B';
+		if (HasFlag(f.flit_type, FlitType::Tail)) os << 'T';
+		os << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << ')';
 	}
 	os << ']';
 

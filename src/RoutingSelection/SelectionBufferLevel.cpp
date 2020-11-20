@@ -3,23 +3,23 @@
 
 
 
-std::int32_t SelectionBufferLevel::Apply(Router& router, Flit& flit, const std::vector<std::int32_t>& directions) const
+Connection SelectionBufferLevel::Apply(const Router& router, const Flit& flit, const std::vector<Connection>& directions) const
 {
-	std::vector<std::int32_t> best_dirs;
+	std::vector<Connection> best_dirs;
 	std::int32_t max_free_slots = 0;
 	for (std::int32_t i = 0; i < directions.size(); i++)
 	{
-		std::int32_t dir = directions[i];
+		Connection dst = directions[i];
 		
-		std::int32_t free_slots = router[dir][flit.vc_id].GetFreeSlots();
+		std::int32_t free_slots = router.DestinationFreeSlots(dst);
 
 		if (free_slots > max_free_slots) 
 		{
 			max_free_slots = free_slots;
 			best_dirs.clear();
-			best_dirs.push_back(dir);
+			best_dirs.push_back(dst);
 		}
-		else if (free_slots == max_free_slots) best_dirs.push_back(dir);
+		else if (free_slots == max_free_slots) best_dirs.push_back(dst);
 	}
 
 	if (best_dirs.size()) return best_dirs[rand() % best_dirs.size()];

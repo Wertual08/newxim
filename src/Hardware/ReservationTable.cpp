@@ -1,43 +1,44 @@
 #include "ReservationTable.hpp"
+#include <algorithm>
 
 
 
-ReservationTable::ReservationTable(std::int32_t ports, std::int32_t vcs) :
-	PortsCount(ports), Table(ports * vcs, -1), VirtualTable(ports * vcs, -1)
+ReservationTable::ReservationTable(std::int32_t ports, std::int32_t vcs) 
 {
 }
 
-void ReservationTable::Reserve(std::int32_t port_in, std::int32_t vc_in, std::int32_t port_out, std::int32_t vc_out)
+void ReservationTable::Reserve(Connection dest_in, Connection dest_out)
 {
-	Table[port_in + vc_in * PortsCount] = port_out;
-	VirtualTable[port_in + vc_in * PortsCount] = vc_out;
+	Table.push_back({ dest_in, dest_out });
 }
-void ReservationTable::Release(std::int32_t port_in, std::int32_t vc_in)
+void ReservationTable::Release(Connection dest_in)
 {
-	Table[port_in + vc_in * PortsCount] = -1;
-	VirtualTable[port_in + vc_in * PortsCount] = -1;
+	std::size_t s = 0;
+	for (std::size_t i = 0; i < Table.size(); i++)
+		if (Table[i].in != dest_in) Table[s++] = Table[i];
+
+	Table.resize(s);
 }
-bool ReservationTable::Reserved(std::int32_t port_out, std::int32_t vc_out) const
+bool ReservationTable::Reserved(Connection dest_in, Connection dest_out) const
 {
 	for (std::size_t i = 0; i < Table.size(); i++)
-		if (Table[i] == port_out && VirtualTable[i] == vc_out) return true;
+		if (Table[i].in.port == dest_in.port || Table[i].out.port == dest_out.port) return true;
 	return false;
 }
-std::int32_t ReservationTable::Reservation(std::int32_t port_in, std::int32_t vc_in) const
+Connection ReservationTable::operator[](Connection dest_in) const
 {
-	return Table[port_in + vc_in * PortsCount];
-}
-std::int32_t ReservationTable::ReservationVC(std::int32_t port_in, std::int32_t vc_in) const
-{
-	return VirtualTable[port_in + vc_in * PortsCount];
+	for (const auto& node : Table)
+		if (node.in == dest_in)
+			return node.out;
+	return Connection();
 }
 
 std::ostream& operator<<(std::ostream& os, const ReservationTable& table)
 {
-	for (std::int32_t p = 0; p < table.PortsCount; p++)
+	auto t = table.Table;
+	for (const auto& node : t)
 	{
-		std::int32_t r = table.Table[p];
-		os << p << " >> " << r << '\n';
+		os << node.in << " >> " << node.out << '\n';
 	}
 	return os;
 }

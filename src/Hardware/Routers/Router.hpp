@@ -5,6 +5,8 @@
 #include "Metrics/Stats.hpp"
 #include "RoutingSelection/RoutingAlgorithm.hpp"
 #include "RoutingSelection/SelectionStrategy.hpp"
+#include "Hardware/Connection.hpp"
+#include "Hardware/ReservationTable.hpp"
 
 
 
@@ -23,8 +25,8 @@ protected:
 	std::vector<Relay> Relays;
 	std::size_t start_from_port;		// Port from which to start the reservation cycle
 
-	std::int32_t PerformRoute(Flit& flit);
-	bool Route(std::int32_t in_port, std::int32_t out_port, std::int32_t vc);
+	Connection FindDestination/*...unknown...*/(const Flit& flit);
+	bool Route(std::int32_t in_port, Connection dst);
 
 	virtual void TXProcess() = 0;		// The transmitting process
 	void RXProcess();					// The receiving process
@@ -48,8 +50,14 @@ public:
 
 	std::size_t Size() const { return Relays.size(); }
 	Relay& operator[](std::size_t i) { return Relays[i]; }
+	const Relay& operator[](std::size_t i) const { return Relays[i]; }
+	Buffer& operator[](Connection d) { return Relays[d.port][d.vc]; }
+	const Buffer& operator[](Connection d) const { return Relays[d.port][d.vc]; }
 
 	std::size_t TotalBufferedFlits() const;
+	std::size_t DestinationFreeSlots(Connection dst) const;
+
+	virtual const ReservationTable* GetReservationTable() const { return nullptr; }
 };
 
 

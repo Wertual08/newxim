@@ -12,14 +12,16 @@ void PerFlitRouter::TXProcess()
 		if (rel.FlitAvailable())
 		{
 			Flit flit = rel.Front();
-			flit.dir_in = in_port;
-			std::int32_t res = PerformRoute(flit);
-			if (res < 0) continue;
+			
+			Connection dst = FindDestination(flit);
 
-			Route(in_port, res, flit.vc_id);
+			if (!dst.valid()) continue;
+
+			Route(in_port, dst);
 		}
 	} // for loop directions
 
+	for (auto& relay : Relays) relay.Skip();
 }
 
 PerFlitRouter::PerFlitRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :

@@ -4,11 +4,6 @@
 
 
 
-GlobalStats::GlobalStats(const NoC& network, const Configuration& config) : 
-	Network(network), Config(config)
-{
-}
-
 std::size_t GlobalStats::GetActualFlitsReceived() const
 {
 	std::size_t n = 0;
@@ -222,10 +217,9 @@ void GlobalStats::ShowBuffers(std::ostream& out) const
 			const auto& relay = (*Network.Tiles[i].RouterDevice)[r];
 			for (std::size_t vc = 0; vc < relay.Size(); vc++)
 			{
-				out << '[';
-				out << i << "<-(" << r << ':' << vc << ")--";
-				if (r < node.size()) out << node[r] << ']';
-				else out << "L]";
+				if (r < node.size()) out << '[' << node[r];
+				else out << "[L";
+				out << "--(" << r << ':' << vc << ")->" << i << ']';
 				out << ": " << static_cast<std::int32_t>(stats.GetMaxBufferStuckDelay(r, vc)) << " ";
 				out << relay[vc] << '\n';
 			}
@@ -233,8 +227,58 @@ void GlobalStats::ShowBuffers(std::ostream& out) const
 	}
 }
 
+void GlobalStats::Update()
+{
+	if (Network.Timer.SimulationTime() < Config.SimulationTime() - 37252) return;
+
+	std::cout << "Cycle " << Network.Timer.SimulationTime() << ":\n";
+	ShowBuffers(std::cout);
+
+	for (const auto& tile : Network.Tiles)
+	{
+		auto rt = tile.RouterDevice->GetReservationTable();
+		if (rt)
+		{
+			std::cout << "Reservation table " << tile.RouterDevice->LocalID << ":\n";
+			std::cout << *rt;
+		}
+	}
+}
+
+void GlobalStats::FinishStats() const
+{
+	for (std::size_t i = 0; i < Config.TopologyGraph().size(); i++)
+	{
+		auto& node = Config.TopologyGraph()[i];
+		auto& stats = Network.Tiles[i].RouterDevice->stats;
+		for (std::size_t r = 0; r < Network.Tiles[i].RouterDevice->Size(); r++)
+		{
+			const auto& relay = (*Network.Tiles[i].RouterDevice)[r];
+			for (std::size_t vc = 0; vc < relay.Size(); vc++)
+			{
+				stats.StopStuckTimer(r, vc);
+			}
+		}
+	}
+}
+
+GlobalStats::GlobalStats(sc_module_name name, const NoC& network, const Configuration& config) :
+	Network(network), Config(config)
+{
+	if (config.ReportCycleResult())
+	{
+		SC_METHOD(Update);
+		sensitive << reset << clock.pos();
+	}
+
+	clock(network.clock);
+	reset(network.reset);
+}
+
 std::ostream& operator<<(std::ostream& out, const GlobalStats& gs)
 {
+	gs.FinishStats();
+
 	out << "% Total produced flits: " << gs.GetFlitsProduced() << '\n';
 	out << "% Total accepted flits: " << gs.GetFlitsAccepted() << '\n';
 	out << "% Total received flits: " << gs.GetFlitsReceived() << '\n';

@@ -2,8 +2,8 @@
 
 
 
-std::int32_t SelectionRandom::Apply(Router& router, Flit& flit, const std::vector<std::int32_t>& directions) const
+Connection SelectionRandom::Apply(const Router& router, const Flit& flit, const std::vector<Connection>& directions) const
 {
-    if (directions.size() == 0) return -1;
+    if (directions.size() == 0) return Connection();
     else return directions[rand() % directions.size()];
 }

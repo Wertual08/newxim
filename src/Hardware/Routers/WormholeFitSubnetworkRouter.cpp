@@ -26,23 +26,23 @@ void WormholeFitSubnetworkRouter::TXProcess()
 		if (rel.FlitAvailable())
 		{
 			Flit flit = rel.Front();
-			std::int32_t vc_in = flit.vc_id;
-			flit.dir_in = in_port;
+			
 			power.bufferRouterFront();
 
 			if (HasFlag(flit.flit_type, FlitType::Head))
 			{
-				std::int32_t out_port = PerformRoute(flit);
-				if (out_port < 0) continue;
+				Connection src = { in_port, flit.vc_id };
+				Connection dst = FindDestination(flit); 
+				if (!dst.valid()) continue;
 
 				// TODO: Maybe it should select one of the channels... (Apply selection strategy???)
-				if (Relays[out_port].GetFreeSlots(flit.vc_id) < flit.sequence_length)
-					out_port = SubnetworkTable[flit.dst_id][0];
-				if (Relays[out_port].GetFreeSlots(flit.vc_id) < flit.sequence_length)
+				if (DestinationFreeSlots(dst) < flit.sequence_length)
+					dst.port = SubnetworkTable[flit.dst_id][0];
+				if (DestinationFreeSlots(dst) < flit.sequence_length)
 					continue;
 
-				if (!reservation_table.Reserved(out_port, flit.vc_id))
-					reservation_table.Reserve(in_port, vc_in, out_port, flit.vc_id);
+				if (!reservation_table.Reserved(src, dst))
+					reservation_table.Reserve(src, dst);
 			}
 		}
 	}
@@ -54,18 +54,18 @@ void WormholeFitSubnetworkRouter::TXProcess()
 		if (rel.FlitAvailable())
 		{
 			Flit flit = rel.Front();
-			std::int32_t vc_in = flit.vc_id;
 
-			std::int32_t res = reservation_table.Reservation(in_port, vc_in);
-			std::int32_t vc = reservation_table.ReservationVC(in_port, vc_in);
-			if (res < 0) continue;
+			Connection src = { in_port, flit.vc_id };
+			Connection dst = reservation_table[src];
 
-			flit.vc_id = vc;
-			flit.dir_in = in_port;
-			if (Route(in_port, res, flit.vc_id) && HasFlag(flit.flit_type, FlitType::Tail))
-				reservation_table.Release(in_port, vc_in);
+			if (!dst.valid()) continue;
+
+			if (Route(in_port, dst) && HasFlag(flit.flit_type, FlitType::Tail))
+				reservation_table.Release(src);
 		}
 	}
+
+	for (auto& relay : Relays) relay.Skip();
 }
 
 WormholeFitSubnetworkRouter::WormholeFitSubnetworkRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :

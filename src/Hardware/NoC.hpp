@@ -22,7 +22,6 @@ class NoC : sc_module
 {
 private:
 	const Configuration& Config;
-	const SimulationTimer Timer;
 	std::unique_ptr<RoutingAlgorithm> Algorithm;
 	std::unique_ptr<SelectionStrategy> Strategy;
 	std::unique_ptr<TrafficManager> Traffic;
@@ -31,6 +30,7 @@ private:
 	void InitSubNetwork();
 
 public:
+	const SimulationTimer Timer;
 	sc_clock clock;
 	sc_signal<bool> reset;
 

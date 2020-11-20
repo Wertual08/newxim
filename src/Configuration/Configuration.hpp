@@ -75,6 +75,7 @@ private:
 	bool report_sub_routing_table;
 	bool report_topology_sub_graph;
 	bool report_topology_sub_graph_adjacency_matrix;
+	bool report_cycle_result;
 
 	std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>> hotspots;
 
@@ -133,6 +134,7 @@ public:
 	const Power& PowerConfiguration() const;
 	bool ReportProgress() const;
 	bool ReportBuffers() const;
+	bool ReportCycleResult() const;
 
 	std::int32_t DimX() const;
 	std::int32_t DimY() const;

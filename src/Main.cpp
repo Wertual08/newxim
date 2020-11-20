@@ -16,7 +16,7 @@
 #include "Configuration/Configuration.hpp"
 #include "Metrics/ProgressBar.hpp"
 
-const static std::string Version = "0.0.0.4";
+const static std::string Version = "0.0.0.5";
 
 
 
@@ -28,13 +28,13 @@ int sc_main(int arg_num, char* arg_vet[])
 	std::cout << "        Version: " << Version << '\n';
 	std::cout << "    --------------------------------------------------------\n";
 
-	//cout << "Catania V., Mineo A., Monteleone S., Palesi M., and Patti D. (2016) Cycle-Accurate Network on Chip Simulation with Noxim. ACM Trans. Model. Comput. Simul. 27, 1, Article 4 (August 2016), 25 pages. DOI: https://doi.org/10.1145/2953878" << endl;
 	std::cout << "\n\n";
 
 	Configuration Config(arg_num, arg_vet);
-
 	SimulationTimer Timer(Config.ClockPeriodPS(), Config.ResetTime(), Config.StatsWarmUpTime(), Config.SimulationTime());
 	NoC Network(Config, Timer);
+	GlobalStats stats(Network, Config);
+
 	std::unique_ptr<ProgressBar> Bar;
 	if (Config.ReportProgress()) Bar = std::make_unique<ProgressBar>(std::cout, Timer, 20, Network.clock);
 
@@ -58,6 +58,6 @@ int sc_main(int arg_num, char* arg_vet[])
 	std::cout << '\n';
 
 	// Show statistics
-	std::cout << GlobalStats(Network, Config);
+	std::cout << stats;
 	return 0;
 }

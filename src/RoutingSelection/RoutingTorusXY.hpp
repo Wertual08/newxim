@@ -18,5 +18,5 @@ private:
 public:
 	RoutingTorusXY(std::int32_t w, std::int32_t h, const Graph& graph);
 
-	std::vector<std::int32_t> Route(Router& router, Flit& flit) const override;
+	std::vector<Connection> Route(const Router& router, const Flit& flit) const override;
 };

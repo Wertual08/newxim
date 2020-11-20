@@ -18,6 +18,9 @@ Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, st
 	Routing(nullptr),
 	Selection(nullptr)
 {
+	for (std::int32_t i = 0; i < Relays.size(); i++)
+		Relays[i].SetLocalID(i);
+
 	SC_METHOD(Update);
 	sensitive << reset << clock.pos();
 
@@ -49,27 +52,25 @@ void Router::Update()
 	}
 }
 
-std::int32_t Router::PerformRoute(Flit& flit)
+Connection Router::FindDestination(const Flit& flit) 
 {
-	if (flit.dst_id == LocalID) return LocalRelayID;
+	if (flit.dst_id == LocalID) return { LocalRelayID, 0 };
 
 	power.routing();
 	power.selection();
 	return Selection->Apply(*this, flit, Routing->Route(*this, flit));
 }
-bool Router::Route(std::int32_t in_port, std::int32_t out_port, std::int32_t vc)
+bool Router::Route(std::int32_t in_port, Connection dst)
 {
 	Relay& in_relay = Relays[in_port];
-	Relay& out_relay = Relays[out_port];
+	Relay& out_relay = Relays[dst.port];
 
 	Flit flit = in_relay.Front();
-	flit.dir_in = in_port;
-	flit.vc_id = vc;
+	flit.vc_id = dst.vc;
 
 	if (out_relay.Send(flit))
 	{
 		flit = in_relay.Pop();
-		flit.dir_in = in_port;
 
 		/* Power & Stats ------------------------------------------------- */
 		stats.StopStuckTimer(in_port, flit.vc_id);
@@ -80,7 +81,7 @@ bool Router::Route(std::int32_t in_port, std::int32_t out_port, std::int32_t vc)
 		power.bufferRouterPop();
 		power.crossBar();
 
-		if (out_port == LocalRelayID)
+		if (dst.port == LocalRelayID)
 		{
 			power.networkInterface();
 		}
@@ -106,8 +107,6 @@ void Router::RXProcess()
 				power.networkInterface();
 			}
 		}
-
-		Relays[i].UpdateFreeSlots();
 	}
 }
 
@@ -135,4 +134,8 @@ std::size_t Router::TotalBufferedFlits() const
 		}
 	}
 	return count;
+}
+std::size_t Router::DestinationFreeSlots(Connection dst) const
+{
+	return Relays[dst.port].GetFreeSlots(dst.vc);
 }

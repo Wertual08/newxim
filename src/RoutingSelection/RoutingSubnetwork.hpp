@@ -5,7 +5,7 @@
 
 
 
-class RoutingFitSubnetwork : public RoutingAlgorithm
+class RoutingSubnetwork : public RoutingAlgorithm
 {
 private:
 	const RoutingTable& Table;
@@ -13,7 +13,7 @@ private:
 
 
 public:
-	RoutingFitSubnetwork(const RoutingTable& table, const RoutingTable& subnetwork);
+	RoutingSubnetwork(const RoutingTable& table, const RoutingTable& subnetwork);
 
 	std::vector<Connection> Route(const Router& router, const Flit& flit) const override;
 };

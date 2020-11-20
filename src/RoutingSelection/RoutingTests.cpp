@@ -29,9 +29,9 @@ TEST_RoutingChannelNextIDGraterCurrent::TEST_RoutingChannelNextIDGraterCurrent(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelNextIDGraterCurrent::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelNextIDGraterCurrent::Route(const Router& router, const Flit& flit) const
 {
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t vc = 0;// prev_vc;
@@ -42,7 +42,7 @@ std::vector<std::int32_t> TEST_RoutingChannelNextIDGraterCurrent::Route(Router& 
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
 
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
@@ -55,9 +55,9 @@ TEST_RoutingChannelPrevIDGraterCurrent::TEST_RoutingChannelPrevIDGraterCurrent(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelPrevIDGraterCurrent::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelPrevIDGraterCurrent::Route(const Router& router, const Flit& flit) const
 {
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
 
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TopologyGraph[router.LocalID].size())
@@ -73,7 +73,7 @@ std::vector<std::int32_t> TEST_RoutingChannelPrevIDGraterCurrent::Route(Router& 
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
 
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
@@ -86,9 +86,9 @@ TEST_RoutingChannelPrevIDGraterNext::TEST_RoutingChannelPrevIDGraterNext(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelPrevIDGraterNext::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelPrevIDGraterNext::Route(const Router& router, const Flit& flit) const
 {
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
 
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TopologyGraph[router.LocalID].size())
@@ -104,7 +104,7 @@ std::vector<std::int32_t> TEST_RoutingChannelPrevIDGraterNext::Route(Router& rou
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
 
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
@@ -117,9 +117,9 @@ TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::TEST_RoutingChannelNextI
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelNextIDGraterCurrentDirectionInverse::Route(const Router& router, const Flit& flit) const
 {
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
 
     std::int32_t dist = router.LocalID - flit.dst_id;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
@@ -134,7 +134,7 @@ std::vector<std::int32_t> TEST_RoutingChannelNextIDGraterCurrentDirectionInverse
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
 
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
@@ -147,9 +147,9 @@ TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::TEST_RoutingChannelPrevI
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse::Route(const Router& router, const Flit& flit) const
 {
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
 
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TopologyGraph[router.LocalID].size())
@@ -168,7 +168,7 @@ std::vector<std::int32_t> TEST_RoutingChannelPrevIDGraterCurrentDirectionInverse
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
 
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
@@ -181,9 +181,9 @@ TEST_RoutingChannelSourceID::TEST_RoutingChannelSourceID(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelSourceID::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelSourceID::Route(const Router& router, const Flit& flit) const
 {
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     std::int32_t vc = router.LocalID < TopologyGraph.size() / 2 ? 0 : 1;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
@@ -191,7 +191,7 @@ std::vector<std::int32_t> TEST_RoutingChannelSourceID::Route(Router& router, Fli
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -203,9 +203,9 @@ TEST_RoutingChannelDestinationID::TEST_RoutingChannelDestinationID(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelDestinationID::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelDestinationID::Route(const Router& router, const Flit& flit) const
 {
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     std::int32_t vc = flit.dst_id < TopologyGraph.size() / 2 ? 0 : 1;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
@@ -213,7 +213,7 @@ std::vector<std::int32_t> TEST_RoutingChannelDestinationID::Route(Router& router
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -225,7 +225,7 @@ TEST_RoutingChannelInputLinkLength::TEST_RoutingChannelInputLinkLength(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelInputLinkLength::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelInputLinkLength::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t max_length = std::numeric_limits<std::int32_t>::min();
     for (std::int32_t r = 0; r < TopologyGraph[router.LocalID].size(); r++)
@@ -241,14 +241,14 @@ std::vector<std::int32_t> TEST_RoutingChannelInputLinkLength::Route(Router& rout
     std::int32_t vc = 0;
     if (abs(prev_id - router.LocalID) == max_length) vc = 1;
 
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
 
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-    if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+    if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -260,16 +260,16 @@ TEST_RoutingChannelHopsGrater0::TEST_RoutingChannelHopsGrater0(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelHopsGrater0::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelHopsGrater0::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t vc = flit.hop_no <= 0 ? 0 : 1;
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -281,16 +281,16 @@ TEST_RoutingChannelHopsGrater1::TEST_RoutingChannelHopsGrater1(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelHopsGrater1::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelHopsGrater1::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t vc = flit.hop_no <= 1 ? 0 : 1;
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -302,16 +302,16 @@ TEST_RoutingChannelHopsGrater2::TEST_RoutingChannelHopsGrater2(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelHopsGrater2::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelHopsGrater2::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t vc = flit.hop_no <= 2 ? 0 : 1;
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -323,7 +323,7 @@ TEST_RoutingChannelHopsSwitchNotMod2::TEST_RoutingChannelHopsSwitchNotMod2(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelHopsSwitchNotMod2::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelHopsSwitchNotMod2::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TopologyGraph[router.LocalID].size())
@@ -334,13 +334,13 @@ std::vector<std::int32_t> TEST_RoutingChannelHopsSwitchNotMod2::Route(Router& ro
             prev_vc = i;
 
     std::int32_t vc = flit.hop_no % 2 ? prev_vc : !prev_vc;
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -352,7 +352,7 @@ TEST_RoutingChannelHopsSwitchNotMod3::TEST_RoutingChannelHopsSwitchNotMod3(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelHopsSwitchNotMod3::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelHopsSwitchNotMod3::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TopologyGraph[router.LocalID].size())
@@ -363,13 +363,13 @@ std::vector<std::int32_t> TEST_RoutingChannelHopsSwitchNotMod3::Route(Router& ro
             prev_vc = i;
 
     std::int32_t vc = flit.hop_no % 3 ? prev_vc : !prev_vc;
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -381,7 +381,7 @@ TEST_RoutingChannelHopsSwitchNotMod4::TEST_RoutingChannelHopsSwitchNotMod4(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelHopsSwitchNotMod4::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelHopsSwitchNotMod4::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TopologyGraph[router.LocalID].size())
@@ -392,13 +392,13 @@ std::vector<std::int32_t> TEST_RoutingChannelHopsSwitchNotMod4::Route(Router& ro
             prev_vc = i;
 
     std::int32_t vc = flit.hop_no % 4 ? prev_vc : !prev_vc;
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);
@@ -409,7 +409,7 @@ TEST_RoutingChannelSwitchNode0AndNDiv2::TEST_RoutingChannelSwitchNode0AndNDiv2(
     TopologyGraph(graph), Table(table)
 {
 }
-std::vector<std::int32_t> TEST_RoutingChannelSwitchNode0AndNDiv2::Route(Router& router, Flit& flit) const
+std::vector<Connection> TEST_RoutingChannelSwitchNode0AndNDiv2::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t prev_id = router.LocalID;
     if (flit.dir_in < TopologyGraph[router.LocalID].size())
@@ -420,13 +420,13 @@ std::vector<std::int32_t> TEST_RoutingChannelSwitchNode0AndNDiv2::Route(Router& 
             prev_vc = i;
 
     std::int32_t vc = router.LocalID == 0 || router.LocalID == TopologyGraph.size() / 2 ? 1 : prev_vc;
-    std::vector<std::int32_t> result;
+    std::vector<Connection> result;
     for (std::int32_t r : Table[router.LocalID][flit.dst_id])
     {
         std::int32_t next_id = TopologyGraph[router.LocalID][r];
         if (vc >= TopologyGraph[router.LocalID].links_to(next_id).size())
             throw std::runtime_error("Routing error: Invalid virtual channel [" + std::to_string(vc) + "].");
-        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back(r);
+        if (r == TopologyGraph[router.LocalID].links_to(next_id)[vc]) result.push_back({ r, flit.vc_id });
     }
     if (result.size() < 1) throw std::runtime_error("Routing error: No paths found.");
     return std::move(result);

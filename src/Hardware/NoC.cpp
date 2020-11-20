@@ -1,5 +1,6 @@
 #include "NoC.hpp"
 #include "RoutingSelection/RoutingTableBased.hpp"
+#include "RoutingSelection/RoutingSubnetwork.hpp"
 #include "RoutingSelection/RoutingFitSubnetwork.hpp"
 #include "RoutingSelection/SelectionRandom.hpp"
 #include "RoutingSelection/SelectionBufferLevel.hpp"
@@ -25,6 +26,7 @@
 std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config)
 {
 	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
+	if (config.RoutingAlgorithm() == "SUBNETWORK") return std::make_unique<RoutingSubnetwork>(config.GRTable(), config.VirtualSubGRTable());
 	if (config.RoutingAlgorithm() == "FIT_SUBNETWORK") return std::make_unique<RoutingFitSubnetwork>(config.GRTable(), config.VirtualSubGRTable());
 	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.TopologyGraph());
 	if (config.RoutingAlgorithm() == "TORUS_XY") return std::make_unique<RoutingTorusXY>(config.DimX(), config.DimY(), config.TopologyGraph());

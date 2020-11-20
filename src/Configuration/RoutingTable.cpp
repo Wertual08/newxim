@@ -542,28 +542,28 @@ bool RoutingTable::LoadCirculantPairExchange(const Graph& graph)
 			auto vec = PerformPairExchange(graph.size(), generator, i, j);
 			if (vec.first > 0)
 			{
-				std::int32_t dest = (i + generator) % graph.size();
-				for (std::int32_t l : graph[i].links_to(dest))
+				std::int32_t src = (i + generator) % graph.size();
+				for (std::int32_t l : graph[i].links_to(src))
 					Nodes[i][j].push_back(l);
 			}
 			if (vec.first < 0)
 			{
-				std::int32_t dest = i - generator;
-				if (dest < 0) dest += graph.size();
-				for (std::int32_t l : graph[i].links_to(dest))
+				std::int32_t src = i - generator;
+				if (src < 0) src += graph.size();
+				for (std::int32_t l : graph[i].links_to(src))
 					Nodes[i][j].push_back(l);
 			}
 			if (vec.second > 0)
 			{
-				std::int32_t dest = (i + generator + 1) % graph.size();
-				for (std::int32_t l : graph[i].links_to(dest))
+				std::int32_t src = (i + generator + 1) % graph.size();
+				for (std::int32_t l : graph[i].links_to(src))
 					Nodes[i][j].push_back(l);
 			}
 			if (vec.second < 0)
 			{
-				std::int32_t dest = i - (generator + 1);
-				if (dest < 0) dest += graph.size();
-				for (std::int32_t l : graph[i].links_to(dest))
+				std::int32_t src = i - (generator + 1);
+				if (src < 0) src += graph.size();
+				for (std::int32_t l : graph[i].links_to(src))
 					Nodes[i][j].push_back(l);
 			}
 		}

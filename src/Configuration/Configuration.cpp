@@ -357,6 +357,7 @@ void Configuration::ReadSimulationParams(const YAML::Node& config)
 	report_topology_sub_graph = ReadParam<bool>(config, "report_topology_sub_graph", false);
 	report_topology_sub_graph_adjacency_matrix = ReadParam<bool>(config, "report_topology_sub_graph_adjacency_matrix", false);
 	report_sub_routing_table = ReadParam<bool>(config, "report_sub_routing_table", false);
+	report_cycle_result = ReadParam<bool>(config, "report_cycle_result", false);
 
 	clock_period_ps = ReadParam<std::int32_t>(config, "clock_period_ps");
 	reset_time = ReadParam<std::int32_t>(config, "reset_time");
@@ -818,6 +819,10 @@ bool Configuration::ReportProgress() const
 bool Configuration::ReportBuffers() const
 {
 	return report_buffers;
+}
+bool Configuration::ReportCycleResult() const
+{
+	return report_cycle_result;
 }
 
 std::int32_t Configuration::DimX() const

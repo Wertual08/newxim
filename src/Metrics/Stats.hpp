@@ -32,10 +32,10 @@ struct BufferStats
 class Stats 
 {
 private:
-	const SimulationTimer Timer;
 	std::map<RelaySignature, BufferStats> Buffers;
 
 public:
+	const SimulationTimer Timer;
 	Stats(const SimulationTimer& timer);
 
 	void StartStuckTimer(std::size_t relay, std::size_t vc);

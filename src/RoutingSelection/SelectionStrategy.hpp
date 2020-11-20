@@ -2,6 +2,7 @@
 #include <vector>
 #include "../DataStructs.hpp"
 #include "../Utils.hpp"
+#include "Hardware/Connection.hpp"
 
 
 
@@ -9,5 +10,5 @@ class Router;
 class SelectionStrategy
 {
 public:
-	virtual std::int32_t Apply(Router& router, Flit& flit, const std::vector<std::int32_t>& directions) const = 0;
+	virtual Connection Apply(const Router& router, const Flit& flit, const std::vector<Connection>& directions) const = 0;
 };

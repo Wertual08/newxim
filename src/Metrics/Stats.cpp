@@ -27,7 +27,6 @@ void Stats::PushLoad(std::size_t relay, std::size_t vc, double load)
 
 double Stats::GetMaxBufferStuckDelay(std::size_t relay, std::size_t vc)
 {
-	StopStuckTimer(relay, vc);
 	auto it = Buffers.find({ relay, vc });
 
 	if (it != Buffers.end()) return it->second.MaxStuckDelay;

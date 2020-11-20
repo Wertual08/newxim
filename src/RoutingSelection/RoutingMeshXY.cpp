@@ -29,7 +29,7 @@ RoutingMeshXY::RoutingMeshXY(std::int32_t w, std::int32_t h, const Graph& graph)
 {
 }
 
-std::vector<std::int32_t> RoutingMeshXY::Route(Router& router, Flit& flit) const
+std::vector<Connection> RoutingMeshXY::Route(const Router& router, const Flit& flit) const
 {
     std::int32_t id = router.LocalID;
     std::int32_t x = GetXFromID(router.LocalID);
@@ -37,12 +37,12 @@ std::vector<std::int32_t> RoutingMeshXY::Route(Router& router, Flit& flit) const
     std::int32_t dx = GetXFromID(flit.dst_id) - x;
     std::int32_t dy = GetYFromID(flit.dst_id) - y;
 
-    std::vector<std::int32_t> result;
-    if (dx > 0) result = std::move(GetLinksTo(id, x + 1, y));
-    else if (dx < 0) result = std::move(GetLinksTo(id, x - 1, y));
-    else if (dy > 0) result = std::move(GetLinksTo(id, x, y + 1));
-    else if (dy < 0) result = std::move(GetLinksTo(id, x, y - 1));
-    else result.push_back(TorusGraph[id].size());
+    std::vector<Connection> result;
+    if (dx > 0) for (std::int32_t l : GetLinksTo(id, x + 1, y)) result.push_back({ l, flit.vc_id });
+    else if (dx < 0) for (std::int32_t l : GetLinksTo(id, x - 1, y)) result.push_back({ l, flit.vc_id });
+    else if (dy > 0) for (std::int32_t l : GetLinksTo(id, x, y + 1)) result.push_back({ l, flit.vc_id });
+    else if (dy < 0) for (std::int32_t l : GetLinksTo(id, x, y - 1)) result.push_back({ l, flit.vc_id });
+    else result.push_back({ static_cast<std::int32_t>(TorusGraph[id].size()), flit.vc_id });
 
     return result;
 }

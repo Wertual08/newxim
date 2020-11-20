@@ -19,7 +19,7 @@ sub_tree_generator: TGEN_4
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: MESH
+topology: TORUS
 topology_args: [8, 8]
 topology_channels: 1
 virtual_channels: 2
@@ -31,10 +31,10 @@ virtual_channels: 2
 #   PER_FLIT_SUBNETWORK
 #   WORMHOLE_FIXED_SUBNETWORK
 #   WORMHOLE_FIT_SUBNETWORK
-router_type: WORMHOLE 
+router_type: PER_FLIT 
 
 # number of flits for each router buffer
-buffer_depth: 9
+buffer_depth: 10
 # size of flits, in bits
 flit_size: 32
 
@@ -42,9 +42,11 @@ flit_size: 32
 #   TABLE_BASED
 #   MESH_XY
 #   TORUS_XY (test)
+#	SUBNETWORK
+#	FIT_SUBNETWORK
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: FIT_SUBNETWORK
+routing_algorithm: SUBNETWORK
 
 # Selection Strategies:
 #   RANDOM
@@ -80,12 +82,13 @@ report_routing_table: false
 report_topology_sub_graph: false
 report_topology_sub_graph_adjacency_matrix: false
 report_sub_routing_table: false
+report_cycle_result: false
 
 clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 10000
+simulation_time: 1000000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
 
