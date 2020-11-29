@@ -31,7 +31,7 @@ virtual_channels: 2
 #   PER_FLIT_SUBNETWORK
 #   WORMHOLE_FIXED_SUBNETWORK
 #   WORMHOLE_FIT_SUBNETWORK
-router_type: PER_FLIT 
+router_type: WORMHOLE 
 
 # number of flits for each router buffer
 buffer_depth: 10
@@ -46,7 +46,7 @@ flit_size: 32
 #	FIT_SUBNETWORK
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: SUBNETWORK
+routing_algorithm: FIT_SUBNETWORK
 
 # Selection Strategies:
 #   RANDOM
@@ -83,12 +83,13 @@ report_topology_sub_graph: false
 report_topology_sub_graph_adjacency_matrix: false
 report_sub_routing_table: false
 report_cycle_result: false
+report_flit_trace: true
 
 clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 1000000
+simulation_time: 10000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
 

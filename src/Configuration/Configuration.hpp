@@ -76,6 +76,9 @@ private:
 	bool report_topology_sub_graph;
 	bool report_topology_sub_graph_adjacency_matrix;
 	bool report_cycle_result;
+	bool report_flit_trace;
+	double flit_trace_start;
+	double flit_trace_end;
 
 	std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>> hotspots;
 
@@ -135,6 +138,9 @@ public:
 	bool ReportProgress() const;
 	bool ReportBuffers() const;
 	bool ReportCycleResult() const;
+	bool ReportFlitTrace() const;
+	double FlitTraceStart() const;
+	double FlitTraceEnd() const;
 
 	std::int32_t DimX() const;
 	std::int32_t DimY() const;

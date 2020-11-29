@@ -45,10 +45,11 @@ public:
 	void Disable();
 
 	void Reset();
+	void Update();
 	bool CanSend(const Flit& flit) const;
 	bool Send(const Flit& flit);
 	bool CanReceive() const;
-	bool Receive();
+	Flit Receive();
 
 	std::size_t GetFreeSlots(std::size_t vc) const 
 	{ 

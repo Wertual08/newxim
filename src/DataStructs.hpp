@@ -35,7 +35,6 @@ struct Packet
 	double timestamp;		// SC timestamp at packet generation
 	std::int32_t size;
 	std::int32_t flit_left;		// Number of remaining flits inside the packet
-	bool use_low_voltage_path;
 
 	Packet() 
 	{
@@ -45,7 +44,6 @@ struct Packet
 		timestamp = -1;
 		size = -1;
 		flit_left = -1;
-		use_low_voltage_path = false;
 	}
 	Packet(std::int32_t s, std::int32_t d, std::int32_t vc, double ts, std::int32_t sz)
 	{
@@ -55,13 +53,13 @@ struct Packet
 		timestamp = ts;
 		size = sz;
 		flit_left = sz;
-		use_low_voltage_path = false;
 	}
 };
 
 // Flit -- Flit definition
 struct Flit 
 {
+	std::uint64_t id;
 	int src_id = -1;
 	int dst_id = -1;
 	int dir_in = -1;
@@ -72,20 +70,20 @@ struct Flit
 	double timestamp = -1;					// Unix timestamp at packet generation
 	double accept_timestamp = - 1;
 	int hop_no = -1;						// Current number of hops from source to destination
-	bool use_low_voltage_path = false;
 
 	inline bool operator==(const Flit& flit) const 
 	{
-		return flit.src_id == src_id 
+		return flit.id == id
+			&& flit.src_id == src_id
 			&& flit.dst_id == dst_id
 			&& flit.flit_type == flit_type
 			&& flit.vc_id == vc_id
 			&& flit.sequence_no == sequence_no
 			&& flit.sequence_length == sequence_length
 			&& flit.timestamp == timestamp
-			&& flit.hop_no == hop_no
-			&& flit.use_low_voltage_path == use_low_voltage_path;
+			&& flit.hop_no == hop_no;
 	}
+	bool valid() const { return flit_type != FlitType::None; }
 };
 
 inline std::ostream& operator <<(std::ostream& os, const Flit& flit)

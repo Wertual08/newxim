@@ -8,6 +8,7 @@
 #include "Configuration/TrafficManagers/TrafficManager.hpp"
 #include "Utils.hpp"
 #include "ProcessorQueue.hpp"
+#include "Metrics/FlitTracer.hpp"
 
 
 
@@ -35,6 +36,8 @@ private:
 	double SimulationMaxTimeFlitInNetwork;
 	double SimulationLastTimeFlitReceived;
 
+	FlitTracer* Tracer = nullptr;
+
 	void ReceiveFlit(Flit flit);
 	void SendFlit(Flit flit);
 
@@ -58,6 +61,7 @@ public:
 	Processor(const SimulationTimer& timer, std::int32_t id,
 		std::int32_t min_packet_size, std::int32_t max_packet_size);
 	void SetTrafficManager(const TrafficManager& traffic);
+	void SetFlitTracer(FlitTracer& tracer);
 
 	// Functions
 	void Update();

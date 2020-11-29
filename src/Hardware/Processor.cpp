@@ -102,6 +102,10 @@ void Processor::SetTrafficManager(const TrafficManager& traffic)
 {
 	Traffic = &traffic;
 }
+void Processor::SetFlitTracer(FlitTracer& tracer)
+{
+	Tracer = &tracer;
+}
 
 void Processor::Update()
 {
@@ -138,10 +142,11 @@ void Processor::TXProcess()
 {
 	if (!Queue.Empty())
 	{
-		Flit flit = NextFlit();	
-
-		if (relay.Send(flit))
+		Flit flit = NextFlit();
+		if (relay.CanSend(flit))
 		{
+			if (Tracer) Tracer->Register(flit);
+			relay.Send(flit);
 			PopFlit();
 			SendFlit(flit);
 		}

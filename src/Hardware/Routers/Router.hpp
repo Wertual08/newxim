@@ -7,6 +7,7 @@
 #include "RoutingSelection/SelectionStrategy.hpp"
 #include "Hardware/Connection.hpp"
 #include "Hardware/ReservationTable.hpp"
+#include "Metrics/FlitTracer.hpp"
 
 
 
@@ -16,6 +17,7 @@ class Router : public sc_module
 private:
 	const RoutingAlgorithm* Routing = nullptr;
 	const SelectionStrategy* Selection = nullptr;
+	FlitTracer* Tracer = nullptr;
 
 	Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays);
 
@@ -47,6 +49,7 @@ public:
 	Router(const SimulationTimer& timer, std::int32_t id, std::size_t relays);
 	void SetRoutingAlgorithm(const RoutingAlgorithm& alg);
 	void SetSelectionStrategy(const SelectionStrategy& sel);
+	void SetFlitTracer(FlitTracer& tracer);
 
 	std::size_t Size() const { return Relays.size(); }
 	Relay& operator[](std::size_t i) { return Relays[i]; }

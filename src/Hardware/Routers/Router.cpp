@@ -39,6 +39,8 @@ void Router::Update()
 
 	TXProcess();
 	RXProcess();
+	for (std::size_t i = 0; i < Relays.size(); i++)
+		Relays[i].Update();
 
 	start_from_port = (start_from_port + 1) % Relays.size();
 
@@ -98,8 +100,12 @@ void Router::RXProcess()
 	// and wormhole related issues are addressed in the txProcess()
 	for (std::size_t i = 0; i < Relays.size(); i++)
 	{
-		if (Relays[i].Receive())
+		if (Relays[i].CanReceive())
 		{
+			Flit flit = Relays[i].Receive();
+
+			if (Tracer) Tracer->Remember(flit, LocalID);
+
 			power.bufferRouterPush();
 			// if a new flit is injected from local PE
 			if (i == LocalRelayID)
@@ -121,6 +127,10 @@ void Router::SetRoutingAlgorithm(const RoutingAlgorithm& alg)
 void Router::SetSelectionStrategy(const SelectionStrategy& sel)
 {
 	Selection = &sel;
+}
+void Router::SetFlitTracer(FlitTracer& tracer)
+{
+	Tracer = &tracer;
 }
 
 std::size_t Router::TotalBufferedFlits() const

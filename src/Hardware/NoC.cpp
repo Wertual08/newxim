@@ -74,6 +74,8 @@ void NoC::InitBase()
 {
 	srand(Config.RndGeneratorSeed());
 
+	if (Config.ReportFlitTrace()) Tracer = std::make_unique<FlitTracer>(
+		Timer, Config.FlitTraceStart(), Config.FlitTraceEnd());
 	Algorithm = GetAlgorithm(Config);
 	Strategy = GetStrategy(Config);
 	Traffic = GetTraffic(Config);
@@ -92,10 +94,12 @@ void NoC::InitBase()
 
 		RouterDevice->SetRoutingAlgorithm(*Algorithm);
 		RouterDevice->SetSelectionStrategy(*Strategy);
+		if (Tracer) RouterDevice->SetFlitTracer(*Tracer);
 		RouterDevice->power.configureRouter(Config.PowerConfiguration(), Config.FlitSize(), Config.BufferDepth(), Config.FlitSize(), Config.RoutingAlgorithm(), "default");
 
 		std::unique_ptr<Processor> ProcessorDevice = GetProcessor(Timer, id, Config);
 		ProcessorDevice->SetTrafficManager(*Traffic);
+		if (Tracer) ProcessorDevice->SetFlitTracer(*Tracer);
 		ProcessorDevice->relay.SetVirtualChannels(Config.VirtualChannels());
 		ProcessorDevice->relay[0].Reserve(Config.BufferDepth());
 

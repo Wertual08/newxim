@@ -229,20 +229,20 @@ void GlobalStats::ShowBuffers(std::ostream& out) const
 
 void GlobalStats::Update()
 {
-	if (Network.Timer.SimulationTime() < Config.SimulationTime() - 37252) return;
-
-	std::cout << "Cycle " << Network.Timer.SimulationTime() << ":\n";
-	ShowBuffers(std::cout);
-
-	for (const auto& tile : Network.Tiles)
-	{
-		auto rt = tile.RouterDevice->GetReservationTable();
-		if (rt)
-		{
-			std::cout << "Reservation table " << tile.RouterDevice->LocalID << ":\n";
-			std::cout << *rt;
-		}
-	}
+	//if (Network.Timer.SimulationTime() < Config.SimulationTime() - 10) return;
+	//
+	//std::cout << "Cycle " << Network.Timer.SimulationTime() << ":\n";
+	//ShowBuffers(std::cout);
+	//
+	//for (const auto& tile : Network.Tiles)
+	//{
+	//	auto rt = tile.RouterDevice->GetReservationTable();
+	//	if (rt)
+	//	{
+	//		std::cout << "Reservation table " << tile.RouterDevice->LocalID << ":\n";
+	//		std::cout << *rt;
+	//	}
+	//}
 }
 
 void GlobalStats::FinishStats() const
@@ -302,6 +302,10 @@ std::ostream& operator<<(std::ostream& out, const GlobalStats& gs)
 	out << "% Total energy (J): " << gs.GetTotalPower() << '\n';
 	out << "% Dynamic energy (J): " << gs.GetDynamicPower() << '\n';
 	out << "% Static energy (J): " << gs.GetStaticPower() << '\n';
+	if (gs.Config.ReportFlitTrace())
+	{
+		out << *gs.Network.Tracer;
+	}
 
 	if (gs.Config.ReportBuffers()) gs.ShowBuffers(out);
 	return out;

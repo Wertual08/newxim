@@ -278,7 +278,7 @@ void Configuration::ReadRoutingTableParams(const YAML::Node& config)
 {
 	try
 	{
-		const auto& node = config["routing_table"];
+		auto node = config["routing_table"];
 		if (node.IsDefined())
 		{
 			if (node.IsSequence())
@@ -358,6 +358,21 @@ void Configuration::ReadSimulationParams(const YAML::Node& config)
 	report_topology_sub_graph_adjacency_matrix = ReadParam<bool>(config, "report_topology_sub_graph_adjacency_matrix", false);
 	report_sub_routing_table = ReadParam<bool>(config, "report_sub_routing_table", false);
 	report_cycle_result = ReadParam<bool>(config, "report_cycle_result", false);
+
+	flit_trace_start = -1;
+	flit_trace_end = -1;
+	auto node = config["report_flit_trace"];
+	if (node.IsDefined())
+	{
+		if (node.IsSequence())
+		{
+			report_flit_trace = false;
+			flit_trace_start = node[0].as<std::int32_t>();
+			if (node.size() == 2) flit_trace_end = node[1].as<std::int32_t>();
+		}
+		else report_flit_trace = node.as<bool>();
+	}
+	else report_flit_trace = false;
 
 	clock_period_ps = ReadParam<std::int32_t>(config, "clock_period_ps");
 	reset_time = ReadParam<std::int32_t>(config, "reset_time");
@@ -823,6 +838,18 @@ bool Configuration::ReportBuffers() const
 bool Configuration::ReportCycleResult() const
 {
 	return report_cycle_result;
+}
+bool Configuration::ReportFlitTrace() const
+{
+	return report_flit_trace;
+}
+double Configuration::FlitTraceStart() const
+{
+	return flit_trace_start;
+}
+double Configuration::FlitTraceEnd() const
+{
+	return flit_trace_end;
 }
 
 std::int32_t Configuration::DimX() const

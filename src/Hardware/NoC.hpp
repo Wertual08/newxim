@@ -15,6 +15,7 @@
 #include "Configuration/RoutingTable.hpp"
 #include "Configuration/Graph.hpp"
 #include "Configuration/TrafficManagers/TrafficManager.hpp"
+#include "Metrics/FlitTracer.hpp"
 
 
 
@@ -30,6 +31,7 @@ private:
 	void InitSubNetwork();
 
 public:
+	std::unique_ptr<FlitTracer> Tracer;
 	const SimulationTimer Timer;
 	sc_clock clock;
 	sc_signal<bool> reset;
