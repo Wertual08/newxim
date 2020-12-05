@@ -1,4 +1,7 @@
 #include "FlitTracer.hpp"
+#include <iomanip>
+
+
 
 FlitTracer::FlitTracer(const SimulationTimer& timer, double story_start, double story_end) :
 	Timer(timer), StoryStart(story_start), StoryEnd(story_end)
@@ -26,10 +29,11 @@ std::ostream& operator<<(std::ostream& os, const FlitTracer& tracer)
 	for (const auto& story : tracer.FlitHistory)
 	{
 		const auto& f = story.first;
+		os << '[' << std::left << std::setw(6) << f.id << ']';
 		if (HasFlag(f.flit_type, FlitType::Head)) os << 'H';
 		if (HasFlag(f.flit_type, FlitType::Body)) os << 'B';
 		if (HasFlag(f.flit_type, FlitType::Tail)) os << 'T';
-		os << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << "): ";
+		os << f.sequence_no << '(' << f.src_id << "->" << f.dst_id << "): \t";
 		for (const auto& loc : story.second)
 		{
 			os << '{' << loc.timestamp << '|' << loc.port << ':' << loc.vc << "->" << loc.id << "} ";
