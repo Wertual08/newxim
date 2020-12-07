@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\systemc\msvc80\SystemC\SystemC.vcxproj">
+      <Project>{86df4b8c-cf94-4ea8-b529-78997f0f30a7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\yaml-cpp\yaml-cpp.vcxproj">
+      <Project>{bb31c7a0-cba8-4c22-9a03-905363af7da8}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config.yaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Configuration\Configuration.cpp" />
+    <ClCompile Include="src\Configuration\Graph.cpp" />
+    <ClCompile Include="src\Configuration\RoutingTable.cpp" />
+    <ClCompile Include="src\Configuration\TrafficManagers\HotspotTrafficManager.cpp" />
+    <ClCompile Include="src\Configuration\TrafficManagers\RandomTrafficManager.cpp" />
+    <ClCompile Include="src\Configuration\TrafficManagers\TableTrafficManager.cpp" />
+    <ClCompile Include="src\Hardware\Buffer.cpp" />
+    <ClCompile Include="src\Hardware\NoC.cpp" />
+    <ClCompile Include="src\Hardware\Processor.cpp" />
+    <ClCompile Include="src\Hardware\ProcessorQueue.cpp" />
+    <ClCompile Include="src\Hardware\ReservationTable.cpp" />
+    <ClCompile Include="src\Hardware\Routers\PerFlitRouter.cpp" />
+    <ClCompile Include="src\Hardware\Routers\PerFlitSubnetworkRouter.cpp" />
+    <ClCompile Include="src\Hardware\Routers\Router.cpp" />
+    <ClCompile Include="src\Hardware\Routers\WormholeFitSubnetworkRouter.cpp" />
+    <ClCompile Include="src\Hardware\Routers\WormholeFixedSubnetworkRouter.cpp" />
+    <ClCompile Include="src\Hardware\Routers\WormholeRouter.cpp" />
+    <ClCompile Include="src\Hardware\Routers\WormholeSubnetworkRouter.cpp" />
+    <ClCompile Include="src\Hardware\SimulationTimer.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Metrics\GlobalStats.cpp" />
+    <ClCompile Include="src\Metrics\Power.cpp" />
+    <ClCompile Include="src\Metrics\ProgressBar.cpp" />
+    <ClCompile Include="src\Metrics\Stats.cpp" />
+    <ClCompile Include="src\RoutingSelection\RoutingMeshXY.cpp" />
+    <ClCompile Include="src\RoutingSelection\RoutingTableBased.cpp" />
+    <ClCompile Include="src\RoutingSelection\RoutingTests.cpp" />
+    <ClCompile Include="src\RoutingSelection\RoutingTorusXY.cpp" />
+    <ClCompile Include="src\RoutingSelection\SelectionBufferLevel.cpp" />
+    <ClCompile Include="src\RoutingSelection\SelectionKeepSpace.cpp" />
+    <ClCompile Include="src\RoutingSelection\SelectionRandom.cpp" />
+    <ClCompile Include="src\RoutingSelection\SelectionRandomKeepSpace.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Configuration\Configuration.hpp" />
+    <ClInclude Include="src\Configuration\Graph.hpp" />
+    <ClInclude Include="src\Configuration\RoutingTable.hpp" />
+    <ClInclude Include="src\Configuration\TrafficManagers\HotspotTrafficManager.hpp" />
+    <ClInclude Include="src\Configuration\TrafficManagers\RandomTrafficManager.hpp" />
+    <ClInclude Include="src\Configuration\TrafficManagers\TableTrafficManager.hpp" />
+    <ClInclude Include="src\Configuration\TrafficManagers\TrafficManager.hpp" />
+    <ClInclude Include="src\DataStructs.hpp" />
+    <ClInclude Include="src\Hardware\Buffer.hpp" />
+    <ClInclude Include="src\Hardware\NoC.hpp" />
+    <ClInclude Include="src\Hardware\Processor.hpp" />
+    <ClInclude Include="src\Hardware\ProcessorQueue.hpp" />
+    <ClInclude Include="src\Hardware\Relay.hpp" />
+    <ClInclude Include="src\Hardware\ReservationTable.hpp" />
+    <ClInclude Include="src\Hardware\Connection.hpp" />
+    <ClInclude Include="src\Hardware\Routers\PerFlitRouter.hpp" />
+    <ClInclude Include="src\Hardware\Routers\PerFlitSubnetworkRouter.hpp" />
+    <ClInclude Include="src\Hardware\Routers\Router.hpp" />
+    <ClInclude Include="src\Hardware\Routers\SubnetworkRouter.hpp" />
+    <ClInclude Include="src\Hardware\Routers\WormholeFitSubnetworkRouter.hpp" />
+    <ClInclude Include="src\Hardware\Routers\WormholeFixedSubnetworkRouter.hpp" />
+    <ClInclude Include="src\Hardware\Routers\WormholeRouter.hpp" />
+    <ClInclude Include="src\Hardware\Routers\WormholeSubnetworkRouter.hpp" />
+    <ClInclude Include="src\Hardware\SimulationTimer.hpp" />
+    <ClInclude Include="src\Hardware\Tile.hpp" />
+    <ClInclude Include="src\Metrics\GlobalStats.hpp" />
+    <ClInclude Include="src\Metrics\Power.hpp" />
+    <ClInclude Include="src\Metrics\ProgressBar.hpp" />
+    <ClInclude Include="src\Metrics\Stats.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingAlgorithm.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingFitSubnetwork.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingMeshXY.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingSubnetwork.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingTableBased.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingTests.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingTorusXY.hpp" />
+    <ClInclude Include="src\RoutingSelection\SelectionBufferLevel.hpp" />
+    <ClInclude Include="src\RoutingSelection\SelectionKeepSpace.hpp" />
+    <ClInclude Include="src\RoutingSelection\SelectionRandom.hpp" />
+    <ClInclude Include="src\RoutingSelection\SelectionRandomKeepSpace.hpp" />
+    <ClInclude Include="src\RoutingSelection\SelectionStrategy.hpp" />
+    <ClInclude Include="src\Utils.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{5491FE99-246A-4C60-B5C5-1643AE4AE705}</ProjectGuid>
+    <RootNamespace>Noxim</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Newxim</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>obj\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IntDir>obj\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>obj\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IntDir>obj\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);SC_NO_WRITE_CHECK</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Newxim\src;$(SolutionDir)yaml-cpp\include;$(SolutionDir)systemc\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>Default</LanguageStandard>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformShortName)\$(Configuration);$(SolutionDir)lib\$(PlatformShortName)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);SC_NO_WRITE_CHECK</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Newxim\src;$(SolutionDir)yaml-cpp\include;$(SolutionDir)systemc\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>Default</LanguageStandard>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformShortName)\$(Configuration);$(SolutionDir)lib\$(PlatformShortName)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);SC_NO_WRITE_CHECK</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Newxim\src;$(SolutionDir)yaml-cpp\include;$(SolutionDir)systemc\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>Default</LanguageStandard>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformShortName)\$(Configuration);$(SolutionDir)lib\$(PlatformShortName)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);SC_NO_WRITE_CHECK</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Newxim\src;$(SolutionDir)yaml-cpp\include;$(SolutionDir)systemc\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>Default</LanguageStandard>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformShortName)\$(Configuration);$(SolutionDir)lib\$(PlatformShortName)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

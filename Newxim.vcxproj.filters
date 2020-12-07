@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{e6080770-8066-4e72-8e26-6d3223ebbfa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{936071ed-92ec-4cbe-8813-be6fc95ae2bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\RoutingSelection">
+      <UniqueIdentifier>{0af27eef-e820-42c3-b1ed-e82b50aeca6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\RoutingSelection">
+      <UniqueIdentifier>{9d2ea3a4-a2dc-4203-8f50-07cb44e22d6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Configuration">
+      <UniqueIdentifier>{6e1f008c-dc93-4c64-a439-441bbd0bdc45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Configuration">
+      <UniqueIdentifier>{1dbc2a40-c52c-4cf3-ab94-796eac3bbf71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Configuration\TrafficManagers">
+      <UniqueIdentifier>{ce2f979e-86d6-480a-b3ea-f3315149dcb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Configuration\TrafficManagers">
+      <UniqueIdentifier>{d6a24c44-84ec-47a3-bd47-78f976f4e867}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Hardware">
+      <UniqueIdentifier>{5eae3cac-7308-4f04-8ce6-e923191ddba0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Hardware">
+      <UniqueIdentifier>{bf3ccf52-ab42-4c91-b4d7-99e93f473803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Hardware\Router">
+      <UniqueIdentifier>{14411895-7f39-4978-b3e7-35d682f988ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Hardware\Router">
+      <UniqueIdentifier>{c62f0d09-67fe-4587-935d-3e6f76f9eb1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Metrics">
+      <UniqueIdentifier>{fdb7496e-d03f-4614-9734-43d69ac1d784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Metrics">
+      <UniqueIdentifier>{25b76409-b7fa-4648-bc8f-1065fe85e07b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config.yaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\RoutingSelection\RoutingMeshXY.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\RoutingTableBased.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\RoutingTests.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\RoutingTorusXY.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\SelectionBufferLevel.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\SelectionKeepSpace.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\SelectionRandom.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\SelectionRandomKeepSpace.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\RoutingTable.cpp">
+      <Filter>Source files\Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\Graph.cpp">
+      <Filter>Source files\Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\Configuration.cpp">
+      <Filter>Source files\Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\TrafficManagers\HotspotTrafficManager.cpp">
+      <Filter>Source files\Configuration\TrafficManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\TrafficManagers\RandomTrafficManager.cpp">
+      <Filter>Source files\Configuration\TrafficManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\TrafficManagers\TableTrafficManager.cpp">
+      <Filter>Source files\Configuration\TrafficManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\NoC.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Buffer.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Processor.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\ProcessorQueue.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\ReservationTable.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\SimulationTimer.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Routers\PerFlitSubnetworkRouter.cpp">
+      <Filter>Source files\Hardware\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Routers\PerFlitRouter.cpp">
+      <Filter>Source files\Hardware\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Routers\WormholeFitSubnetworkRouter.cpp">
+      <Filter>Source files\Hardware\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Routers\WormholeFixedSubnetworkRouter.cpp">
+      <Filter>Source files\Hardware\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Routers\WormholeRouter.cpp">
+      <Filter>Source files\Hardware\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Routers\WormholeSubnetworkRouter.cpp">
+      <Filter>Source files\Hardware\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Routers\Router.cpp">
+      <Filter>Source files\Hardware\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Metrics\GlobalStats.cpp">
+      <Filter>Source files\Metrics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Metrics\Power.cpp">
+      <Filter>Source files\Metrics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Metrics\Stats.cpp">
+      <Filter>Source files\Metrics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Metrics\ProgressBar.cpp">
+      <Filter>Source files\Metrics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Main.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\RoutingSelection\SelectionBufferLevel.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionKeepSpace.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionRandom.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionRandomKeepSpace.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionStrategy.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingTorusXY.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingTests.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingTableBased.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingMeshXY.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingAlgorithm.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Configuration.hpp">
+      <Filter>Header files\Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Graph.hpp">
+      <Filter>Header files\Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\RoutingTable.hpp">
+      <Filter>Header files\Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\TrafficManagers\HotspotTrafficManager.hpp">
+      <Filter>Header files\Configuration\TrafficManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\TrafficManagers\RandomTrafficManager.hpp">
+      <Filter>Header files\Configuration\TrafficManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\TrafficManagers\TableTrafficManager.hpp">
+      <Filter>Header files\Configuration\TrafficManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\TrafficManagers\TrafficManager.hpp">
+      <Filter>Header files\Configuration\TrafficManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Processor.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\NoC.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Buffer.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\ProcessorQueue.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Relay.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\SimulationTimer.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\ReservationTable.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Tile.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\WormholeSubnetworkRouter.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\WormholeFitSubnetworkRouter.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\WormholeFixedSubnetworkRouter.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\WormholeRouter.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\Router.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\PerFlitRouter.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\PerFlitSubnetworkRouter.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Metrics\GlobalStats.hpp">
+      <Filter>Header files\Metrics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Metrics\Power.hpp">
+      <Filter>Header files\Metrics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Metrics\ProgressBar.hpp">
+      <Filter>Header files\Metrics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Metrics\Stats.hpp">
+      <Filter>Header files\Metrics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Routers\SubnetworkRouter.hpp">
+      <Filter>Header files\Hardware\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataStructs.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingFitSubnetwork.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Connection.hpp">
+      <Filter>Header files\Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingSubnetwork.hpp">
+      <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
