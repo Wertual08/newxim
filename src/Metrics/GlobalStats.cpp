@@ -153,7 +153,7 @@ double GlobalStats::GetAverageDelay() const
 		}
 	}
 
-	avg_delay /= (double)total_packets;
+	avg_delay /= static_cast<double>(total_packets);
 
 	return avg_delay;
 }

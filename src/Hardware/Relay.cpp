@@ -103,11 +103,7 @@ bool Relay::CanSend(const Flit& flit) const
 }
 bool Relay::Send(const Flit& flit)
 {
-	if (tx_current_level != tx_ack.read())
-		return false;
-
-	if (tx_current_level == tx_ack.read() &&
-		rx_free_slots[flit.vc_id].read() > 0)
+	if (CanSend(flit))
 	{
 		tx_flit.write(flit);
 		tx_current_level = !tx_current_level;
@@ -123,7 +119,7 @@ bool Relay::CanReceive() const
 }
 Flit Relay::Receive()
 {
-	if (rx_req.read() == !rx_current_level)
+	if (CanReceive())
 	{
 		Flit flit = rx_flit.read();
 		flit.hop_no++;
@@ -136,12 +132,9 @@ Flit Relay::Receive()
 
 		if (buffer.Full()) throw std::runtime_error("Relay error: Buffer overflow.");
 
-		// Store the incoming flit in the circular buffer
 		buffer.Push(flit);
 
-		// Negate the old value for Alternating Bit Protocol (ABP)
 		rx_current_level = !rx_current_level;
-		//tx_free_slots[flit.vc_id].write(buffer.GetFreeSlots());
 
 		return flit;
 	}

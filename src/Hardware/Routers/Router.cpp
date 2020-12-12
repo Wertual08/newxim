@@ -31,16 +31,13 @@ void Router::Update()
 {
 	if (reset.read())
 	{
-		for (std::size_t i = 0; i < Relays.size(); i++)
-			Relays[i].Reset();
+		for (auto& relay : Relays) relay.Reset();
 
 		return;
 	}
 
 	TXProcess();
 	RXProcess();
-	for (std::size_t i = 0; i < Relays.size(); i++)
-		Relays[i].Update();
 
 	start_from_port = (start_from_port + 1) % Relays.size();
 
@@ -72,7 +69,7 @@ bool Router::Route(std::int32_t in_port, Connection dst)
 
 	if (out_relay.Send(flit))
 	{
-		flit = in_relay.Pop();
+		in_relay.Pop();
 
 		/* Power & Stats ------------------------------------------------- */
 		stats.StopStuckTimer(in_port, flit.vc_id);
@@ -113,6 +110,7 @@ void Router::RXProcess()
 				power.networkInterface();
 			}
 		}
+		Relays[i].Update();
 	}
 }
 

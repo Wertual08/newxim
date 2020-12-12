@@ -151,6 +151,7 @@ void Processor::TXProcess()
 			SendFlit(flit);
 		}
 	}
+
 }
 void Processor::RXProcess()
 {
@@ -159,6 +160,7 @@ void Processor::RXProcess()
 	{
 		ReceiveFlit(relay.Pop());
 	}
+	relay.Update();
 }
 
 std::size_t Processor::FlitsSent() const

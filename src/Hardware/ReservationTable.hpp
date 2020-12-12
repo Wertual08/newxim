@@ -11,8 +11,6 @@ private:
 	std::vector<PairConnection> Table;
 
 public:
-	ReservationTable(std::int32_t ports, std::int32_t vcs = 10);
-
 	void Reserve(Connection dest_in, Connection dest_out);
 	void Release(Connection dest_in);
 	bool Reserved(Connection dest_in, Connection dest_out) const;

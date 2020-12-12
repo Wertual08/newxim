@@ -31,10 +31,10 @@ virtual_channels: 2
 #   PER_FLIT_SUBNETWORK
 #   WORMHOLE_FIXED_SUBNETWORK
 #   WORMHOLE_FIT_SUBNETWORK
-router_type: WORMHOLE 
+router_type: WORMHOLE
 
 # number of flits for each router buffer
-buffer_depth: 10
+buffer_depth: 9
 # size of flits, in bits
 flit_size: 32
 
@@ -83,7 +83,7 @@ report_topology_sub_graph: false
 report_topology_sub_graph_adjacency_matrix: false
 report_sub_routing_table: false
 report_cycle_result: false
-report_flit_trace: true
+report_flit_trace: false
 
 clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
@@ -97,8 +97,8 @@ min_packet_size: 3
 max_packet_size: 9
 flit_injection_rate: true
 scale_with_nodes: false
-packet_injection_rate: 1
-probability_of_retransmission: 1
+packet_injection_rate: 0.2
+probability_of_retransmission: 0.2
 
 # Traffic distribution:
 #   TRAFFIC_RANDOM

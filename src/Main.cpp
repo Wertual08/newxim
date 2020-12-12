@@ -1,13 +1,3 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the implementation of the top-level of Noxim
- */
-
 #include "Hardware/SimulationTimer.hpp"
 #include "Hardware/NoC.hpp"
 #include "Metrics/GlobalStats.hpp"
@@ -16,7 +6,7 @@
 #include "Configuration/Configuration.hpp"
 #include "Metrics/ProgressBar.hpp"
 
-const static std::string Version = "0.0.0.5";
+const static std::string Version = "0.0.0.6";
 
 
 

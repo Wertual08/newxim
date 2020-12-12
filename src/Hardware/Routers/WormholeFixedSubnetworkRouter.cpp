@@ -68,8 +68,3 @@ void WormholeFixedSubnetworkRouter::TXProcess()
 
 	for (auto& relay : Relays) relay.Skip();
 }
-
-WormholeFixedSubnetworkRouter::WormholeFixedSubnetworkRouter(const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
-	SubnetworkRouter(timer, id, relays), reservation_table(Relays.size())
-{
-}

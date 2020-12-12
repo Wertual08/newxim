@@ -53,7 +53,7 @@ public:
 
 	std::size_t GetFreeSlots(std::size_t vc) const 
 	{ 
-		return bound->buffers[vc].GetFreeSlots() - (bound->CanReceive() ? (bound->rx_flit.read().vc_id == vc ? 1 : 0) : 0);
+		//return bound->buffers[vc].GetFreeSlots() - (bound->CanReceive() ? (bound->rx_flit.read().vc_id == vc ? 1 : 0) : 0);
 		//if (bound->buffers[vc].GetFreeSlots() != rx_free_slots[vc].read())
 		//	throw "shit";
 		return rx_free_slots[vc].read(); 

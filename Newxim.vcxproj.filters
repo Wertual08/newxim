@@ -144,6 +144,18 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Metrics\FlitTracer.cpp">
+      <Filter>Source files\Metrics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hardware\Relay.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\RoutingSubnetwork.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoutingSelection\RoutingFitSubnetwork.cpp">
+      <Filter>Source files\RoutingSelection</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\RoutingSelection\SelectionBufferLevel.hpp">
@@ -271,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="src\RoutingSelection\RoutingSubnetwork.hpp">
       <Filter>Header files\RoutingSelection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Metrics\FlitTracer.hpp">
+      <Filter>Header files\Metrics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

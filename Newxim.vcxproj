@@ -40,6 +40,7 @@
     <ClCompile Include="src\Hardware\NoC.cpp" />
     <ClCompile Include="src\Hardware\Processor.cpp" />
     <ClCompile Include="src\Hardware\ProcessorQueue.cpp" />
+    <ClCompile Include="src\Hardware\Relay.cpp" />
     <ClCompile Include="src\Hardware\ReservationTable.cpp" />
     <ClCompile Include="src\Hardware\Routers\PerFlitRouter.cpp" />
     <ClCompile Include="src\Hardware\Routers\PerFlitSubnetworkRouter.cpp" />
@@ -50,11 +51,14 @@
     <ClCompile Include="src\Hardware\Routers\WormholeSubnetworkRouter.cpp" />
     <ClCompile Include="src\Hardware\SimulationTimer.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Metrics\FlitTracer.cpp" />
     <ClCompile Include="src\Metrics\GlobalStats.cpp" />
     <ClCompile Include="src\Metrics\Power.cpp" />
     <ClCompile Include="src\Metrics\ProgressBar.cpp" />
     <ClCompile Include="src\Metrics\Stats.cpp" />
+    <ClCompile Include="src\RoutingSelection\RoutingFitSubnetwork.cpp" />
     <ClCompile Include="src\RoutingSelection\RoutingMeshXY.cpp" />
+    <ClCompile Include="src\RoutingSelection\RoutingSubnetwork.cpp" />
     <ClCompile Include="src\RoutingSelection\RoutingTableBased.cpp" />
     <ClCompile Include="src\RoutingSelection\RoutingTests.cpp" />
     <ClCompile Include="src\RoutingSelection\RoutingTorusXY.cpp" />
@@ -89,6 +93,7 @@
     <ClInclude Include="src\Hardware\Routers\WormholeSubnetworkRouter.hpp" />
     <ClInclude Include="src\Hardware\SimulationTimer.hpp" />
     <ClInclude Include="src\Hardware\Tile.hpp" />
+    <ClInclude Include="src\Metrics\FlitTracer.hpp" />
     <ClInclude Include="src\Metrics\GlobalStats.hpp" />
     <ClInclude Include="src\Metrics\Power.hpp" />
     <ClInclude Include="src\Metrics\ProgressBar.hpp" />
