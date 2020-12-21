@@ -26,6 +26,7 @@ private:
 	bool LoadCirculantClockwise(const Graph& graph);
 	bool LoadCirculantAdaptive(const Graph& graph);
 	bool LoadCirculantMultiplicative(const Graph& graph);
+	bool LoadDeltaDistanceVector(const Graph &graph);
 
 public:
 	RoutingTable();

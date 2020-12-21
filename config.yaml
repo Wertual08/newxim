@@ -67,6 +67,7 @@ selection_strategy: RANDOM
 #   CIRCULANT_MULTIPLICATIVE
 #   CIRCULANT_CLOCKWISE
 #   CIRCULANT_ADAPTIVE
+#   DELTA_DISTANCE_VECTOR
 #   just table
 routing_table: DIJKSTRA_MULTIPATH
 routing_table_id_based: true
@@ -78,7 +79,7 @@ report_progress: true
 report_buffers: false
 report_topology_graph: false
 report_topology_graph_adjacency_matrix: false
-report_routing_table: false
+report_routing_table: true
 report_topology_sub_graph: false
 report_topology_sub_graph_adjacency_matrix: false
 report_sub_routing_table: false

@@ -1,7 +1,9 @@
 #include "RoutingTable.hpp"
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <algorithm>
+#include <array>
 
 // TODO: Decide how to generate routing tables for circulants
 
@@ -711,7 +713,7 @@ bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
 	for (std::int32_t i = 0; i < graph.size(); i++)
 	{
 		std::int32_t from_zero_to_i = PerformAdaptive(graph.size(), generator_1, generator_2, 0, i);
-	
+
 		for (std::int32_t j = 0; j < graph.size(); j++)
 		{
 			std::int32_t target = (i + j) % graph.size();
@@ -726,18 +728,18 @@ bool RoutingTable::LoadCirculantAdaptive(const Graph& graph)
 
 	return true;
 }
-bool RoutingTable::LoadCirculantMultiplicative(const Graph& graph)
+bool RoutingTable::LoadCirculantMultiplicative(const Graph &graph)
 {
 	if (graph.size() < 1) return true;
 
 	std::vector<std::int32_t> generators;
 	for (std::int32_t i = 0; i < graph[0].size(); i++)
-		if (std::find(generators.begin(), generators.end(), 
+		if (std::find(generators.begin(), generators.end(),
 			graph[0][i]) == generators.end())
 			generators.push_back(graph[0][i]);
 	std::sort(generators.begin(), generators.end());
 	generators.resize(generators.size() / 2);
-	
+
 	for (std::int32_t i = 0; i < graph.size(); i++)
 	{
 		for (std::int32_t j = 0; j < graph.size(); j++)
@@ -768,6 +770,103 @@ bool RoutingTable::LoadCirculantMultiplicative(const Graph& graph)
 	//		}
 	//	}
 	//}
+
+	return true;
+}
+bool RoutingTable::LoadDeltaDistanceVector(const Graph &graph)
+{
+	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
+
+	//std::array<std::int32_t, 4> basis = { 9, 14, 49, 54 }; // A, B, C, D
+	std::array<std::int32_t, 4> basis = { 0, 7, 56, 63 }; // A, B, C, D
+	std::vector<std::array<std::int32_t, basis.size()>> distances(graph.size(), { inf, inf, inf, inf });
+
+	for (std::size_t b = 0; b < basis.size(); b++)
+		distances[basis[b]][b] = 0;
+
+	for (std::size_t b = 0; b < basis.size(); b++)
+	{
+		for (std::size_t d = 1; d < graph.size(); d++)
+		{
+			for (std::size_t n = 0; n < graph.size(); n++)
+			{
+				if (d < distances[n][b])
+				{
+					for (std::int32_t s : graph[n])
+					{
+						if (distances[s][b] == d - 1)
+						{
+							distances[n][b] = d;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//for (std::size_t i = 0; i < distances.size(); i++)
+	//{
+	//	std::cout << "{ ";
+	//	for (std::size_t b = 0; b < basis.size() - 1; b++)
+	//		std::cout << std::setw(2) << std::setfill('0') << distances[i][b] << ", ";
+	//	if (distances[i].empty()) std::cout << "}";
+	//	else std::cout << std::setw(2) << std::setfill('0') << distances[i][basis.size() - 1] << " }";
+	//	if (i % 8 == 7) std::cout << '\n';
+	//	else std::cout << ';';
+	//}
+	//
+	//for (std::size_t b = 0; b < basis.size(); b++)
+	//{
+	//	for (std::size_t i = 0; i < distances.size(); i++)
+	//	{
+	//		std::cout << std::setw(2) << std::setfill('0') << distances[i][b];
+	//		if (i % 8 == 7) std::cout << '\n';
+	//		else std::cout << ";";
+	//	}
+	//	std::cout << '\n';
+	//}
+
+	for (std::size_t s = 0; s < graph.size(); s++)
+	{
+		for (std::size_t d = 0; d < graph.size(); d++)
+		{
+			auto &node = Nodes[s][d];
+			if (s == d) node.push_back(graph[s].size());
+			else
+			{
+				std::array<std::int32_t, basis.size()> delta;
+				for (std::size_t b = 0; b < basis.size(); b++)
+					delta[b] = distances[d][b] - distances[s][b];
+
+
+				std::int32_t max_len = -1;
+				for (std::int32_t r = 0; r < graph[s].size(); r++)
+				{
+					std::int32_t n = graph[s][r];
+
+					std::array<std::int32_t, basis.size()> delta_n;
+					for (std::size_t b = 0; b < basis.size(); b++)
+						delta_n[b] = distances[n][b] - distances[s][b];
+
+					std::int32_t len = 0;
+					for (std::size_t b = 0; b < basis.size(); b++)
+						len += delta[b] * delta_n[b];
+
+					if (len > max_len)
+					{
+						max_len = len;
+						node.clear();
+						node.push_back(r);
+					}
+					else if (len == max_len)
+					{
+						node.push_back(r);
+					}
+				}
+			}
+		}
+	}
 
 	return true;
 }
@@ -852,6 +951,7 @@ bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 	if (generator == "CIRCULANT_MULTIPLICATIVE") return LoadCirculantMultiplicative(graph);
 	if (generator == "CIRCULANT_CLOCKWISE") return LoadCirculantClockwise(graph);
 	if (generator == "CIRCULANT_ADAPTIVE") return LoadCirculantAdaptive(graph);
+	if (generator == "DELTA_DISTANCE_VECTOR") return LoadDeltaDistanceVector(graph);
 	return false;
 }
 
