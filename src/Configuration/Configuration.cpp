@@ -7,6 +7,7 @@
 #include <ctime>
 #include "Hardware/Buffer.hpp"
 #include <filesystem>
+#include <iomanip>
 
 
 
@@ -354,6 +355,8 @@ void Configuration::ReadSimulationParams(const YAML::Node& config)
 	report_topology_graph = ReadParam<bool>(config, "report_topology_graph", false);
 	report_topology_graph_adjacency_matrix = ReadParam<bool>(config, "report_topology_graph_adjacency_matrix", false);
 	report_routing_table = ReadParam<bool>(config, "report_routing_table", false);
+	report_routes_stats = ReadParam<bool>(config, "report_routes_stats", false);
+	report_possible_routes = ReadParam<bool>(config, "report_possible_routes", false);
 	report_topology_sub_graph = ReadParam<bool>(config, "report_topology_sub_graph", false);
 	report_topology_sub_graph_adjacency_matrix = ReadParam<bool>(config, "report_topology_sub_graph_adjacency_matrix", false);
 	report_sub_routing_table = ReadParam<bool>(config, "report_sub_routing_table", false);
@@ -366,7 +369,7 @@ void Configuration::ReadSimulationParams(const YAML::Node& config)
 	{
 		if (node.IsSequence())
 		{
-			report_flit_trace = false;
+			report_flit_trace = true;
 			flit_trace_start = node[0].as<std::int32_t>();
 			if (node.size() == 2) flit_trace_end = node[1].as<std::int32_t>();
 		}
@@ -409,6 +412,56 @@ void Configuration::ReportData()
 	if (report_topology_graph) std::cout << "Topology graph: " << graph;
 	if (report_topology_graph_adjacency_matrix) std::cout << "Topology graph adjacency matrix:\n" << graph.adjacency_matrix();
 	if (report_routing_table) std::cout << "Routing table: " << table << '\n'; 
+	if (report_possible_routes)
+	{
+		std::cout << "Possible routes:\n";
+		for (std::int32_t s = 0; s < graph.size(); s++)
+		{
+			for (std::int32_t d = 0; d < graph.size(); d++)
+			{
+				auto routes = table.GetPaths(graph, s, d);
+				std::cout << std::setfill('0') << "[" << std::setw(2) << s << " -> " << std::setw(2) << d << "]:\n";
+				for (std::int32_t i = 0; i < static_cast<std::int32_t>(routes.size()); i++)
+				{
+					const auto &route = routes[i];
+					for (std::int32_t j = 0; j < static_cast<std::int32_t>(route.size()) - 1; j++)
+					{
+						std::cout << route[j] << " -> ";
+					}
+					if (route.size()) std::cout << route.back();
+					std::cout << '\n';
+				}
+			}
+		}
+	}
+	if (report_routes_stats)
+	{
+		std::size_t total_routes = 0;
+		std::size_t total_distance = 0;
+		std::size_t total_combinations = 0;
+		std::size_t total_min_distance = 0;
+		for (std::int32_t s = 0; s < graph.size(); s++)
+		{
+			for (std::int32_t d = 0; d < graph.size(); d++)
+			{
+				auto routes = table.GetPaths(graph, s, d);
+				total_routes += routes.size();
+				total_combinations++;
+				std::size_t min_size = routes.front().size() - 1;
+				for (const auto &route : routes)
+				{
+					total_distance += route.size() - 1;
+					if (route.size() - 1 < min_size) min_size = route.size() - 1;
+				}
+				total_min_distance += min_size;
+			}
+		}
+		std::cout << "Total routes:       " << total_routes << '\n';
+		std::cout << "Total distance:     " << total_distance << '\n';
+		std::cout << "Average distance:   " << static_cast<double>(total_distance) / static_cast<double>(total_routes) << '\n';
+		std::cout << "Total combinations: " << total_combinations << '\n';
+		std::cout << "Average min route:  " << static_cast<double>(total_min_distance) / static_cast<double>(total_combinations) << '\n';
+	}
 	if (report_topology_sub_graph && sub_graph) std::cout << "Topology sub graph: " << *sub_graph;
 	if (report_topology_sub_graph_adjacency_matrix && sub_graph) std::cout << "Topology sub graph adjacency matrix:\n" << sub_graph->adjacency_matrix();
 	if (report_sub_routing_table && sub_table) std::cout << "Sub routing table: " << *sub_table << '\n';

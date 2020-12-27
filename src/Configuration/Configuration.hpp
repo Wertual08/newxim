@@ -70,6 +70,8 @@ private:
 	bool report_progress;
 	bool report_buffers;
 	bool report_routing_table;
+	bool report_possible_routes;
+	bool report_routes_stats;
 	bool report_topology_graph;
 	bool report_topology_graph_adjacency_matrix;
 	bool report_sub_routing_table;

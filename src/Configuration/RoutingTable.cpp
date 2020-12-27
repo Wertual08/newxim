@@ -248,138 +248,7 @@ std::vector<std::string> split(const std::string& str, char s)
 	return std::move(result);
 }
 
-bool RoutingTable::LoadDijkstraDeadlockFree(const Graph& graph)
-{
-	std::int32_t helper_offset = 0;
-	for (std::int32_t i = 0; i < Nodes.size(); i++)
-		if (helper_offset < graph[i].size()) 
-			helper_offset = graph[i].size();
-
-	std::vector<std::vector<std::int32_t>> helper_graph(graph.size() * helper_offset);
-	std::vector<std::pair<std::int32_t, std::vector<std::int32_t>>> path_backup;
-
-	for (std::int32_t i = 0; i < graph.size(); i++)
-	{
-		//printf("*");
-		for (std::int32_t j = 0; j < graph.size(); j++)
-		{
-			if (i == j) Nodes[i][j].push_back(graph[i].size());
-			else
-			{
-				bool found = false;
-				auto shortest_paths = graph.get_paths(i, j);
-				for (const auto& path : shortest_paths)
-				{
-					path_backup.clear();
-					for (std::int32_t p = 0; p < path.size(); p++)
-					{
-						const auto& node = path[p];
-						if (node.ORelay >= 0)
-						{
-							std::int32_t index_o = node.NodeID * helper_offset + node.ORelay;
-							const auto& next_node = path[p + 1];
-
-							std::int32_t index = next_node.NodeID * helper_offset + next_node.IRelay;
-							if (std::find(helper_graph[index_o].begin(), helper_graph[index_o].end(), index) == helper_graph[index_o].end())
-							{
-								path_backup.push_back(std::make_pair(index_o, helper_graph[index_o]));
-								helper_graph[index_o].push_back(index);
-							}
-
-							if (node.IRelay >= 0)
-							{
-								std::int32_t index_i = node.NodeID * helper_offset + node.IRelay;
-
-								if (std::find(helper_graph[index_i].begin(), helper_graph[index_i].end(), index_o) == helper_graph[index_i].end())
-								{
-									path_backup.push_back(std::make_pair(index_i, helper_graph[index_i]));
-									helper_graph[index_i].push_back(index_o);
-								}
-							}
-						}
-					}
-					if (no_cycles(helper_graph))
-					{
-						Nodes[i][j].push_back(path[0].ORelay);
-						found = true;
-						break;
-					}
-					else
-					{
-						for (const auto& node : path_backup)
-							helper_graph[node.first] = node.second;
-					}
-				}
-				if (!found) return false;
-			}
-		}
-	}
-	for (std::int32_t i = 0; i < helper_graph.size(); i++)
-	{
-		for (std::int32_t v : helper_graph[i]) std::cout << v << " ";
-		std::cout << '\n';
-	}
-	return true;
-}
 bool RoutingTable::LoadDijkstra(const Graph& graph)
-{
-	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
-
-	for (std::int32_t i = 0; i < graph.size(); i++)
-	{
-		std::vector<std::int32_t> weights(graph.size(), inf);
-		std::vector<bool> visited(graph.size(), false);
-		weights[i] = 0;
-
-		std::int32_t min_index, min;
-		do
-		{
-			min_index = min = inf;
-
-			for (std::int32_t j = 0; j < graph.size(); j++)
-			{ 
-				if (!visited[j] && weights[j] < min)
-				{ 
-					min = weights[j];
-					min_index = j;
-				}
-			}
-
-			if (min_index != inf)
-			{
-				for (std::int32_t j = 0; j < graph[min_index].size(); j++)
-				{
-					std::int32_t id = graph[min_index][j];
-					if (id >= 0)
-					{
-						std::int32_t t = min + 1; // 1 distance may be here...
-						if (t < weights[id]) weights[id] = t;
-					}
-				}
-				visited[min_index] = true;
-			}
-		} 
-		while (min_index != inf);
-
-		for (std::int32_t j = 0; j < graph.size(); j++)
-		{
-			Nodes[j][i].push_back(0);
-			auto& current_relay = Nodes[j][i][0];
-
-			for (std::int32_t k = 1; k < graph[j].size(); k++)
-			{
-				std::int32_t id = graph[j][k];
-				if (id >= 0)
-				{
-					std::int32_t t = weights[j] - 1;
-					if (t == weights[id]) current_relay = k;
-				}
-			}
-		}
-	}
-	return true;
-}
-bool RoutingTable::LoadDijkstraMultipath(const Graph& graph)
 {
 	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
 
@@ -773,59 +642,84 @@ bool RoutingTable::LoadCirculantMultiplicative(const Graph &graph)
 
 	return true;
 }
-bool RoutingTable::LoadDeltaDistanceVector(const Graph &graph)
+template<std::size_t sz>
+void mark_distances(const Graph &graph,
+	std::vector<std::array<std::int32_t, sz>> &distances, 
+	std::array<std::int32_t, sz> &basis, std::size_t b)
 {
-	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
-
-	//std::array<std::int32_t, 4> basis = { 9, 14, 49, 54 }; // A, B, C, D
-	std::array<std::int32_t, 4> basis = { 0, 7, 56, 63 }; // A, B, C, D
-	std::vector<std::array<std::int32_t, basis.size()>> distances(graph.size(), { inf, inf, inf, inf });
-
-	for (std::size_t b = 0; b < basis.size(); b++)
-		distances[basis[b]][b] = 0;
-
-	for (std::size_t b = 0; b < basis.size(); b++)
+	distances[basis[b]][b] = 0;
+	for (std::size_t d = 1; d < graph.size(); d++)
 	{
-		for (std::size_t d = 1; d < graph.size(); d++)
+		for (std::size_t n = 0; n < graph.size(); n++)
 		{
-			for (std::size_t n = 0; n < graph.size(); n++)
+			if (d < distances[n][b])
 			{
-				if (d < distances[n][b])
+				for (std::int32_t s : graph[n])
 				{
-					for (std::int32_t s : graph[n])
+					if (distances[s][b] == d - 1)
 					{
-						if (distances[s][b] == d - 1)
-						{
-							distances[n][b] = d;
-							break;
-						}
+						distances[n][b] = d;
+						break;
 					}
 				}
 			}
 		}
 	}
+}
+bool RoutingTable::LoadGreedyPromotion(const Graph &graph)
+{
+	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
 
-	//for (std::size_t i = 0; i < distances.size(); i++)
-	//{
-	//	std::cout << "{ ";
-	//	for (std::size_t b = 0; b < basis.size() - 1; b++)
-	//		std::cout << std::setw(2) << std::setfill('0') << distances[i][b] << ", ";
-	//	if (distances[i].empty()) std::cout << "}";
-	//	else std::cout << std::setw(2) << std::setfill('0') << distances[i][basis.size() - 1] << " }";
-	//	if (i % 8 == 7) std::cout << '\n';
-	//	else std::cout << ';';
-	//}
-	//
-	//for (std::size_t b = 0; b < basis.size(); b++)
-	//{
-	//	for (std::size_t i = 0; i < distances.size(); i++)
-	//	{
-	//		std::cout << std::setw(2) << std::setfill('0') << distances[i][b];
-	//		if (i % 8 == 7) std::cout << '\n';
-	//		else std::cout << ";";
-	//	}
-	//	std::cout << '\n';
-	//}
+	std::array<std::int32_t, 4> basis = { 0, -1, -1, -1 }; // A, B, C, D
+
+	std::vector<std::array<std::int32_t, basis.size()>> distances(graph.size(), { inf, inf, inf, inf });
+
+	mark_distances(graph, distances, basis, 0);
+	std::size_t select = 0;
+	for (std::size_t n = 0; n < distances.size(); n++)
+		if (distances[n][0] > distances[select][0]) 
+			select = n;
+	
+	basis[1] = select;
+	mark_distances(graph, distances, basis, 1);
+	select = 0;
+	for (std::size_t n = 0; n < distances.size(); n++)
+		if (distances[n][0] + distances[n][1] > 
+			distances[select][0] + distances[select][1])
+			select = n;
+
+	basis[2] = select;
+	mark_distances(graph, distances, basis, 2);
+	select = 0;
+	for (std::size_t n = 0; n < distances.size(); n++)
+		if (std::min({ distances[n][0], distances[n][1], distances[n][2] }) >
+			std::min({ distances[select][0], distances[select][1], distances[select][2] }))
+			select = n;
+
+	basis[3] = select;
+	mark_distances(graph, distances, basis, 3);
+
+	/*for (std::size_t i = 0; i < distances.size(); i++)
+	{
+		std::cout << "{ ";
+		for (std::size_t b = 0; b < basis.size() - 1; b++)
+			std::cout << std::setw(2) << std::setfill('0') << distances[i][b] << ", ";
+		if (distances[i].empty()) std::cout << "}";
+		else std::cout << std::setw(2) << std::setfill('0') << distances[i][basis.size() - 1] << " }";
+		if (i % 2 == 1) std::cout << '\n';
+		else std::cout << ';';
+	}
+	
+	for (std::size_t b = 0; b < basis.size(); b++)
+	{
+		for (std::size_t i = 0; i < distances.size(); i++)
+		{
+			std::cout << std::setw(2) << std::setfill('0') << distances[i][b];
+			if (i % 2 == 1) std::cout << '\n';
+			else std::cout << ";";
+		}
+		std::cout << '\n';
+	}*/
 
 	for (std::size_t s = 0; s < graph.size(); s++)
 	{
@@ -941,17 +835,15 @@ bool RoutingTable::Load(const std::string& path)
 bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 {
 	Nodes.resize(graph.size(), Node(graph.size()));
-	if (generator == "DEFAULT") return LoadDijkstraMultipath(graph);
+	if (generator == "DEFAULT") return LoadDijkstra(graph);
 	if (generator == "DIJKSTRA") return LoadDijkstra(graph);
-	if (generator == "DIJKSTRA_MULTIPATH") return LoadDijkstraMultipath(graph);
-	if (generator == "DIJKSTRA_DEADLOCK_FREE") return LoadDijkstraDeadlockFree(graph);
 	if (generator == "UP_DOWN") return LoadUpDown(graph);
 	if (generator == "MESH_XY") return LoadMeshXY(graph);
 	if (generator == "CIRCULANT_PAIR_EXCHANGE") return LoadCirculantPairExchange(graph);
 	if (generator == "CIRCULANT_MULTIPLICATIVE") return LoadCirculantMultiplicative(graph);
 	if (generator == "CIRCULANT_CLOCKWISE") return LoadCirculantClockwise(graph);
 	if (generator == "CIRCULANT_ADAPTIVE") return LoadCirculantAdaptive(graph);
-	if (generator == "DELTA_DISTANCE_VECTOR") return LoadDeltaDistanceVector(graph);
+	if (generator == "GREEDY_PROMOTION") return LoadGreedyPromotion(graph);
 	return false;
 }
 
@@ -972,6 +864,25 @@ const RoutingTable::Node& RoutingTable::operator[](std::int32_t node_id) const
 bool RoutingTable::IsValid() const
 {
 	return Nodes.size();
+}
+
+void RoutingTable::get_paths_helper(const Graph &graph, std::vector<std::vector<std::int32_t>> &paths, 
+	std::vector<std::int32_t> path, std::int32_t next, std::int32_t d) const
+{
+	path.push_back(next);
+	if (next == d) 
+	{
+		paths.push_back(std::move(path));
+		return;
+	}
+	for (std::int32_t r : Nodes[next][d])
+		get_paths_helper(graph, paths, path, graph[next][r], d);
+}
+std::vector<std::vector<std::int32_t>> RoutingTable::GetPaths(const Graph &graph, std::int32_t s, std::int32_t d) const
+{
+	std::vector<std::vector<std::int32_t>> result;
+	get_paths_helper(graph, result, std::vector<std::int32_t>(), s, d);
+	return result;
 }
 
 std::ostream& operator<<(std::ostream& os, const RoutingTable& rt)

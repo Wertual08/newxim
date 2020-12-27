@@ -1,5 +1,5 @@
 # TESTING
-sub_tree_generator: TGEN_4
+sub_tree_generator: TGEN_4 # TGEN_4 / NONE
 # END_OF_TESTING
 
 # Each parameter is overwritten when corresponding command line value is set
@@ -19,7 +19,7 @@ sub_tree_generator: TGEN_4
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: TORUS
+topology: MESH
 topology_args: [8, 8]
 topology_channels: 1
 virtual_channels: 2
@@ -31,7 +31,7 @@ virtual_channels: 2
 #   PER_FLIT_SUBNETWORK
 #   WORMHOLE_FIXED_SUBNETWORK
 #   WORMHOLE_FIT_SUBNETWORK
-router_type: WORMHOLE
+router_type: WORMHOLE_FIT_SUBNETWORK
 
 # number of flits for each router buffer
 buffer_depth: 9
@@ -46,7 +46,7 @@ flit_size: 32
 #	FIT_SUBNETWORK
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: FIT_SUBNETWORK
+routing_algorithm: TABLE_BASED
 
 # Selection Strategies:
 #   RANDOM
@@ -59,17 +59,15 @@ selection_strategy: RANDOM
 
 # Default routing table generators:
 #   DIJKSTRA
-#   DIJKSTRA_MULTIPATH
-#   DIJKSTRA_DEADLOCK_FREE (test)
 #   UP_DOWN
 #   MESH_XY
 #   CIRCULANT_PAIR_EXCHANGE
 #   CIRCULANT_MULTIPLICATIVE
 #   CIRCULANT_CLOCKWISE
 #   CIRCULANT_ADAPTIVE
-#   DELTA_DISTANCE_VECTOR
+#   GREEDY_PROMOTION
 #   just table
-routing_table: DIJKSTRA_MULTIPATH
+routing_table: DIJKSTRA
 routing_table_id_based: true
 
 # SIMULATION PARAMETERS
@@ -79,7 +77,9 @@ report_progress: true
 report_buffers: false
 report_topology_graph: false
 report_topology_graph_adjacency_matrix: false
-report_routing_table: true
+report_routing_table: false
+report_possible_routes: false
+report_routes_stats: true
 report_topology_sub_graph: false
 report_topology_sub_graph_adjacency_matrix: false
 report_sub_routing_table: false
