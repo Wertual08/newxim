@@ -32,7 +32,6 @@ public:
 	RoutingTable(const Graph& graph, const std::string& generator = "DEFAULT");
 	RoutingTable(const Graph& graph, const Graph& sub_graph, const std::string& generator = "DEFAULT");
 
-	// Load routing table from file. Returns true if ok, false otherwise
 	bool Load(const std::string& path);
 	bool Load(const Graph& graph, const std::string& generator = "DEFAULT");
 

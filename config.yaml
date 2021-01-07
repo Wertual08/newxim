@@ -19,19 +19,17 @@ sub_tree_generator: TGEN_4 # TGEN_4 / NONE
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: MESH
-topology_args: [8, 8]
+topology: CIRCULANT
+topology_args: [64, 1, 14]
 topology_channels: 1
 virtual_channels: 2
 
 # Router types:
-#   WORMHOLE
-#   PER_FLIT
-#   WORMHOLE_SUBNETWORK
-#   PER_FLIT_SUBNETWORK
-#   WORMHOLE_FIXED_SUBNETWORK
-#   WORMHOLE_FIT_SUBNETWORK
-router_type: WORMHOLE_FIT_SUBNETWORK
+#   BASIC
+#   SUBNETWORK
+#   FIXED_SUBNETWORK
+#   FIT_SUBNETWORK
+router_type: FIT_SUBNETWORK
 
 # number of flits for each router buffer
 buffer_depth: 9
@@ -41,9 +39,9 @@ flit_size: 32
 # Routing algorithms:
 #   TABLE_BASED
 #   MESH_XY
-#   TORUS_XY (test)
-#	SUBNETWORK
-#	FIT_SUBNETWORK
+#   TORUS_XY (test)    
+#   SUBNETWORK
+#   FIT_SUBNETWORK
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
 routing_algorithm: TABLE_BASED
@@ -67,7 +65,7 @@ selection_strategy: RANDOM
 #   CIRCULANT_ADAPTIVE
 #   GREEDY_PROMOTION
 #   just table
-routing_table: DIJKSTRA
+routing_table: GREEDY_PROMOTION
 routing_table_id_based: true
 
 # SIMULATION PARAMETERS
@@ -79,7 +77,7 @@ report_topology_graph: false
 report_topology_graph_adjacency_matrix: false
 report_routing_table: false
 report_possible_routes: false
-report_routes_stats: true
+report_routes_stats: false
 report_topology_sub_graph: false
 report_topology_sub_graph_adjacency_matrix: false
 report_sub_routing_table: false

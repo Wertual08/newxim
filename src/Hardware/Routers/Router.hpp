@@ -27,10 +27,12 @@ protected:
 	std::vector<Relay> Relays;
 	std::size_t start_from_port;		// Port from which to start the reservation cycle
 
+	ReservationTable reservation_table;
+
 	Connection FindDestination/*...unknown...*/(const Flit& flit);
 	bool Route(std::int32_t in_port, Connection dst);
 
-	virtual void TXProcess() = 0;		// The transmitting process
+	virtual void TXProcess();			// The transmitting process
 	void RXProcess();					// The receiving process
 
 public:
@@ -60,7 +62,7 @@ public:
 	std::size_t TotalBufferedFlits() const;
 	std::size_t DestinationFreeSlots(Connection dst) const;
 
-	virtual const ReservationTable* GetReservationTable() const { return nullptr; }
+	const ReservationTable &GetReservationTable() const { return reservation_table; }
 };
 
 

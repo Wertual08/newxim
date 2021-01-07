@@ -1,25 +1,46 @@
-#include "WormholeRouter.hpp"
+#include "SubnetworkRouter.hpp"
 
 
 
-void WormholeRouter::TXProcess()
+static bool VectorContains(const std::vector<std::int32_t>& vec, std::int32_t v)
 {
-	// 1st phase: Reservation
+	return std::find(vec.begin(), vec.end(), v) != vec.end();
+}
+static bool VectorContains(const std::vector<std::vector<std::int32_t>>& vec, std::int32_t v)
+{
+	for (const auto& sub_vec : vec)
+	{
+		if (std::find(sub_vec.begin(), sub_vec.end(), v) != sub_vec.end())
+			return true;
+	}
+	return false;
+}
+
+void SubnetworkRouter::TXProcess()
+{
 	for (std::int32_t j = 0; j < Relays.size(); j++)
 	{
-		std::int32_t in_port = (start_from_port + j) % Relays.size();
+		std::int32_t in_port = (start_from_port + j) % static_cast<std::int32_t>(Relays.size());
 		Relay& rel = Relays[in_port];
 
 		if (rel.FlitAvailable())
 		{
 			Flit flit = rel.Front();
+
 			power.bufferRouterFront();
 
 			if (HasFlag(flit.flit_type, FlitType::Head))
 			{
 				Connection src = { in_port, flit.vc_id };
 				Connection dst = FindDestination(flit);
+				
 				if (!dst.valid()) continue;
+
+				// TODO: Maybe it should select one of the channels... (Apply selection strategy???)
+				if (DestinationFreeSlots(dst) < 1)
+					dst.port = SubnetworkTable[flit.dst_id][0];
+				if (DestinationFreeSlots(dst) < 1)
+					continue;
 
 				if (!reservation_table.Reserved(src, dst))
 					reservation_table.Reserve(src, dst);
@@ -27,16 +48,14 @@ void WormholeRouter::TXProcess()
 		}
 	}
 
-	// 2nd phase: Forwarding
 	for (std::int32_t in_port = 0; in_port < Relays.size(); in_port++)
 	{
 		Relay& rel = Relays[in_port];
-		
-		Flit flit = rel.Front();
 
 		if (rel.FlitAvailable())
 		{
 			Flit flit = rel.Front();
+
 			Connection src = { in_port, flit.vc_id };
 			Connection dst = reservation_table[src];
 
@@ -44,10 +63,8 @@ void WormholeRouter::TXProcess()
 
 			if (Route(in_port, dst) && HasFlag(flit.flit_type, FlitType::Tail))
 				reservation_table.Release(src);
-
-			flit = rel.Front();
 		}
-	} // for loop directions
+	}
 
 	for (auto& relay : Relays) relay.Skip();
 }

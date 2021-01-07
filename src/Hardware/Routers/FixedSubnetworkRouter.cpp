@@ -1,4 +1,4 @@
-#include "WormholeSubnetworkRouter.hpp"
+#include "FixedSubnetworkRouter.hpp"
 
 
 
@@ -16,7 +16,7 @@ static bool VectorContains(const std::vector<std::vector<std::int32_t>>& vec, st
 	return false;
 }
 
-void WormholeSubnetworkRouter::TXProcess()
+void FixedSubnetworkRouter::TXProcess()
 {
 	for (std::int32_t j = 0; j < Relays.size(); j++)
 	{
@@ -32,12 +32,12 @@ void WormholeSubnetworkRouter::TXProcess()
 			if (HasFlag(flit.flit_type, FlitType::Head))
 			{
 				Connection src = { in_port, flit.vc_id };
-				Connection dst = FindDestination(flit);
-				
+				Connection dst = FindDestination(flit); if (!dst.valid())
 				if (!dst.valid()) continue;
 
 				// TODO: Maybe it should select one of the channels... (Apply selection strategy???)
-				if (DestinationFreeSlots(dst) < 1)
+				if (DestinationFreeSlots(dst) < 1 ||
+					VectorContains(SubnetworkTable, in_port))
 					dst.port = SubnetworkTable[flit.dst_id][0];
 				if (DestinationFreeSlots(dst) < 1)
 					continue;
@@ -58,7 +58,7 @@ void WormholeSubnetworkRouter::TXProcess()
 
 			Connection src = { in_port, flit.vc_id };
 			Connection dst = reservation_table[src];
-
+			
 			if (!dst.valid()) continue;
 
 			if (Route(in_port, dst) && HasFlag(flit.flit_type, FlitType::Tail))

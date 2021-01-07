@@ -14,12 +14,10 @@
 #include "Configuration/TrafficManagers/HotspotTrafficManager.hpp"
 #include "Configuration/TrafficManagers/TableTrafficManager.hpp"
 
-#include "Hardware/Routers/WormholeRouter.hpp"
-#include "Hardware/Routers/PerFlitRouter.hpp"
-#include "Hardware/Routers/PerFlitSubnetworkRouter.hpp"
-#include "Hardware/Routers/WormholeSubnetworkRouter.hpp"
-#include "Hardware/Routers/WormholeFixedSubnetworkRouter.hpp"
-#include "Hardware/Routers/WormholeFitSubnetworkRouter.hpp"
+#include "Hardware/Routers/Router.hpp"
+#include "Hardware/Routers/SubnetworkRouter.hpp"
+#include "Hardware/Routers/FixedSubnetworkRouter.hpp"
+#include "Hardware/Routers/FitSubnetworkRouter.hpp"
 
 
 
@@ -53,12 +51,10 @@ std::unique_ptr<TrafficManager> GetTraffic(const Configuration& config)
 std::unique_ptr<Router> GetRouter(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
 {
 	std::size_t relays_count = config.TopologyGraph()[id].size();
-	if (config.RouterType() == "WORMHOLE") return std::make_unique<WormholeRouter>(timer, id, relays_count);
-	if (config.RouterType() == "PER_FLIT") return std::make_unique<PerFlitRouter>(timer, id, relays_count);
-	if (config.RouterType() == "PER_FLIT_SUBNETWORK") return std::make_unique<PerFlitSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size());
-	if (config.RouterType() == "WORMHOLE_SUBNETWORK") return std::make_unique<WormholeSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size());
-	if (config.RouterType() == "WORMHOLE_FIXED_SUBNETWORK") return std::make_unique<WormholeFixedSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size());
-	if (config.RouterType() == "WORMHOLE_FIT_SUBNETWORK") return std::make_unique<WormholeFitSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size());
+	if (config.RouterType() == "BASIC") return std::make_unique<Router>(timer, id, relays_count);
+	if (config.RouterType() == "SUBNETWORK") return std::make_unique<SubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size());
+	if (config.RouterType() == "FIXED_SUBNETWORK") return std::make_unique<FixedSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size());
+	if (config.RouterType() == "FIT_SUBNETWORK") return std::make_unique<FitSubnetworkRouter>(timer, id, relays_count + config.TopologySubGraph()[id].size());
 	throw std::runtime_error("Configuration error: Invalid router type [" + config.RouterType() + "].");
 }
 std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
@@ -195,10 +191,9 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 {
 	InitBase();
 
-	if (config.RouterType() == "PER_FLIT_SUBNETWORK" ||
-		config.RouterType() == "WORMHOLE_SUBNETWORK" ||
-		config.RouterType() == "WORMHOLE_FIXED_SUBNETWORK" ||
-		config.RouterType() == "WORMHOLE_FIT_SUBNETWORK")
+	if (config.RouterType() == "SUBNETWORK" ||
+		config.RouterType() == "FIXED_SUBNETWORK" ||
+		config.RouterType() == "FIT_SUBNETWORK")
 	{
 		InitSubNetwork();
 	}

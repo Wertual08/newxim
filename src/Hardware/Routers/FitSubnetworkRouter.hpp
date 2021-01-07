@@ -4,11 +4,8 @@
 
 
 
-class WormholeFixedSubnetworkRouter : public SubnetworkRouter
+class FitSubnetworkRouter : public SubnetworkRouter
 {
-private:
-	ReservationTable reservation_table;
-
 protected:
 	virtual void TXProcess() override;
 
