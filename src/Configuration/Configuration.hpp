@@ -105,7 +105,7 @@ public:
 	static void ShowHelp(const std::string& selfname);
 
 	Configuration(std::int32_t arg_num, char* arg_vet[]);
-	void ParseArgs(std::int32_t arg_num, char* arg_vet[]);
+	void ParseArgs(YAML::Node &node, std::int32_t arg_num, char* arg_vet[]);
 	void Check();
 
 	void Show() const;

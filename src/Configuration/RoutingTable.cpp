@@ -684,9 +684,16 @@ bool RoutingTable::LoadGreedyPromotion(const Graph &graph)
 	mark_distances(graph, distances, basis, 1);
 	select = 0;
 	for (std::size_t n = 0; n < distances.size(); n++)
-		if (distances[n][0] + distances[n][1] > 
+	{
+		if (distances[n][0] + distances[n][1] >
 			distances[select][0] + distances[select][1])
 			select = n;
+		else if (distances[n][0] + distances[n][1] ==
+			distances[select][0] + distances[select][1] &&
+			std::abs(distances[n][0] - distances[n][1]) <
+			std::abs(distances[select][0] - distances[select][1]))
+			select = n;
+	}
 
 	basis[2] = select;
 	mark_distances(graph, distances, basis, 2);
@@ -699,27 +706,27 @@ bool RoutingTable::LoadGreedyPromotion(const Graph &graph)
 	basis[3] = select;
 	mark_distances(graph, distances, basis, 3);
 
-	/*for (std::size_t i = 0; i < distances.size(); i++)
+	std::size_t row = 4;
+	for (std::size_t i = 0; i < distances.size(); i++)
 	{
 		std::cout << "{ ";
 		for (std::size_t b = 0; b < basis.size() - 1; b++)
 			std::cout << std::setw(2) << std::setfill('0') << distances[i][b] << ", ";
 		if (distances[i].empty()) std::cout << "}";
 		else std::cout << std::setw(2) << std::setfill('0') << distances[i][basis.size() - 1] << " }";
-		if (i % 2 == 1) std::cout << '\n';
+		if (i % row == row - 1) std::cout << '\n';
 		else std::cout << ';';
 	}
-	
 	for (std::size_t b = 0; b < basis.size(); b++)
 	{
 		for (std::size_t i = 0; i < distances.size(); i++)
 		{
 			std::cout << std::setw(2) << std::setfill('0') << distances[i][b];
-			if (i % 2 == 1) std::cout << '\n';
+			if (i % row == row - 1) std::cout << '\n';
 			else std::cout << ";";
 		}
 		std::cout << '\n';
-	}*/
+	}
 
 	for (std::size_t s = 0; s < graph.size(); s++)
 	{
@@ -734,7 +741,7 @@ bool RoutingTable::LoadGreedyPromotion(const Graph &graph)
 					delta[b] = distances[d][b] - distances[s][b];
 
 
-				std::int32_t max_len = -1;
+				std::int32_t max_len = std::numeric_limits<std::int32_t>::min();
 				for (std::int32_t r = 0; r < graph[s].size(); r++)
 				{
 					std::int32_t n = graph[s][r];

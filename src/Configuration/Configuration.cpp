@@ -568,6 +568,10 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 		exit(0);
 	}
 
+
+	ParseArgs(config, arg_num, arg_vet);
+
+
 	ReadTopologyParams(config);
 	ReadRouterParams(config);
 	ReadRoutingTableParams(config);
@@ -605,8 +609,6 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 	}
 	power_configuration = power_config.as<Power>();
 
-	ParseArgs(arg_num, arg_vet); 
-
 	Check();
 
 	ReportData();
@@ -614,7 +616,7 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[])
 	// Show configuration
 	// Show();
 }
-void Configuration::ParseArgs(std::int32_t arg_num, char* arg_vet[])
+void Configuration::ParseArgs(YAML::Node &node, std::int32_t arg_num, char* arg_vet[])
 {
 	if (arg_num == 1)
 		std::cout << "Running with default parameters (use '-help' option to see how to override them)\n";
@@ -622,71 +624,9 @@ void Configuration::ParseArgs(std::int32_t arg_num, char* arg_vet[])
 	{
 		for (std::int32_t i = 1; i < arg_num; i++)
 		{
-			if (!strcmp(arg_vet[i], "-buffer")) buffer_depth = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-flit")) flit_size = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-size"))
-			{
-				min_packet_size = atoi(arg_vet[++i]);
-				max_packet_size = atoi(arg_vet[++i]);
+			if (arg_vet[i][0] == '-') {
+				node[arg_vet[i] + 1] = arg_vet[++i];
 			}
-			else if (!strcmp(arg_vet[i], "-routing"))
-			{
-				routing_algorithm = arg_vet[++i];
-				if (routing_algorithm == "TABLE_BASED")
-				{
-					//routing_table_filename = arg_vet[++i];
-					//packet_injection_rate = 0;
-				}
-			}
-			else if (!strcmp(arg_vet[i], "-sel")) selection_strategy = arg_vet[++i];
-			else if (!strcmp(arg_vet[i], "-pir"))
-			{
-				packet_injection_rate = atof(arg_vet[++i]);
-				char* distribution = arg_vet[i + 1 < arg_num ? ++i : i];
-
-				if (!strcmp(distribution, "poisson"))
-					probability_of_retransmission = packet_injection_rate;
-				else if (!strcmp(distribution, "burst"))
-				{
-					double burstness = atof(arg_vet[++i]);
-					probability_of_retransmission = packet_injection_rate / (1 - burstness);
-				}
-				else if (!strcmp(distribution, "pareto")) 
-				{
-					double Aon = atof(arg_vet[++i]);
-					double Aoff = atof(arg_vet[++i]);
-					double r = atof(arg_vet[++i]);
-					probability_of_retransmission = packet_injection_rate * pow((1 - r), (1 / Aoff - 1 / Aon));
-				}
-				else if (!strcmp(distribution, "custom")) probability_of_retransmission = atof(arg_vet[++i]);
-				else assert("Invalid pir format" && false);
-			}
-			else if (!strcmp(arg_vet[i], "-traffic"))
-			{
-				char* traffic = arg_vet[++i];
-				if (!strcmp(traffic, "random")) traffic_distribution = "TRAFFIC_RANDOM";
-				//else if (!strcmp(traffic, "transpose1")) traffic_distribution = TRAFFIC_TRANSPOSE1;
-				//else if (!strcmp(traffic, "transpose2")) traffic_distribution = TRAFFIC_TRANSPOSE2;
-				//else if (!strcmp(traffic, "bitreversal")) traffic_distribution = TRAFFIC_BIT_REVERSAL;
-				//else if (!strcmp(traffic, "butterfly")) traffic_distribution = TRAFFIC_BUTTERFLY;
-				//else if (!strcmp(traffic, "shuffle")) traffic_distribution = TRAFFIC_SHUFFLE;
-				//else if (!strcmp(traffic, "ulocal")) traffic_distribution = TRAFFIC_ULOCAL;
-				//else if (!strcmp(traffic, "table")) 
-				//{
-				//	traffic_distribution = TRAFFIC_TABLE_BASED;
-				//	traffic_table_filename = arg_vet[++i];
-				//}
-				//else if (!strcmp(traffic, "local"))
-				//{
-				//	traffic_distribution = TRAFFIC_LOCAL;
-				//	locality = atof(arg_vet[++i]);
-				//}
-				else assert(false);
-			}
-			else if (!strcmp(arg_vet[i], "-warmup")) stats_warm_up_time = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-seed")) rnd_generator_seed = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-sim")) simulation_time = atoi(arg_vet[++i]);
-			else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power")) i++;
 			else {
 				std::cerr << "Error: Invalid option: " << arg_vet[i] << '\n';
 				exit(1);
