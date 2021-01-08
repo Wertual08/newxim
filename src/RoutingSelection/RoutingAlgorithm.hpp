@@ -1,12 +1,11 @@
 #pragma once
 #include <vector>
-#include "../DataStructs.hpp"
-#include "../Utils.hpp"
+#include "DataStructs.hpp"
 #include "Hardware/Connection.hpp"
+#include "Hardware/Router.hpp"
 
 
 
-class Router;
 class RoutingAlgorithm
 {
 public:

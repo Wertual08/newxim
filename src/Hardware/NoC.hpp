@@ -6,6 +6,8 @@
 #include "Configuration/Graph.hpp"
 #include "Configuration/TrafficManagers/TrafficManager.hpp"
 #include "Metrics/FlitTracer.hpp"
+#include "RoutingSelection/RoutingAlgorithm.hpp"
+#include "RoutingSelection/SelectionStrategy.hpp"
 
 
 
@@ -18,7 +20,6 @@ private:
 	std::unique_ptr<TrafficManager> Traffic;
 
 	void InitBase();
-	void InitSubNetwork();
 
 public:
 	std::unique_ptr<FlitTracer> Tracer;

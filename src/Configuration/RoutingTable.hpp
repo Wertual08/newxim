@@ -35,6 +35,8 @@ public:
 	bool Load(const std::string& path);
 	bool Load(const Graph& graph, const std::string& generator = "DEFAULT");
 
+	void Promote(const Graph &graph);
+
 	void push_back(Node&& node);
 
 	Node& operator[](std::int32_t node_id);

@@ -100,6 +100,24 @@ std::ostream& operator<<(std::ostream& os, const Graph& g)
 	return os;
 }
 
+Graph Graph::operator+(const Graph &g)
+{
+	if (size() != g.size()) throw std::runtime_error("Can not sum graphes with different sizes.");
+	Graph result;
+	result.resize(size());
+
+	for (std::size_t i = 0; i < result.size(); i++)
+	{
+		result[i].reserve(at(i).size() + g.at(i).size());
+		for (std::size_t j = 0; j < at(i).size(); j++)
+			result[i].push_back(at(i)[j]);
+		for (std::size_t j = 0; j < g.at(i).size(); j++)
+			result[i].push_back(g.at(i)[j]);
+	}
+
+	return result;
+}
+
 std::vector<std::vector<Graph::PathNode>> Graph::get_paths(std::int32_t from, std::int32_t to) const
 {
 	constexpr std::int32_t inf = std::numeric_limits<std::int32_t>::max();
@@ -214,7 +232,7 @@ Graph Graph::directed_subtree(std::int32_t root_node) const
 
 	return result;
 }
-Graph Graph::subtree(const std::string& str)
+Graph Graph::subgraph(const std::string& str)
 {
 	if (str == "TGEN_0") return tgen0_subtree(0);
 	else if (str == "TGEN_1") return tgen1_subtree(0);

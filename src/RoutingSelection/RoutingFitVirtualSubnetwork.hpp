@@ -5,20 +5,20 @@
 
 
 
-class RoutingSubnetwork : public RoutingAlgorithm
+class RoutingFitVirtualSubnetwork : public RoutingAlgorithm
 {
 private:
-	const RoutingTable &Table;
-	const RoutingTable &SubnetworkTable;
+	const RoutingTable& Table;
+	const RoutingTable& SubnetworkTable;
 
 
 public:
-	RoutingSubnetwork(const RoutingTable &table, const RoutingTable &subnetwork) :
+	RoutingFitVirtualSubnetwork(const RoutingTable& table, const RoutingTable& subnetwork) :
 		Table(table), SubnetworkTable(subnetwork)
 	{
 	}
 
-	std::vector<Connection> Route(const Router &router, const Flit &flit) const override
+	std::vector<Connection> Route(const Router& router, const Flit& flit) const override
 	{
 		std::vector<Connection> result;
 
@@ -26,7 +26,7 @@ public:
 		for (auto port : ports)
 		{
 			Connection con = { port, 0 };
-			if (router.DestinationFreeSlots(con) >= 1)
+			if (router.DestinationFreeSlots(con) >= flit.sequence_length)
 			{
 				result.push_back(con);
 			}
@@ -37,8 +37,8 @@ public:
 			const auto &ports = SubnetworkTable[router.LocalID][flit.dst_id];
 			for (auto port : ports)
 			{
-				Connection con = { port, 0 };
-				if (router.DestinationFreeSlots(con) >= 1)
+				Connection con = { port, 1 };
+				if (router.DestinationFreeSlots(con) >= flit.sequence_length)
 				{
 					result.push_back(con);
 				}

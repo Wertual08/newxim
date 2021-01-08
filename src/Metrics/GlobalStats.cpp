@@ -185,26 +185,6 @@ double GlobalStats::GetAverageBufferLoad() const
 	return sum / Network.Tiles.size();
 }
 
-double GlobalStats::GetDynamicPower() const
-{
-	double power = 0.0;
-	for (const auto& t : Network.Tiles)
-	{
-		power += t.RouterDevice->power.getDynamicPower();
-	}
-	return power;
-}
-double GlobalStats::GetStaticPower() const
-{
-	double power = 0.0;
-
-	for (const auto& t : Network.Tiles)
-	{
-		power += t.RouterDevice->power.getStaticPower();
-	}
-	return power;
-}
-
 void GlobalStats::ShowBuffers(std::ostream& out) const
 {
 	out << "% Buffer statuses:\n";
@@ -299,9 +279,6 @@ std::ostream& operator<<(std::ostream& out, const GlobalStats& gs)
 		//for (std::int32_t i = 0; i < gs.Config.ChannelsCount(); i++)
 		//	out << "% Average channel " << i << " utilization: " << gs.GetAverageBufferLoad(i) << '\n';
 	}
-	out << "% Total energy (J): " << gs.GetTotalPower() << '\n';
-	out << "% Dynamic energy (J): " << gs.GetDynamicPower() << '\n';
-	out << "% Static energy (J): " << gs.GetStaticPower() << '\n';
 	if (gs.Config.ReportFlitTrace())
 	{
 		out << *gs.Network.Tracer;

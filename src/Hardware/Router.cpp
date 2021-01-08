@@ -1,4 +1,7 @@
 #include "Router.hpp"
+#include <iomanip>
+#include "RoutingSelection/RoutingAlgorithm.hpp"
+#include "RoutingSelection/SelectionStrategy.hpp"
 
 
 
@@ -11,7 +14,6 @@ static std::string GetRouterName(std::int32_t id)
 Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays) :
 	Relays(relays + 1),
 	stats(timer),
-	power(timer),
 	LocalID(id),
 	LocalRelay(Relays[relays]),
 	LocalRelayID(relays),
@@ -41,11 +43,8 @@ void Router::Update()
 
 	start_from_port = (start_from_port + 1) % Relays.size();
 
-	power.leakageRouter();
 	for (int i = 0; i < Relays.size(); i++)
 	{
-		power.leakageBufferRouter();
-		power.leakageLinkRouter2Router();
 		for (int j = 0; j < Relays[i].Size(); j++)
 			stats.PushLoad(i, j, Relays[i][j].GetLoad());
 	}
@@ -55,8 +54,6 @@ Connection Router::FindDestination(const Flit& flit)
 {
 	if (flit.dst_id == LocalID) return { LocalRelayID, 0 };
 
-	power.routing();
-	power.selection();
 	return Selection->Apply(*this, flit, Routing->Route(*this, flit));
 }
 bool Router::Route(std::int32_t in_port, Connection dst)
@@ -74,16 +71,6 @@ bool Router::Route(std::int32_t in_port, Connection dst)
 		/* Power & Stats ------------------------------------------------- */
 		stats.StopStuckTimer(in_port, flit.vc_id);
 		if (in_relay[flit.vc_id].Size()) stats.StartStuckTimer(in_port, flit.vc_id);
-
-		power.r2rLink();
-
-		power.bufferRouterPop();
-		power.crossBar();
-
-		if (dst.port == LocalRelayID)
-		{
-			power.networkInterface();
-		}
 		/* End Power & Stats ------------------------------------------------- */
 
 		return true;
@@ -102,13 +89,6 @@ void Router::RXProcess()
 			Flit flit = Relays[i].Receive();
 
 			if (Tracer) Tracer->Remember(flit, LocalID);
-
-			power.bufferRouterPush();
-			// if a new flit is injected from local PE
-			if (i == LocalRelayID)
-			{
-				power.networkInterface();
-			}
 		}
 		Relays[i].Update();
 	}
@@ -125,7 +105,6 @@ void Router::TXProcess()
 		if (rel.FlitAvailable())
 		{
 			Flit flit = rel.Front();
-			power.bufferRouterFront();
 
 			if (HasFlag(flit.flit_type, FlitType::Head))
 			{

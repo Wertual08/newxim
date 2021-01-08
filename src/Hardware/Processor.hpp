@@ -6,7 +6,6 @@
 #include "SimulationTimer.hpp"
 #include "Relay.hpp"
 #include "Configuration/TrafficManagers/TrafficManager.hpp"
-#include "Utils.hpp"
 #include "ProcessorQueue.hpp"
 #include "Metrics/FlitTracer.hpp"
 

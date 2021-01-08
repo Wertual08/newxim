@@ -1,12 +1,3 @@
-/*
- * Noxim - the NoC Simulator
- *
- * (C) 2005-2018 by the University of Catania
- * For the complete list of authors refer to file ../doc/AUTHORS.txt
- * For the license applied to these sources refer to file ../doc/LICENSE.txt
- *
- * This file contains the declaration of the global statistics
- */
 
 #pragma once
 #include <systemc.h>
@@ -52,10 +43,6 @@ private:
 
 	double GetAverageBufferLoad(std::size_t relay, std::size_t vc) const;
 	double GetAverageBufferLoad() const;
-
-	double GetTotalPower() const { return GetDynamicPower() + GetStaticPower(); }
-	double GetDynamicPower() const;
-	double GetStaticPower() const;
 
 	void ShowBuffers(std::ostream& out) const;
 

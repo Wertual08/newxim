@@ -16,41 +16,20 @@
     <Filter Include="Source files\Hardware">
       <UniqueIdentifier>{bf3ccf52-ab42-4c91-b4d7-99e93f473803}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source files\Hardware\Router">
-      <UniqueIdentifier>{14411895-7f39-4978-b3e7-35d682f988ae}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source files\Metrics">
       <UniqueIdentifier>{fdb7496e-d03f-4614-9734-43d69ac1d784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\RoutingSelection\Routing">
+      <UniqueIdentifier>{619ed280-3792-44c8-9b62-da1f4db3cdd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\RoutingSelection\Selection">
+      <UniqueIdentifier>{af8d9d36-9508-441f-a79e-abaa014ea695}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.yaml" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\RoutingSelection\RoutingMeshXY.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RoutingSelection\RoutingTableBased.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RoutingSelection\RoutingTests.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RoutingSelection\RoutingTorusXY.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RoutingSelection\SelectionBufferLevel.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RoutingSelection\SelectionKeepSpace.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RoutingSelection\SelectionRandom.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RoutingSelection\SelectionRandomKeepSpace.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
     <ClCompile Include="src\Configuration\RoutingTable.cpp">
       <Filter>Source files\Configuration</Filter>
     </ClCompile>
@@ -87,13 +66,7 @@
     <ClCompile Include="src\Hardware\SimulationTimer.cpp">
       <Filter>Source files\Hardware</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hardware\Routers\Router.cpp">
-      <Filter>Source files\Hardware\Router</Filter>
-    </ClCompile>
     <ClCompile Include="src\Metrics\GlobalStats.cpp">
-      <Filter>Source files\Metrics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Metrics\Power.cpp">
       <Filter>Source files\Metrics</Filter>
     </ClCompile>
     <ClCompile Include="src\Metrics\Stats.cpp">
@@ -111,20 +84,11 @@
     <ClCompile Include="src\Hardware\Relay.cpp">
       <Filter>Source files\Hardware</Filter>
     </ClCompile>
-    <ClCompile Include="src\RoutingSelection\RoutingSubnetwork.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
+    <ClCompile Include="src\DataStructs.cpp">
+      <Filter>Source files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RoutingSelection\RoutingFitSubnetwork.cpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Hardware\Routers\FitSubnetworkRouter.cpp">
-      <Filter>Source files\Hardware\Router</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Hardware\Routers\FixedSubnetworkRouter.cpp">
-      <Filter>Source files\Hardware\Router</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Hardware\Routers\SubnetworkRouter.cpp">
-      <Filter>Source files\Hardware\Router</Filter>
+    <ClCompile Include="src\Hardware\Router.cpp">
+      <Filter>Source files\Hardware</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,52 +140,10 @@
     <ClInclude Include="src\Hardware\Tile.hpp">
       <Filter>Source files\Hardware</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hardware\Routers\Router.hpp">
-      <Filter>Source files\Hardware\Router</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingAlgorithm.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingFitSubnetwork.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingMeshXY.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingSubnetwork.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingTableBased.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingTests.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingTorusXY.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionBufferLevel.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionKeepSpace.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionRandom.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionRandomKeepSpace.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionStrategy.hpp">
-      <Filter>Source files\RoutingSelection</Filter>
-    </ClInclude>
     <ClInclude Include="src\Metrics\FlitTracer.hpp">
       <Filter>Source files\Metrics</Filter>
     </ClInclude>
     <ClInclude Include="src\Metrics\GlobalStats.hpp">
-      <Filter>Source files\Metrics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Metrics\Power.hpp">
       <Filter>Source files\Metrics</Filter>
     </ClInclude>
     <ClInclude Include="src\Metrics\ProgressBar.hpp">
@@ -230,20 +152,50 @@
     <ClInclude Include="src\Metrics\Stats.hpp">
       <Filter>Source files\Metrics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils.hpp">
-      <Filter>Source files</Filter>
-    </ClInclude>
     <ClInclude Include="src\DataStructs.hpp">
       <Filter>Source files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hardware\Routers\FitSubnetworkRouter.hpp">
-      <Filter>Source files\Hardware\Router</Filter>
+    <ClInclude Include="src\RoutingSelection\RoutingAlgorithm.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hardware\Routers\FixedSubnetworkRouter.hpp">
-      <Filter>Source files\Hardware\Router</Filter>
+    <ClInclude Include="src\RoutingSelection\RoutingMeshXY.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hardware\Routers\SubnetworkRouter.hpp">
-      <Filter>Source files\Hardware\Router</Filter>
+    <ClInclude Include="src\RoutingSelection\RoutingTableBased.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionBufferLevel.hpp">
+      <Filter>Source files\RoutingSelection\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionKeepSpace.hpp">
+      <Filter>Source files\RoutingSelection\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionRandom.hpp">
+      <Filter>Source files\RoutingSelection\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionRandomKeepSpace.hpp">
+      <Filter>Source files\RoutingSelection\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\SelectionStrategy.hpp">
+      <Filter>Source files\RoutingSelection\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingVirtualSubnetwork.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingFitVirtualSubnetwork.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingSubnetwork.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingFitSubnetwork.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingFixedSubnetwork.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware\Router.hpp">
+      <Filter>Source files\Hardware</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

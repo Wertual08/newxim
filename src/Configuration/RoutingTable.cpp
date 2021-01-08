@@ -854,6 +854,14 @@ bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 	return false;
 }
 
+void RoutingTable::Promote(const Graph &graph)
+{
+	for (std::size_t i = 0; i < Nodes.size(); i++)
+		for (std::size_t d = 0; d < Nodes[i].size(); d++)
+			for (std::size_t r = 0; r < Nodes[i][d].size(); r++)
+				Nodes[i][d][r] += graph[i].size();
+}
+
 void RoutingTable::push_back(Node&& node)
 {
 	Nodes.push_back(std::move(node));

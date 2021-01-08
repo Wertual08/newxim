@@ -52,11 +52,13 @@ public:
 	friend std::istream& operator>>(std::istream& is, Graph& g);
 	friend std::ostream& operator<<(std::ostream& os, const Graph& g);
 
+	Graph operator+(const Graph &g);
+
 	std::vector<std::vector<PathNode>> get_paths(std::int32_t from, std::int32_t to) const;
 	std::vector<std::vector<std::int32_t>> get_simple_paths(std::int32_t from, std::int32_t to) const;
 
 	Graph directed_subtree(std::int32_t root_node = 0) const;
-	Graph subtree(const std::string& str);
+	Graph subgraph(const std::string& str);
 	Graph tgen0_subtree(std::int32_t root_node = 0) const;
 	Graph tgen1_subtree(std::int32_t root_node = 0) const;
 	Graph tgen2_subtree(std::int32_t root_node = 0) const;

@@ -3,14 +3,14 @@
 #include "Hardware/SimulationTimer.hpp"
 #include "Hardware/Relay.hpp"
 #include "Metrics/Stats.hpp"
-#include "RoutingSelection/RoutingAlgorithm.hpp"
-#include "RoutingSelection/SelectionStrategy.hpp"
 #include "Hardware/Connection.hpp"
 #include "Hardware/ReservationTable.hpp"
 #include "Metrics/FlitTracer.hpp"
 
 
 
+class RoutingAlgorithm;
+class SelectionStrategy;
 class Router : public sc_module
 {
 	SC_HAS_PROCESS(Router);
@@ -46,7 +46,6 @@ public:
 	// Registers
 	const std::int32_t LocalID;			// Unique ID
 	Stats stats;						// Statistics
-	Power power;
 
 	Router(const SimulationTimer& timer, std::int32_t id, std::size_t relays);
 	void SetRoutingAlgorithm(const RoutingAlgorithm& alg);

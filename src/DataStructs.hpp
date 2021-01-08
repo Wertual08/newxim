@@ -1,10 +1,9 @@
 #pragma once
+#include <systemc.h>
 #include <cstdint>
-#include <ostream>
 
 
 
-// FlitType -- Flit type enumeration
 enum class FlitType : std::int32_t
 {
 	None = 0b000,
@@ -26,15 +25,14 @@ static bool HasFlag(T flit, T flag)
 	return (flit & flag) == flag;
 }
 
-// Packet -- Packet definition
 struct Packet 
 {
 	std::int32_t src_id;
 	std::int32_t dst_id;
 	std::int32_t vc_id;
-	double timestamp;		// SC timestamp at packet generation
+	double timestamp;
 	std::int32_t size;
-	std::int32_t flit_left;		// Number of remaining flits inside the packet
+	std::int32_t flit_left;	
 
 	Packet() 
 	{
@@ -56,20 +54,19 @@ struct Packet
 	}
 };
 
-// Flit -- Flit definition
 struct Flit 
 {
 	std::uint64_t id;
 	int src_id = -1;
 	int dst_id = -1;
 	int dir_in = -1;
-	int vc_id = -1;							// Virtual Channel
-	FlitType flit_type = FlitType::None;	// The flit type (FlitType::Head, FlitType::Body, FlitType::Tail)
-	int sequence_no = -1;					// The sequence number of the flit inside the packet
+	int vc_id = -1;							
+	FlitType flit_type = FlitType::None;	
+	int sequence_no = -1;					
 	int sequence_length = -1;
-	double timestamp = -1;					// Unix timestamp at packet generation
+	double timestamp = -1;					
 	double accept_timestamp = - 1;
-	int hop_no = -1;						// Current number of hops from source to destination
+	int hop_no = -1;						
 
 	inline bool operator==(const Flit& flit) const 
 	{
@@ -86,66 +83,5 @@ struct Flit
 	bool valid() const { return flit_type != FlitType::None; }
 };
 
-inline std::ostream& operator <<(std::ostream& os, const Flit& flit)
-{
-	os << '(';
-	if (HasFlag(flit.flit_type, FlitType::Head)) os << 'H';
-	if (HasFlag(flit.flit_type, FlitType::Body)) os << 'B';
-	if (HasFlag(flit.flit_type, FlitType::Tail)) os << 'T';
-	return os << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ')';
-}
-
-
-struct PowerBreakdownEntry
-{
-	std::string label;
-	double value;
-};
-
-
-enum
-{
-	BUFFER_PUSH_PWR_D,
-	BUFFER_POP_PWR_D,
-	BUFFER_FRONT_PWR_D,
-	BUFFER_TO_TILE_PUSH_PWR_D,
-	BUFFER_TO_TILE_POP_PWR_D,
-	BUFFER_TO_TILE_FRONT_PWR_D,
-	BUFFER_FROM_TILE_PUSH_PWR_D,
-	BUFFER_FROM_TILE_POP_PWR_D,
-	BUFFER_FROM_TILE_FRONT_PWR_D,
-	ANTENNA_BUFFER_PUSH_PWR_D,
-	ANTENNA_BUFFER_POP_PWR_D,
-	ANTENNA_BUFFER_FRONT_PWR_D,
-	ROUTING_PWR_D,
-	SELECTION_PWR_D,
-	CROSSBAR_PWR_D,
-	LINK_R2R_PWR_D,
-	LINK_R2H_PWR_D,
-	NI_PWR_D,
-	NO_BREAKDOWN_ENTRIES_D
-};
-
-enum
-{
-	TRANSCEIVER_RX_PWR_BIASING,
-	TRANSCEIVER_TX_PWR_BIASING,
-	BUFFER_ROUTER_PWR_S,
-	BUFFER_TO_TILE_PWR_S,
-	BUFFER_FROM_TILE_PWR_S,
-	ANTENNA_BUFFER_PWR_S,
-	LINK_R2H_PWR_S,
-	ROUTING_PWR_S,
-	SELECTION_PWR_S,
-	CROSSBAR_PWR_S,
-	NI_PWR_S,
-	TRANSCEIVER_RX_PWR_S,
-	TRANSCEIVER_TX_PWR_S,
-	NO_BREAKDOWN_ENTRIES_S
-};
-
-struct PowerBreakdown
-{
-	int size;
-	PowerBreakdownEntry breakdown[NO_BREAKDOWN_ENTRIES_D + NO_BREAKDOWN_ENTRIES_S];
-};
+void sc_trace(sc_trace_file *&tf, const Flit &flit, std::string &name);
+std::ostream &operator<<(std::ostream &os, const Flit &flit);
