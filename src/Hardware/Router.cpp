@@ -45,6 +45,7 @@ void Router::Update()
 
 	for (int i = 0; i < Relays.size(); i++)
 	{
+		Relays[i].Update();
 		for (int j = 0; j < Relays[i].Size(); j++)
 			stats.PushLoad(i, j, Relays[i][j].GetLoad());
 	}
@@ -90,7 +91,6 @@ void Router::RXProcess()
 
 			if (Tracer) Tracer->Remember(flit, LocalID);
 		}
-		Relays[i].Update();
 	}
 }
 
@@ -122,8 +122,6 @@ void Router::TXProcess()
 	for (std::int32_t in_port = 0; in_port < Relays.size(); in_port++)
 	{
 		Relay &rel = Relays[in_port];
-
-		Flit flit = rel.Front();
 
 		if (rel.FlitAvailable())
 		{

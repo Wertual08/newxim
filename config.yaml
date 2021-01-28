@@ -15,7 +15,7 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: TORUS
+topology: MESH
 topology_args: [8, 8]
 topology_channels: 1
 virtual_channels: 2
@@ -25,18 +25,24 @@ virtual_channels: 2
 #   TGEN_2 - test tree generator
 #   TGEN_3 - test tree generator
 #   TGEN_4 - test tree generator
+#   TGEN_5 - test tree generator
 #   TREE - future reserved
 #   RING - future reserved
 subtopology: TGEN_4 # TGEN_4 / NONE
+# NONE
+# VIRTUAL
+# PHYSICAL
+subnetwork: VIRTUAL
 
 # number of flits for each router buffer
-buffer_depth: 9
+buffer_depth: 2
 # size of flits, in bits
 flit_size: 32
 
 # Routing algorithms:
 #   TABLE_BASED
 #   MESH_XY
+#   BYPASS
 #   SUBNETWORK
 #   FIT_SUBNETWORK
 #   FIXED_SUBNETWORK
@@ -44,7 +50,7 @@ flit_size: 32
 #   FIT_VIRTUAL_SUBNETWORK
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: FIT_SUBNETWORK
+routing_algorithm: VIRTUAL_SUBNETWORK
 
 # Selection Strategies:
 #   RANDOM
@@ -88,16 +94,16 @@ clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 10000
+simulation_time: 1000000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
 
-min_packet_size: 3
-max_packet_size: 9
+min_packet_size: 1
+max_packet_size: 1
 flit_injection_rate: true
 scale_with_nodes: false
-packet_injection_rate: 0.2
-probability_of_retransmission: 0.2
+packet_injection_rate: 1
+probability_of_retransmission: 1
 
 # Traffic distribution:
 #   TRAFFIC_RANDOM

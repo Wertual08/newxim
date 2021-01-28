@@ -197,5 +197,8 @@
     <ClInclude Include="src\Hardware\Router.hpp">
       <Filter>Source files\Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingBypass.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

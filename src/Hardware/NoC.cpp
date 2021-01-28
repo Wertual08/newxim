@@ -1,5 +1,6 @@
 #include "NoC.hpp"
 #include "RoutingSelection/RoutingTableBased.hpp"
+#include "RoutingSelection/RoutingBypass.hpp"
 #include "RoutingSelection/RoutingVirtualSubnetwork.hpp"
 #include "RoutingSelection/RoutingFitVirtualSubnetwork.hpp"
 #include "RoutingSelection/RoutingSubnetwork.hpp"
@@ -23,11 +24,12 @@ std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config)
 {
 	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
 	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "BYPASS") return std::make_unique<RoutingBypass>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "SUBNETWORK") return std::make_unique<RoutingSubnetwork>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "FIT_SUBNETWORK") return std::make_unique<RoutingFitSubnetwork>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "FIXED_SUBNETWORK") return std::make_unique<RoutingFixedSubnetwork>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "VIRTUAL_SUBNETWORK") return std::make_unique<RoutingVirtualSubnetwork>(config.GRTable(), config.VirtualSubGRTable());
-	if (config.RoutingAlgorithm() == "FIT_VIRTUAL_SUBNETWORK") return std::make_unique<RoutingFitVirtualSubnetwork>(config.GRTable(), config.VirtualSubGRTable());
+	if (config.RoutingAlgorithm() == "VIRTUAL_SUBNETWORK") return std::make_unique<RoutingVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
+	if (config.RoutingAlgorithm() == "FIT_VIRTUAL_SUBNETWORK") return std::make_unique<RoutingFitVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
 	throw std::runtime_error("Configuration error: Invalid routing algorithm [" + config.RoutingAlgorithm() + "].");
 }
 std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config)

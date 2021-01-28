@@ -93,13 +93,16 @@ void Relay::Reset()
 }
 void Relay::Update()
 {
-	rx_ack.write(rx_current_level);
 	for (std::size_t i = 0; i < num_virtual_channels; i++)
 		tx_free_slots[i].write(buffers[i].GetFreeSlots());
 }
 bool Relay::CanSend(const Flit& flit) const
 {
 	return tx_current_level == tx_ack.read() && rx_free_slots[flit.vc_id].read() > 0;
+}
+bool Relay::CanSend(std::size_t vc) const
+{
+	return tx_current_level == tx_ack.read() && rx_free_slots[vc].read() > 0;
 }
 bool Relay::Send(const Flit& flit)
 {
@@ -135,6 +138,7 @@ Flit Relay::Receive()
 		buffer.Push(flit);
 
 		rx_current_level = !rx_current_level;
+		rx_ack.write(rx_current_level);
 
 		return flit;
 	}

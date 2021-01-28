@@ -61,8 +61,7 @@ private:
 	Graph subgraph;
 	Graph network_graph;
 	RoutingTable table;
-	std::unique_ptr<RoutingTable> subtable;
-	std::unique_ptr<RoutingTable> virtual_subtable;
+	RoutingTable subtable;
 
 	void ReadTopologyParams(const YAML::Node& config);
 	void ReadRouterParams(const YAML::Node& config);
@@ -89,7 +88,6 @@ public:
 	const Graph &NetworkGraph() const;
 	const RoutingTable& GRTable() const;
 	const RoutingTable& SubGRTable() const;
-	const RoutingTable& VirtualSubGRTable() const;
 	const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Hotspots() const;
 
 	std::int32_t BufferDepth() const;

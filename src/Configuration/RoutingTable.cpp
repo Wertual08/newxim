@@ -645,7 +645,7 @@ bool RoutingTable::LoadCirculantMultiplicative(const Graph &graph)
 template<std::size_t sz>
 void mark_distances(const Graph &graph,
 	std::vector<std::array<std::int32_t, sz>> &distances, 
-	std::array<std::int32_t, sz> &basis, std::size_t b)
+	const std::array<std::int32_t, sz> &basis, std::size_t b)
 {
 	distances[basis[b]][b] = 0;
 	for (std::size_t d = 1; d < graph.size(); d++)
@@ -842,7 +842,6 @@ bool RoutingTable::Load(const std::string& path)
 bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 {
 	Nodes.resize(graph.size(), Node(graph.size()));
-	if (generator == "DEFAULT") return LoadDijkstra(graph);
 	if (generator == "DIJKSTRA") return LoadDijkstra(graph);
 	if (generator == "UP_DOWN") return LoadUpDown(graph);
 	if (generator == "MESH_XY") return LoadMeshXY(graph);
@@ -854,6 +853,26 @@ bool RoutingTable::Load(const Graph& graph, const std::string& generator)
 	return false;
 }
 
+void RoutingTable::Adjust(const Graph &src_graph, const Graph &dst_graph)
+{
+	for (std::size_t s = 0; s < Nodes.size(); s++)
+	{
+		for (std::size_t d = 0; d < Nodes[s].size(); d++)
+		{
+			auto paths = Nodes[s][d];
+			Nodes[s][d].clear();
+			for (std::int32_t p : paths)
+			{
+				if (p < src_graph[s].size())
+				{
+					for (std::int32_t l : dst_graph[s].links_to(src_graph[s][p]))
+						Nodes[s][d].push_back(l);
+				}
+				else Nodes[s][d].push_back(dst_graph[s].size());
+			}
+		}
+	}
+}
 void RoutingTable::Promote(const Graph &graph)
 {
 	for (std::size_t i = 0; i < Nodes.size(); i++)

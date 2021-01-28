@@ -160,16 +160,27 @@ void Configuration::ReadTopologyParams(const YAML::Node& config)
 		}
 
 		std::string generator = ReadParam<std::string>(config, "subtopology", "NONE");
+		std::string subnetwork = ReadParam<std::string>(config, "subnetwork", "NONE");
 		if (generator != "NONE")
 		{
 			subgraph = graph.subgraph(generator);
+			subtable.Load(subgraph);
 
-			subtable = std::make_unique<RoutingTable>(subgraph);
-			subtable->Promote(graph);
-
-			virtual_subtable = std::make_unique<RoutingTable>(graph, subgraph);
-
-			network_graph = graph + subgraph;
+			if (subnetwork == "NONE")
+			{
+				network_graph = graph;
+				subtable.Adjust(subgraph, graph);
+			}
+			else if (subnetwork == "VIRTUAL")
+			{
+				network_graph = graph;
+				subtable.Adjust(subgraph, graph);
+			}
+			else if (subnetwork == "PHYSICAL")
+			{
+				network_graph = graph + subgraph;
+				subtable.Promote(graph);
+			}
 		}
 		else network_graph = graph;
 	}
@@ -374,7 +385,7 @@ void Configuration::ReportData()
 	}
 	if (report_topology_sub_graph) std::cout << "Topology subgraph: " << subgraph;
 	if (report_topology_sub_graph_adjacency_matrix) std::cout << "Topology subgraph adjacency matrix:\n" << subgraph.adjacency_matrix();
-	if (report_sub_routing_table && subtable) std::cout << "Subrouting table: " << *subtable << '\n';
+	if (report_sub_routing_table) std::cout << "Subrouting table: " << subtable << '\n';
 }
 
 void Configuration::ShowHelp(const std::string& selfname)
@@ -561,11 +572,7 @@ const RoutingTable& Configuration::GRTable() const
 }
 const RoutingTable& Configuration::SubGRTable() const
 {
-	return *subtable;
-}
-const RoutingTable& Configuration::VirtualSubGRTable() const
-{
-	return *virtual_subtable;
+	return subtable;
 }
 const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Configuration::Hotspots() const
 {

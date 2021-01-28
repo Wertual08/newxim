@@ -11,10 +11,6 @@ private:
 	const RoutingTable &Table;
 	const RoutingTable &SubnetworkTable;
 
-	static bool VectorContains(const std::vector<std::int32_t> &vec, std::int32_t v)
-	{
-		return std::find(vec.begin(), vec.end(), v) != vec.end();
-	}
 	static bool VectorContains(const std::vector<std::vector<std::int32_t>> &vec, std::int32_t v)
 	{
 		for (const auto &sub_vec : vec)

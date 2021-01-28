@@ -45,14 +45,16 @@ public:
 
 	void Reset();
 	void Update();
-	bool CanSend(const Flit& flit) const;
+	bool CanSend(const Flit &flit) const;
+	bool CanSend(std::size_t vc) const;
 	bool Send(const Flit& flit);
 	bool CanReceive() const;
 	Flit Receive();
 
+	// WARNING: Can return irrelevant value due to load changes during cycle
 	std::size_t GetFreeSlots(std::size_t vc) const 
-	{ 
-		return rx_free_slots[vc].read(); 
+	{
+		return rx_free_slots[vc].read();
 	}
 
 	bool FlitAvailable() const;

@@ -5,12 +5,16 @@
 
 
 
-class RoutingFitSubnetwork : public RoutingAlgorithm
+class RoutingBypass : public RoutingAlgorithm
 {
 private:
 	const RoutingTable &Table;
 	const RoutingTable &SubnetworkTable;
 
+	static bool VectorContains(const std::vector<std::int32_t> &vec, std::int32_t v)
+	{
+		return std::find(vec.begin(), vec.end(), v) != vec.end();
+	}
 	static bool VectorContains(const std::vector<std::vector<std::int32_t>> &vec, std::int32_t v)
 	{
 		for (const auto &sub_vec : vec)
@@ -22,7 +26,7 @@ private:
 	}
 
 public:
-	RoutingFitSubnetwork(const RoutingTable &table, const RoutingTable &subnetwork) :
+	RoutingBypass(const RoutingTable &table, const RoutingTable &subnetwork) :
 		Table(table), SubnetworkTable(subnetwork)
 	{
 	}
@@ -35,7 +39,8 @@ public:
 		for (auto port : ports)
 		{
 			Connection con = { port, 0 };
-			if (router.DestinationFreeSlots(con) > flit.sequence_length)
+
+			if (router.DestinationFreeSlots(con) > flit.sequence_length + 4)
 			{
 				result.push_back(con);
 			}
@@ -46,10 +51,20 @@ public:
 			const auto &ports = SubnetworkTable[router.LocalID][flit.dst_id];
 			for (auto port : ports)
 			{
-				Connection con = { port, 0 };
-				if (router.DestinationFreeSlots(con) > flit.sequence_length)
+				Connection con = { port, 0 }; 
+				if (VectorContains(SubnetworkTable[router.LocalID], flit.dir_in))
 				{
-					result.push_back(con);
+					if (router.DestinationFreeSlots(con) >= flit.sequence_length)
+					{
+						result.push_back(con);
+					}
+				}
+				else
+				{
+					if (router.DestinationFreeSlots(con) > flit.sequence_length + 4)
+					{
+						result.push_back(con);
+					}
 				}
 			}
 		}

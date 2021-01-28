@@ -29,12 +29,13 @@ private:
 public:
 	RoutingTable();
 	RoutingTable(const std::string& path);
-	RoutingTable(const Graph& graph, const std::string& generator = "DEFAULT");
-	RoutingTable(const Graph& graph, const Graph& sub_graph, const std::string& generator = "DEFAULT");
+	RoutingTable(const Graph& graph, const std::string& generator = "DIJKSTRA");
+	RoutingTable(const Graph& graph, const Graph& sub_graph, const std::string& generator = "DIJKSTRA");
 
 	bool Load(const std::string& path);
-	bool Load(const Graph& graph, const std::string& generator = "DEFAULT");
+	bool Load(const Graph& graph, const std::string& generator = "DIJKSTRA");
 
+	void Adjust(const Graph &src_graph, const Graph &dst_graph);
 	void Promote(const Graph &graph);
 
 	void push_back(Node&& node);
