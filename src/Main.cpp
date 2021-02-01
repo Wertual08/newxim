@@ -10,7 +10,7 @@ const static std::string Version = "0.0.0.6";
 
 
 
-int sc_main(int arg_num, char* arg_vet[])
+int sc_main(int arg_num, char *arg_vet[])
 {
 	std::cout << "    --------------------------------------------------------\n";
 	std::cout << "        Newxim - modification of the Noxim NoC Simulator\n";
