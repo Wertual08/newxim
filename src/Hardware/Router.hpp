@@ -60,6 +60,7 @@ public:
 
 	std::size_t TotalBufferedFlits() const;
 	std::size_t DestinationFreeSlots(Connection dst) const;
+	bool CanSend(Connection dst) const;
 
 	const ReservationTable &GetReservationTable() const { return reservation_table; }
 };

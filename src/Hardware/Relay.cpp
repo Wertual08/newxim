@@ -173,7 +173,6 @@ Flit Relay::Pop()
 
 	if (i < num_virtual_channels)
 	{
-		tx_free_slots[vc].write(buffers[vc].GetFreeSlots() + 1);
 		return buffers[vc].Pop();
 	}
 	else return Flit();

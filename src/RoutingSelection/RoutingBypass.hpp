@@ -39,6 +39,7 @@ public:
 		for (auto port : ports)
 		{
 			Connection con = { port, 0 };
+			if (!router.CanSend(con)) continue;
 
 			if (router.DestinationFreeSlots(con) > flit.sequence_length + 4)
 			{
@@ -51,7 +52,9 @@ public:
 			const auto &ports = SubnetworkTable[router.LocalID][flit.dst_id];
 			for (auto port : ports)
 			{
-				Connection con = { port, 0 }; 
+				Connection con = { port, 0 };
+				if (!router.CanSend(con)) continue;
+
 				if (VectorContains(SubnetworkTable[router.LocalID], flit.dir_in))
 				{
 					if (router.DestinationFreeSlots(con) >= flit.sequence_length)

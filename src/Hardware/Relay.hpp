@@ -52,9 +52,12 @@ public:
 	Flit Receive();
 
 	// WARNING: Can return irrelevant value due to load changes during cycle
+	// You must check CanSend function befure using it.
 	std::size_t GetFreeSlots(std::size_t vc) const 
 	{
-		return rx_free_slots[vc].read();
+		//if (rx_free_slots[vc].read() > bound->buffers[vc].GetFreeSlots())
+		//	throw "shit";
+		return rx_free_slots[vc].read(); // * CanSend(vc) ???
 	}
 
 	bool FlitAvailable() const;

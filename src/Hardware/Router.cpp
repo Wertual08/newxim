@@ -174,3 +174,7 @@ std::size_t Router::DestinationFreeSlots(Connection dst) const
 {
 	return Relays[dst.port].GetFreeSlots(dst.vc);
 }
+bool Router::CanSend(Connection dst) const
+{
+	return Relays[dst.port].CanSend(dst.vc);
+}

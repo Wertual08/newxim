@@ -37,6 +37,7 @@ public:
 			for (auto port : ports)
 			{
 				Connection con = { port, 0 };
+				if (!router.CanSend(con)) continue;
 				if (router.DestinationFreeSlots(con) >= flit.sequence_length)
 				{
 					result.push_back(con);
@@ -50,6 +51,7 @@ public:
 			for (auto port : ports)
 			{
 				Connection con = { port, 0 };
+				if (!router.CanSend(con)) continue;
 				if (router.DestinationFreeSlots(con) >= flit.sequence_length)
 				{
 					result.push_back(con);

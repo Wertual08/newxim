@@ -13,7 +13,9 @@ public:
 		for (std::int32_t i = 0; i < directions.size(); i++)
 		{
 			Connection dst = directions[i];
-			std::int32_t free_slots = router[dst.port].GetFreeSlots(dst.vc);
+			if (!router.CanSend(dst)) continue;
+
+			std::int32_t free_slots = router.DestinationFreeSlots(dst);
 
 			if (flit.dir_in != router.LocalRelayID)
 			{

@@ -15,8 +15,8 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: MESH
-topology_args: [8, 8]
+topology: CIRCULANT
+topology_args: [64, 1, 14]
 topology_channels: 1
 virtual_channels: 2
 # Supported subtopologies:
@@ -28,6 +28,7 @@ virtual_channels: 2
 #   TGEN_5 - test tree generator
 #   TREE - future reserved
 #   RING - future reserved
+#   MESH - future reserved
 subtopology: TGEN_4 # TGEN_4 / NONE
 # NONE
 # VIRTUAL
@@ -71,7 +72,7 @@ selection_strategy: RANDOM
 #   CIRCULANT_ADAPTIVE
 #   GREEDY_PROMOTION
 #   just table
-routing_table: DIJKSTRA
+routing_table: CIRCULANT_PAIR_EXCHANGE
 routing_table_id_based: true
 
 # SIMULATION PARAMETERS
@@ -94,7 +95,7 @@ clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 1000000
+simulation_time: 100000
 # collect stats after a given number of cycles
 stats_warm_up_time: 0
 

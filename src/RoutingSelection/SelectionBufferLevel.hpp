@@ -13,6 +13,7 @@ public:
 		for (std::int32_t i = 0; i < directions.size(); i++)
 		{
 			Connection dst = directions[i];
+			if (!router.CanSend(dst)) continue;
 
 			std::int32_t free_slots = router.DestinationFreeSlots(dst);
 
