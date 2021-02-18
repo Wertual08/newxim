@@ -21,11 +21,14 @@ private:
 
 	Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, std::size_t relays);
 
+	void Reservation(std::int32_t in_port);
 	void Update();
 
 protected:
 	std::vector<Relay> Relays;
 	std::size_t start_from_port;		// Port from which to start the reservation cycle
+
+	std::vector<std::int32_t> update_sequence;
 
 	ReservationTable reservation_table;
 
@@ -51,6 +54,7 @@ public:
 	void SetRoutingAlgorithm(const RoutingAlgorithm& alg);
 	void SetSelectionStrategy(const SelectionStrategy& sel);
 	void SetFlitTracer(FlitTracer& tracer);
+	void SetUpdateSequence(const std::vector<std::int32_t> &sequence);
 
 	std::size_t Size() const { return Relays.size(); }
 	Relay& operator[](std::size_t i) { return Relays[i]; }

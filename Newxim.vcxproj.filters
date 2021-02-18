@@ -200,5 +200,6 @@
     <ClInclude Include="src\RoutingSelection\RoutingBypass.hpp">
       <Filter>Source files\RoutingSelection\Routing</Filter>
     </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingRingSplit.hpp" />
   </ItemGroup>
 </Project>

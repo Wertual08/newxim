@@ -16,9 +16,9 @@
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
 topology: CIRCULANT
-topology_args: [64, 1, 14]
+topology_args: [64, 5, 6] # [64, 1, 14]
 topology_channels: 1
-virtual_channels: 2
+virtual_channels: 1
 # Supported subtopologies:
 #   NONE
 #   TGEN_1 - test tree generator
@@ -29,16 +29,19 @@ virtual_channels: 2
 #   TREE - future reserved
 #   RING - future reserved
 #   MESH - future reserved
-subtopology: TGEN_4 # TGEN_4 / NONE
-# NONE
-# VIRTUAL
-# PHYSICAL
-subnetwork: VIRTUAL
+subtopology: NONE # TGEN_4 / NONE
+#   NONE
+#   VIRTUAL
+#   PHYSICAL
+subnetwork: NONE
+
+# update sequence of router relays
+#   DEFAULT - round-robin update
+#   [a, b, c, ...] - custom sequence
+update_sequence: [0, 1, 2, 3, 4]
 
 # number of flits for each router buffer
 buffer_depth: 2
-# size of flits, in bits
-flit_size: 32
 
 # Routing algorithms:
 #   TABLE_BASED
@@ -49,9 +52,10 @@ flit_size: 32
 #   FIXED_SUBNETWORK
 #   VIRTUAL_SUBNETWORK
 #   FIT_VIRTUAL_SUBNETWORK
+#   RING_SPLIT
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: VIRTUAL_SUBNETWORK
+routing_algorithm: RING_SPLIT
 
 # Selection Strategies:
 #   RANDOM

@@ -19,8 +19,8 @@ private:
 	std::string topology;
 	std::string topology_args;
 
+	std::vector<std::int32_t> update_sequence;
 	std::int32_t buffer_depth;
-	std::int32_t flit_size;
 	std::int32_t min_packet_size;
 	std::int32_t max_packet_size;
 	std::string routing_algorithm;
@@ -90,8 +90,8 @@ public:
 	const RoutingTable& SubGRTable() const;
 	const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& Hotspots() const;
 
+	const std::vector<std::int32_t> UpdateSequence() const;
 	std::int32_t BufferDepth() const;
-	std::int32_t FlitSize() const;
 	std::int32_t MinPacketSize() const;
 	std::int32_t MaxPacketSize() const;
 

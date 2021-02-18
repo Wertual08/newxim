@@ -11,6 +11,7 @@
 #include "RoutingSelection/SelectionKeepSpace.hpp"
 #include "RoutingSelection/SelectionRandomKeepSpace.hpp"
 #include "RoutingSelection/RoutingMeshXY.hpp"
+#include "RoutingSelection/RoutingRingSplit.hpp"
 
 #include "Configuration/TrafficManagers/RandomTrafficManager.hpp"
 #include "Configuration/TrafficManagers/HotspotTrafficManager.hpp"
@@ -30,6 +31,7 @@ std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config)
 	if (config.RoutingAlgorithm() == "FIXED_SUBNETWORK") return std::make_unique<RoutingFixedSubnetwork>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "VIRTUAL_SUBNETWORK") return std::make_unique<RoutingVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "FIT_VIRTUAL_SUBNETWORK") return std::make_unique<RoutingFitVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
+	if (config.RoutingAlgorithm() == "RING_SPLIT") return std::make_unique<RoutingRingSplit>(config.NetworkGraph(), config.GRTable());
 	throw std::runtime_error("Configuration error: Invalid routing algorithm [" + config.RoutingAlgorithm() + "].");
 }
 std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config)
@@ -86,6 +88,7 @@ void NoC::InitBase()
 		RouterDevice->SetRoutingAlgorithm(*Algorithm);
 		RouterDevice->SetSelectionStrategy(*Strategy);
 		if (Tracer) RouterDevice->SetFlitTracer(*Tracer);
+		RouterDevice->SetUpdateSequence(Config.UpdateSequence());
 		
 		std::unique_ptr<Processor> ProcessorDevice = GetProcessor(Timer, id, Config);
 		ProcessorDevice->SetTrafficManager(*Traffic);

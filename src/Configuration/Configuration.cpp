@@ -191,8 +191,14 @@ void Configuration::ReadTopologyParams(const YAML::Node& config)
 }
 void Configuration::ReadRouterParams(const YAML::Node& config)
 {
+	auto& node = config["update_sequence"];
+	if (node.IsSequence())
+	{
+		for (auto &sub_node : node)
+			update_sequence.push_back(sub_node.as<std::int32_t>());
+	}
+
 	buffer_depth = ReadParam<std::int32_t>(config, "buffer_depth");
-	flit_size = ReadParam<std::int32_t>(config, "flit_size");
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
 }
@@ -478,11 +484,6 @@ void Configuration::Check()
 		std::cerr << "Error: buffer must be >= 1\n";
 		exit(1);
 	}
-	if (flit_size <= 0) 
-	{
-		std::cerr << "Error: flit_size must be > 0\n";
-		exit(1);
-	}
 
 	if (min_packet_size < 1 || max_packet_size < 1) 
 	{
@@ -579,13 +580,13 @@ const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>
 	return hotspots;
 }
 
+const std::vector<std::int32_t> Configuration::UpdateSequence() const
+{
+	return update_sequence;
+}
 std::int32_t Configuration::BufferDepth() const
 {
 	return buffer_depth;
-}
-std::int32_t Configuration::FlitSize() const
-{
-	return flit_size;
 }
 std::int32_t Configuration::MinPacketSize() const
 {
