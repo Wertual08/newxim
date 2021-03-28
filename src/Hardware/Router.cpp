@@ -26,7 +26,7 @@ Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, st
 	SC_METHOD(Update);
 	sensitive << reset << clock.pos();
 
-	start_from_port = LocalRelayID;//rand() % Relays.size();
+	start_from_port = LocalRelayID;
 }
 
 void Router::Reservation(std::int32_t in_port)
@@ -89,10 +89,11 @@ bool Router::Route(std::int32_t in_port, Connection dst)
 	{
 		in_relay.Pop();
 
-		/* Power & Stats ------------------------------------------------- */
+		// --------------- Stats --------------- //
 		stats.StopStuckTimer(in_port, flit.vc_id);
-		if (in_relay[flit.vc_id].Size()) stats.StartStuckTimer(in_port, flit.vc_id);
-		/* End Power & Stats ------------------------------------------------- */
+		if (in_relay[flit.vc_id].Size()) 
+			stats.StartStuckTimer(in_port, flit.vc_id);
+		// --------------- ----- --------------- //
 
 		return true;
 	}
@@ -109,7 +110,10 @@ void Router::RXProcess()
 		{
 			Flit flit = Relays[i].Receive();
 
+			// --------------- Stats --------------- //
+			stats.StartStuckTimer(i, flit.vc_id);
 			if (Tracer) Tracer->Remember(flit, LocalID);
+			// --------------- ----- --------------- //
 		}
 	}
 }
@@ -146,10 +150,8 @@ void Router::TXProcess()
 
 			if (Route(in_port, dst) && HasFlag(flit.flit_type, FlitType::Tail))
 				reservation_table.Release(src);
-
-			flit = rel.Front();
 		}
-	} // for loop directions
+	} 
 
 	for (auto &relay : Relays) relay.Skip();
 }
@@ -193,5 +195,7 @@ std::size_t Router::DestinationFreeSlots(Connection dst) const
 }
 bool Router::CanSend(Connection dst) const
 {
-	return Relays[dst.port].CanSend(dst.vc);
+	return 
+		!reservation_table.Reserved(dst) &&
+		Relays[dst.port].CanSend(dst.vc);
 }

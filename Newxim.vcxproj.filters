@@ -200,6 +200,11 @@
     <ClInclude Include="src\RoutingSelection\RoutingBypass.hpp">
       <Filter>Source files\RoutingSelection\Routing</Filter>
     </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingRingSplit.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingVirtualRingSplit.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoutingSelection\RoutingRingSplit.hpp">
+      <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

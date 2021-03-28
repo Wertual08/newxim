@@ -6,7 +6,7 @@
 
 
 
-class RoutingRingSplit : public RoutingAlgorithm
+class RoutingVirtualRingSplit : public RoutingAlgorithm
 {
 private:
 	const Graph &Circulant;
@@ -18,7 +18,7 @@ private:
 	}
 
 public:
-	RoutingRingSplit(const Graph &circulant, const RoutingTable &table) :
+	RoutingVirtualRingSplit(const Graph &circulant, const RoutingTable &table) :
 		Circulant(circulant), Table(table)
 	{
 	}
@@ -34,6 +34,7 @@ public:
 		for (auto port : ports)
 		{
 			std::int32_t dist = Distance(router.LocalID, Circulant[router.LocalID][port]);
+			std::int32_t from_dist = flit.dir_in != router.LocalRelayID ? Distance(router.LocalID, Circulant[router.LocalID][flit.dir_in]) : -1;
 			if (dist < max_dist) continue;
 			if (dist > max_dist)
 			{
@@ -41,7 +42,11 @@ public:
 				max_dist = dist;
 			}
 
-			Connection con = { port, flit.vc_id };
+			std::int32_t vc = flit.vc_id;
+			if (from_dist != dist)
+				vc = router.LocalID < Circulant.size() / 2 ? 0 : 1;
+
+			Connection con = { port, vc };
 			if (!router.CanSend(con)) continue;
 
 			//if (

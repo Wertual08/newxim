@@ -6,7 +6,7 @@
 #include "Configuration/Configuration.hpp"
 #include "Metrics/ProgressBar.hpp"
 
-const static std::string Version = "0.0.0.6";
+const static std::string Version = "0.0.0.8";
 
 
 

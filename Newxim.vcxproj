@@ -82,6 +82,7 @@
     <ClInclude Include="src\RoutingSelection\RoutingMeshXY.hpp" />
     <ClInclude Include="src\RoutingSelection\RoutingRingSplit.hpp" />
     <ClInclude Include="src\RoutingSelection\RoutingSubnetwork.hpp" />
+    <ClInclude Include="src\RoutingSelection\RoutingVirtualRingSplit.hpp" />
     <ClInclude Include="src\RoutingSelection\RoutingVirtualSubnetwork.hpp" />
     <ClInclude Include="src\RoutingSelection\RoutingTableBased.hpp" />
     <ClInclude Include="src\RoutingSelection\SelectionBufferLevel.hpp" />

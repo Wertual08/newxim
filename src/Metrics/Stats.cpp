@@ -8,7 +8,9 @@ Stats::Stats(const SimulationTimer& timer) : Timer(timer)
 
 void Stats::StartStuckTimer(std::size_t relay, std::size_t vc)
 {
-	Buffers[{ relay, vc }].StuckTimer = Timer.StatisticsTime();
+	auto &stats = Buffers[{ relay, vc }];
+	if (stats.StuckTimer >= 0) return;
+	stats.StuckTimer = Timer.StatisticsTime();
 }
 void Stats::StopStuckTimer(std::size_t relay, std::size_t vc)
 {
