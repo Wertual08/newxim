@@ -15,13 +15,14 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: CIRCULANT
-topology_args: [64, 1, 14]
+topology: MESH
+topology_args: [8, 8]
 topology_channels: 1
-virtual_channels: 2
+virtual_channels: 1
 
 # Supported subtopologies:
 #   NONE
+#   TREE_RANDOM - random subtree generator
 #   TGEN_1 - test tree generator
 #   TGEN_2 - test tree generator
 #   TGEN_3 - test tree generator
@@ -30,23 +31,23 @@ virtual_channels: 2
 #   TREE - future reserved
 #   RING - future reserved
 #   MESH - future reserved
-subtopology: NONE 
+subtopology: TREE_RANDOM  
 
 # NONE
 # VIRTUAL
 # PHYSICAL
-subnetwork: NONE
+subnetwork: PHYSICAL
 
 # update sequence of router relays
 #   DEFAULT - round-robin update
 #   [a, b, c, ...] - custom sequence
-update_sequence: [0, 1, 2, 3, 4]
+update_sequence: DEFAULT # [0, 1, 2, 3, 4]
 
 # number of flits for each router buffer
 buffer_depth: 2
 
-min_packet_size: 16
-max_packet_size: 16
+min_packet_size: 1
+max_packet_size: 1
 flit_injection_rate: false
 scale_with_nodes: false
 packet_injection_rate: 1
@@ -55,7 +56,6 @@ probability_of_retransmission: 1
 # Routing algorithms:
 #   TABLE_BASED
 #   MESH_XY
-#   BYPASS
 #   SUBNETWORK
 #   FIT_SUBNETWORK
 #   FIXED_SUBNETWORK
@@ -65,7 +65,7 @@ probability_of_retransmission: 1
 #   VIRTUAL_RING_SPLIT
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: VIRTUAL_RING_SPLIT
+routing_algorithm: SUBNETWORK
 
 # Selection Strategies:
 #   RANDOM

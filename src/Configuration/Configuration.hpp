@@ -73,7 +73,6 @@ private:
 
 public:
 	static std::string default_config_filename;
-	static std::string default_power_config_filename;
 
 	static void ShowHelp(const std::string& selfname);
 

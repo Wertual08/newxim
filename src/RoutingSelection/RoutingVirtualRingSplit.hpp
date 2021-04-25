@@ -49,14 +49,6 @@ public:
 			Connection con = { port, vc };
 			if (!router.CanSend(con)) continue;
 
-			//if (
-			//	//router.LocalID == 0 * Circulant.size() / 4 || 
-			//	//router.LocalID == 1 * Circulant.size() / 4 ||
-			//	//router.LocalID == 2 * Circulant.size() / 4 || 
-			//	//router.LocalID == 3 * Circulant.size() / 4
-			//	router.LocalID % 2 == 0
-			//) con.vc = !con.vc;
-
 			if (router.DestinationFreeSlots(con) >= 1)
 			{
 				result.push_back(con);

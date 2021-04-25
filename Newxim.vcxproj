@@ -27,7 +27,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="config.yaml" />
+    <None Include="config.yml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Configuration\Configuration.cpp" />

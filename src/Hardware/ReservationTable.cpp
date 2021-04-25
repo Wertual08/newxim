@@ -28,9 +28,6 @@ void ReservationTable::Reserve(Connection dest_in, Connection dest_out)
 }
 void ReservationTable::Release(Connection dest_in)
 {
-	static int cnt = 0;
-	cnt++;
-
 	std::size_t s = 0;
 	for (std::size_t i = 0; i < Table.size(); i++)
 		if (Table[i].in != dest_in) Table[s++] = Table[i];

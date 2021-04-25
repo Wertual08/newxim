@@ -59,6 +59,7 @@ public:
 
 	Graph directed_subtree(std::int32_t root_node = 0) const;
 	Graph subgraph(const std::string& str);
+	Graph random_subtree() const;
 	Graph tgen0_subtree(std::int32_t root_node = 0) const;
 	Graph tgen1_subtree(std::int32_t root_node = 0) const;
 	Graph tgen2_subtree(std::int32_t root_node = 0) const;

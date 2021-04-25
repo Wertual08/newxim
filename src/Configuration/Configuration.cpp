@@ -40,8 +40,8 @@ T ReadParam(YAML::Node node, std::string param)
 }
 
 
-std::string Configuration::default_config_filename = "config.yaml";
-std::string Configuration::default_power_config_filename = "power.yaml";
+std::string Configuration::default_config_filename = "config.yml";
+
 
 void Configuration::ReadTopologyParams(const YAML::Node& config)
 {

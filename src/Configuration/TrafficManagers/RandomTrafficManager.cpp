@@ -14,8 +14,7 @@ bool RandomTrafficManager::FirePacket(std::int32_t from, double time, bool retra
 }
 std::int32_t RandomTrafficManager::FindDestination(std::int32_t from) const
 {
-	return (from + 4) % 64;
-	//std::int32_t destination;
-	//while ((destination = DestDistribution(Random)) == from);
-	//return destination;
+	std::int32_t destination;
+	while ((destination = DestDistribution(Random)) == from);
+	return destination;
 }

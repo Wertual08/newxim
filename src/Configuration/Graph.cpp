@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 
 
@@ -234,7 +235,8 @@ Graph Graph::directed_subtree(std::int32_t root_node) const
 }
 Graph Graph::subgraph(const std::string& str)
 {
-	if (str == "TGEN_0") return tgen0_subtree(0);
+	if (str == "TREE_RANDOM") return random_subtree();
+	else if (str == "TGEN_0") return tgen0_subtree(0);
 	else if (str == "TGEN_1") return tgen1_subtree(0);
 	else if (str == "TGEN_2") return tgen2_subtree(0);
 	else if (str == "TGEN_3") return tgen3_subtree(0);
@@ -242,11 +244,54 @@ Graph Graph::subgraph(const std::string& str)
 	else if (str == "TGEN_5") return tgen5_subtree();
 	else return Graph();
 }
+Graph Graph::random_subtree() const
+{
+	Graph result;
+	result.resize(size());
+	std::vector<bool> visited(size(), false);
+	std::vector<std::int32_t> order;
+
+	std::int32_t to_generate = size();
+	std::int32_t generated = 0;
+	visited[rand() % to_generate--] = true;
+	generated++;
+	while (to_generate > 0) {
+		std::int32_t skip = rand() % generated + 1;
+		std::int32_t i = -1;
+		while (skip > 0) {
+			if (visited[++i]) skip--;
+		}
+
+		const auto& nodes = at(i);
+		order.resize(nodes.size());
+		for (std::int32_t& v : order) v = -1;
+		for (std::int32_t j = 0; j < nodes.size(); j++) {
+			std::int32_t p = rand() % (nodes.size() - j) + 1;
+			std::int32_t k = -1;
+			while (p > 0) if (order[++k] < 0) p--;
+			order[k] = j;
+		}
+
+		for (std::int32_t j = 0; j < nodes.size(); j++) {
+			std::int32_t n = nodes[order[j]];
+			if (!visited[n]) {
+				result[i].push_back(n);
+				result[n].push_back(i);
+				visited[n] = true;
+				generated++;
+				to_generate--;
+				std::cout << n << '\n';
+			}
+		}
+	}
+
+	return result;
+}
 Graph Graph::tgen0_subtree(std::int32_t root_node) const
 {
 	Graph result;
 	result.resize(size());
-	std::vector<std::int32_t> visited(size(), false);
+	std::vector<bool> visited(size(), false);
 	for (std::int32_t i = 0; i < size(); i++)
 	{
 		if (i == root_node) continue;
