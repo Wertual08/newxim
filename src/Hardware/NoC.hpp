@@ -3,7 +3,7 @@
 #include "Configuration/Configuration.hpp"
 #include "Tile.hpp"
 #include "Configuration/RoutingTable.hpp"
-#include "Configuration/Graph.hpp"
+#include "Configuration/Graph/Graph.hpp"
 #include "Configuration/TrafficManagers/TrafficManager.hpp"
 #include "Metrics/FlitTracer.hpp"
 #include "RoutingSelection/RoutingAlgorithm.hpp"

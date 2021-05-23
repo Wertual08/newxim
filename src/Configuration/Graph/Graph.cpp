@@ -242,6 +242,7 @@ Graph Graph::subgraph(const std::string& str)
 	else if (str == "TGEN_3") return tgen3_subtree(0);
 	else if (str == "TGEN_4") return tgen4_subtree(0);
 	else if (str == "TGEN_5") return tgen5_subtree();
+	else if (str == "TGEN_6") return tgen6_subtree();
 	else return Graph();
 }
 Graph Graph::random_subtree() const
@@ -280,7 +281,6 @@ Graph Graph::random_subtree() const
 				visited[n] = true;
 				generated++;
 				to_generate--;
-				std::cout << n << '\n';
 			}
 		}
 	}
@@ -486,7 +486,7 @@ Graph Graph::tgen4_subtree(std::int32_t root_node) const
 						Graph presumably_min = result;
 						presumably_min[j].push_back(n);
 						presumably_min[n].push_back(j);
-						std::int32_t new_ind = presumably_min.wiener_index();
+						std::int32_t new_ind = presumably_min.tree_wiener_index();
 						if (new_ind < index)
 						{
 							index = new_ind;
@@ -504,11 +504,11 @@ Graph Graph::tgen4_subtree(std::int32_t root_node) const
 Graph Graph::tgen5_subtree() const
 {
 	Graph result = tgen4_subtree(0);
-	std::int32_t index = result.wiener_index();
+	std::int32_t index = result.tree_wiener_index();
 	for (std::int32_t i = 1; i < size(); i++) 
 	{
 		Graph new_min = tgen4_subtree(i);
-		std::int32_t new_ind = new_min.wiener_index();
+		std::int32_t new_ind = new_min.tree_wiener_index();
 		if (new_ind < index)
 		{
 			result = new_min;
@@ -516,6 +516,33 @@ Graph Graph::tgen5_subtree() const
 		}
 	}
 	return result;
+}
+Graph Graph::tgen6_subtree() const
+{
+	Graph result;
+	result.resize(size());
+	for (std::int32_t i = 0; i < size() - 1; i++) {
+		result[i].push_back(i + 1);
+		result[i + 1].push_back(i);
+	}
+	return result;
+}
+
+std::int32_t tree_index(const Graph& graph, std::int32_t cur, std::int32_t prev = -1, std::int32_t w = 0)
+{
+	std::int32_t sum = w;
+	for (std::int32_t node : graph[cur]) {
+		if (node != prev)
+			sum += tree_index(graph, node, cur, w + 1);
+	}
+	return sum;
+}
+std::int32_t Graph::tree_wiener_index() const
+{
+	std::int32_t index = 0;
+	for (std::int32_t i = 0; i < size(); i++)
+		index += tree_index(*this, i);
+	return index;
 }
 
 std::int32_t Graph::wiener_index() const

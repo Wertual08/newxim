@@ -1,6 +1,6 @@
 #pragma once
 #include "RoutingAlgorithm.hpp"
-#include "Configuration/Graph.hpp"
+#include "Configuration/Graph/Graph.hpp"
 
 
 

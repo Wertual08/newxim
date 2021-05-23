@@ -31,7 +31,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Configuration\Configuration.cpp" />
-    <ClCompile Include="src\Configuration\Graph.cpp" />
+    <ClCompile Include="src\Configuration\Graph\CirculantGraph.cpp" />
+    <ClCompile Include="src\Configuration\Graph\Graph.cpp" />
+    <ClCompile Include="src\Configuration\Graph\MeshGraph.cpp" />
+    <ClCompile Include="src\Configuration\Graph\TorusGraph.cpp" />
+    <ClCompile Include="src\Configuration\Graph\TreeGraph.cpp" />
     <ClCompile Include="src\Configuration\RoutingTable.cpp" />
     <ClCompile Include="src\Configuration\TrafficManagers\HotspotTrafficManager.cpp" />
     <ClCompile Include="src\Configuration\TrafficManagers\RandomTrafficManager.cpp" />
@@ -53,7 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Configuration\Configuration.hpp" />
-    <ClInclude Include="src\Configuration\Graph.hpp" />
+    <ClInclude Include="src\Configuration\Graph\CirculantGraph.hpp" />
+    <ClInclude Include="src\Configuration\Graph\Graph.hpp" />
+    <ClInclude Include="src\Configuration\Graph\MeshGraph.hpp" />
+    <ClInclude Include="src\Configuration\Graph\TorusGraph.hpp" />
+    <ClInclude Include="src\Configuration\Graph\TreeGraph.hpp" />
     <ClInclude Include="src\Configuration\RoutingTable.hpp" />
     <ClInclude Include="src\Configuration\TrafficManagers\HotspotTrafficManager.hpp" />
     <ClInclude Include="src\Configuration\TrafficManagers\RandomTrafficManager.hpp" />

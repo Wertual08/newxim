@@ -25,15 +25,15 @@
     <Filter Include="Source files\RoutingSelection\Selection">
       <UniqueIdentifier>{af8d9d36-9508-441f-a79e-abaa014ea695}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source files\Configuration\Graph">
+      <UniqueIdentifier>{31e6273a-1139-4c1f-8875-ce6dd6a25183}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.yml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Configuration\RoutingTable.cpp">
-      <Filter>Source files\Configuration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Configuration\Graph.cpp">
       <Filter>Source files\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="src\Configuration\Configuration.cpp">
@@ -84,11 +84,26 @@
     <ClCompile Include="src\Hardware\Relay.cpp">
       <Filter>Source files\Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hardware\Router.cpp">
+      <Filter>Source files\Hardware</Filter>
+    </ClCompile>
     <ClCompile Include="src\DataStructs.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hardware\Router.cpp">
-      <Filter>Source files\Hardware</Filter>
+    <ClCompile Include="src\Configuration\Graph\MeshGraph.cpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\Graph\Graph.cpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\Graph\TorusGraph.cpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\Graph\TreeGraph.cpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Configuration\Graph\CirculantGraph.cpp">
+      <Filter>Source files\Configuration\Graph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -105,9 +120,6 @@
       <Filter>Source files\Configuration\TrafficManagers</Filter>
     </ClInclude>
     <ClInclude Include="src\Configuration\Configuration.hpp">
-      <Filter>Source files\Configuration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Configuration\Graph.hpp">
       <Filter>Source files\Configuration</Filter>
     </ClInclude>
     <ClInclude Include="src\Configuration\RoutingTable.hpp">
@@ -151,9 +163,6 @@
     </ClInclude>
     <ClInclude Include="src\Metrics\Stats.hpp">
       <Filter>Source files\Metrics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DataStructs.hpp">
-      <Filter>Source files</Filter>
     </ClInclude>
     <ClInclude Include="src\RoutingSelection\RoutingAlgorithm.hpp">
       <Filter>Source files\RoutingSelection\Routing</Filter>
@@ -205,6 +214,24 @@
     </ClInclude>
     <ClInclude Include="src\RoutingSelection\RoutingRingSplit.hpp">
       <Filter>Source files\RoutingSelection\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataStructs.hpp">
+      <Filter>Source files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Graph\MeshGraph.hpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Graph\Graph.hpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Graph\TreeGraph.hpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Graph\TorusGraph.hpp">
+      <Filter>Source files\Configuration\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Graph\CirculantGraph.hpp">
+      <Filter>Source files\Configuration\Graph</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

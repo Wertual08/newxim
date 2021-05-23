@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "Graph.hpp"
+#include "Graph/Graph.hpp"
 #include "RoutingTable.hpp"
 #include "TrafficManagers/TrafficManager.hpp"
 

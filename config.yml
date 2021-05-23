@@ -23,15 +23,17 @@ virtual_channels: 1
 # Supported subtopologies:
 #   NONE
 #   TREE_RANDOM - random subtree generator
+#   TGEN_0 - test tree generator
 #   TGEN_1 - test tree generator
 #   TGEN_2 - test tree generator
 #   TGEN_3 - test tree generator
 #   TGEN_4 - test tree generator
 #   TGEN_5 - test tree generator
+#   TGEN_6 - test tree generator
 #   TREE - future reserved
 #   RING - future reserved
 #   MESH - future reserved
-subtopology: TREE_RANDOM  
+subtopology: TGEN_0  
 
 # NONE
 # VIRTUAL

@@ -9,6 +9,11 @@
 #include <filesystem>
 #include <iomanip>
 
+#include "Graph/CirculantGraph.hpp"
+#include "Graph/MeshGraph.hpp"
+#include "Graph/TorusGraph.hpp"
+#include "Graph/TreeGraph.hpp"
+
 
 
 template <typename T>
@@ -64,73 +69,16 @@ void Configuration::ReadTopologyParams(const YAML::Node& config)
 		}
 		else if (topology == "CIRCULANT")
 		{
-			graph.resize(args[0].as<std::int32_t>());
+			std::vector<std::int32_t> generators(args.size() - 1);
 			for (std::int32_t i = 1; i < args.size(); i++)
 			{
-				std::int32_t l = args[i].as<std::int32_t>();
-				for (std::int32_t j = 0; j < graph.size(); j++)
-				{
-					//if ((j + l) % graph.size() < j) continue;
-					graph[j].push_back((j + l) % graph.size(), channels_count);
-					graph[(j + l) % graph.size()].push_back(j, channels_count);
-				}
+				generators[i - 1] = args[i].as<std::int32_t>();
 			}
+			graph = CirculantGraph(args[0].as<std::int32_t>(), generators, channels_count);
 		}
-		else if (topology == "MESH")
-		{
-			dim_x = args[0].as<std::int32_t>();
-			dim_y = args[1].as<std::int32_t>();
-
-			graph.resize(dim_x * dim_y);
-			for (std::int32_t x = 0; x < dim_x; x++)
-			{
-				for (std::int32_t y = 0; y < dim_y; y++)
-				{
-					if (y + 1 < dim_y) graph[y * dim_x + x].push_back((y + 1) * dim_x + x, channels_count);
-					if (x - 1 >= 0) graph[y * dim_x + x].push_back(y * dim_x + x - 1, channels_count);
-					if (y - 1 >= 0) graph[y * dim_x + x].push_back((y - 1) * dim_x + x, channels_count);
-					if (x + 1 < dim_x) graph[y * dim_x + x].push_back(y * dim_x + x + 1, channels_count);
-				}
-			}
-		}
-		else if (topology == "TORUS")
-		{
-			dim_x = args[0].as<std::int32_t>();
-			dim_y = args[1].as<std::int32_t>();
-
-			graph.resize(dim_x * dim_y);
-			for (std::int32_t x = 0; x < dim_x; x++)
-			{
-				for (std::int32_t y = 0; y < dim_y; y++)
-				{
-					auto& node = graph[y * dim_x + x];
-					if (y + 1 < dim_y) node.push_back((y + 1) * dim_x + x, channels_count);
-					else node.push_back(x, channels_count);
-					if (x - 1 >= 0) node.push_back(y * dim_x + x - 1, channels_count);
-					else node.push_back(y * dim_x + dim_x - 1, channels_count);
-					if (y - 1 >= 0) node.push_back((y - 1) * dim_x + x, channels_count);
-					else node.push_back((dim_y - 1) * dim_x + x, channels_count);
-					if (x + 1 < dim_x) node.push_back(y * dim_x + x + 1, channels_count);
-					else node.push_back(y * dim_x, channels_count);
-				}
-			}
-		}
-		else if (topology == "TREE")
-		{
-			std::int32_t nodes_count = args[0].as<std::int32_t>();
-			std::int32_t subnodes_count = args[1].as<std::int32_t>();
-			graph.resize(nodes_count);
-			for (std::int32_t i = 0; i < graph.size(); i++)
-			{
-				if (i * subnodes_count + 1 >= graph.size()) break;
-				for (std::int32_t j = 1; j <= subnodes_count; j++)
-				{
-					if (i * subnodes_count + j >= graph.size()) break;
-					graph[i].push_back(i * subnodes_count + j, channels_count);
-					graph[i * subnodes_count + j].push_back(i, channels_count);
-				}
-			}
-		}
+		else if (topology == "MESH") graph = MeshGraph(args[0].as<std::int32_t>(), args[1].as<std::int32_t>(), channels_count);
+		else if (topology == "TORUS") graph = TorusGraph(args[0].as<std::int32_t>(), args[1].as<std::int32_t>(), channels_count);
+		else if (topology == "TREE") graph = TreeGraph(args[0].as<std::int32_t>(), args[1].as<std::int32_t>(), channels_count);
 		else if (topology == "TMESH")
 		{
 			dim_x = args[0].as<std::int32_t>();

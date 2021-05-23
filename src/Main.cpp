@@ -2,7 +2,7 @@
 #include "Hardware/NoC.hpp"
 #include "Metrics/GlobalStats.hpp"
 #include "DataStructs.hpp"
-#include "Configuration/Graph.hpp"
+#include "Configuration/Graph/Graph.hpp"
 #include "Configuration/Configuration.hpp"
 #include "Metrics/ProgressBar.hpp"
 
@@ -24,6 +24,9 @@ int sc_main(int arg_num, char *arg_vet[])
 	SimulationTimer Timer(Config.ClockPeriodPS(), Config.ResetTime(), Config.StatsWarmUpTime(), Config.SimulationTime());
 	NoC Network(Config, Timer);
 	GlobalStats stats(Network, Config);
+
+
+	std::cout << Config.TopologySubGraph().tree_wiener_index() << '\n';
 
 	std::unique_ptr<ProgressBar> Bar;
 	if (Config.ReportProgress()) Bar = std::make_unique<ProgressBar>(std::cout, Timer, 20, Network.clock);

@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 #include "RoutingAlgorithm.hpp"
-#include "Configuration/Graph.hpp"
+#include "Configuration/Graph/Graph.hpp"
 #include "Configuration/RoutingTable.hpp"
 
 

@@ -66,7 +66,9 @@ public:
 	Graph tgen3_subtree(std::int32_t root_node = 0) const;
 	Graph tgen4_subtree(std::int32_t root_node = 0) const;
 	Graph tgen5_subtree() const;
+	Graph tgen6_subtree() const;
 
+	std::int32_t tree_wiener_index() const;
 	std::int32_t wiener_index() const;
 
 	AdjacencyMatrix adjacency_matrix() const;
