@@ -1,5 +1,5 @@
 # NewXim
-Network on Chip Simulator. 
+Network-on-Chip Simulator. 
 
 
 This project is dedicated to cycle-accurate NoCs 
@@ -21,6 +21,11 @@ In addition, overall code structure and performance
 were improved along with the number of accumulated 
 simulation metrics. 
 
+# Contacts
+nmmyachin@hse.ru (Nikolay Myachin)    
+a.romanov@hse.ru (Aleksandr Romanov, PhD)   
+https://www.hse.ru/en/staff/a.romanov#sci     
+https://www.researchgate.net/profile/Aleksandr-Romanov    
 
 ## User manual
 Simulation configuration is done with *.yml 
