@@ -1,13 +1,26 @@
 # NewXim
-Network on Chip Simulator
+Network on Chip Simulator. 
+
 
 This project is dedicated to cycle-accurate NoCs 
-simulation and based on SystemC library. Main 
+simulation and is a part of NoC topologies study
+at HSE University. Main 
 purpose of the project is to provide tools for 
 analyzing NoCs with custom topologies and in 
 particular Circulant topologies. There are 
 several implemented topologies and potion to 
 pecify custom one.
+<br>
+
+Project was originally forked from davidepatti/noxim 
+but the purpose of modeling NoC\`s with custom 
+topologies support led to complete code overhaul. 
+As a result, current simulator have support for
+different topologies and and routing algorithms.
+In addition, overall code structure and performance
+were improved along with the number of accumulated 
+simulation metrics. 
+
 
 ## User manual
 Simulation configuration is done with *.yml 
