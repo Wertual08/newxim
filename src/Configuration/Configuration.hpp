@@ -41,6 +41,7 @@ private:
 	std::int32_t channels_count;
 	std::size_t virtual_channels_count;
 	bool report_progress;
+	bool json_result;
 	bool report_buffers;
 	bool report_routing_table;
 	bool report_possible_routes;
@@ -74,13 +75,10 @@ private:
 public:
 	static std::string default_config_filename;
 
-	static void ShowHelp(const std::string& selfname);
+	static void ShowHelp();
 
 	Configuration(std::int32_t arg_num, char* arg_vet[]);
 	void ParseArgs(YAML::Node &node, std::int32_t arg_num, char* arg_vet[]);
-	void Check();
-
-	void Show() const;
 
 	const Graph &TopologyGraph() const;
 	const Graph &TopologySubGraph() const;
@@ -107,6 +105,7 @@ public:
 	std::int32_t StatsWarmUpTime() const;
 	std::int32_t RndGeneratorSeed() const;
 	bool ReportProgress() const;
+	bool JsonResult() const;
 	bool ReportBuffers() const;
 	bool ReportCycleResult() const;
 	bool ReportFlitTrace() const;

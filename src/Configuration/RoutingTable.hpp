@@ -17,6 +17,13 @@ private:
 	// ID to Relations
 	std::vector<Node> Nodes;
 
+public:
+	RoutingTable();
+	RoutingTable(const std::string& path);
+
+	bool Load(const std::string& path);
+
+	void Init(const Graph& graph);
 	bool LoadDijkstra(const Graph& graph);
 	bool LoadUpDown(const Graph& graph);
 	bool LoadMeshXY(const Graph& graph);
@@ -24,16 +31,7 @@ private:
 	bool LoadCirculantClockwise(const Graph& graph);
 	bool LoadCirculantAdaptive(const Graph& graph);
 	bool LoadCirculantMultiplicative(const Graph& graph);
-	bool LoadGreedyPromotion(const Graph &graph);
-
-public:
-	RoutingTable();
-	RoutingTable(const std::string& path);
-	RoutingTable(const Graph& graph, const std::string& generator = "DIJKSTRA");
-	RoutingTable(const Graph& graph, const Graph& sub_graph, const std::string& generator = "DIJKSTRA");
-
-	bool Load(const std::string& path);
-	bool Load(const Graph& graph, const std::string& generator = "DIJKSTRA");
+	bool LoadGreedyPromotion(const Graph& graph);
 
 	void Adjust(const Graph &src_graph, const Graph &dst_graph);
 	void Promote(const Graph &graph);
