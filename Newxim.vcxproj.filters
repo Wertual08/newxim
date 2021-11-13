@@ -102,7 +102,9 @@
     <ClCompile Include="src\Configuration\Graph\CirculantGraph.cpp">
       <Filter>Source files\Configuration\Graph</Filter>
     </ClCompile>
-    <ClCompile Include="src\Configuration\Factory.cpp" />
+    <ClCompile Include="src\Configuration\Factory.cpp">
+      <Filter>Source files\Configuration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Configuration\TrafficManagers\HotspotTrafficManager.hpp">
@@ -237,6 +239,8 @@
     <ClInclude Include="src\Selection\SelectionVirtualRingSplit.hpp">
       <Filter>Source files\Selection</Filter>
     </ClInclude>
-    <ClInclude Include="src\Configuration\Factory.hpp" />
+    <ClInclude Include="src\Configuration\Factory.hpp">
+      <Filter>Source files\Configuration</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

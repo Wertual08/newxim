@@ -1,59 +1,9 @@
 #include "NoC.hpp"
-#include "Routing/RoutingTableBased.hpp"
-#include "Routing/RoutingBypass.hpp"
-#include "Routing/RoutingVirtualSubnetwork.hpp"
-#include "Routing/RoutingFitVirtualSubnetwork.hpp"
-#include "Routing/RoutingSubnetwork.hpp"
-#include "Routing/RoutingFitSubnetwork.hpp"
-#include "Routing/RoutingFixedSubnetwork.hpp"
-#include "Routing/RoutingMeshXY.hpp"
-#include "Routing/RoutingRingSplit.hpp"
-#include "Routing/RoutingVirtualRingSplit.hpp"
-#include "Selection/SelectionRandom.hpp"
-#include "Selection/SelectionBufferLevel.hpp"
-#include "Selection/SelectionKeepSpace.hpp"
-#include "Selection/SelectionRandomKeepSpace.hpp"
-
-#include "Configuration/TrafficManagers/RandomTrafficManager.hpp"
-#include "Configuration/TrafficManagers/HotspotTrafficManager.hpp"
-#include "Configuration/TrafficManagers/TableTrafficManager.hpp"
-
 #include "Hardware/Router.hpp"
+#include "Configuration/Factory.hpp"
 
 
 
-std::unique_ptr<RoutingAlgorithm> GetAlgorithm(const Configuration& config)
-{
-	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
-	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.TopologyGraph());
-	if (config.RoutingAlgorithm() == "BYPASS") return std::make_unique<RoutingBypass>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "SUBNETWORK") return std::make_unique<RoutingSubnetwork>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "FIT_SUBNETWORK") return std::make_unique<RoutingFitSubnetwork>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "FIXED_SUBNETWORK") return std::make_unique<RoutingFixedSubnetwork>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "VIRTUAL_SUBNETWORK") return std::make_unique<RoutingVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "FIT_VIRTUAL_SUBNETWORK") return std::make_unique<RoutingFitVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "RING_SPLIT") return std::make_unique<RoutingRingSplit>(config.NetworkGraph(), config.GRTable());
-	if (config.RoutingAlgorithm() == "VIRTUAL_RING_SPLIT") return std::make_unique<RoutingVirtualRingSplit>(config.NetworkGraph(), config.GRTable());
-	throw std::runtime_error("Configuration error: Invalid routing algorithm [" + config.RoutingAlgorithm() + "].");
-}
-std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config)
-{
-	if (config.SelectionStrategy() == "RANDOM") return std::make_unique<SelectionRandom>();
-	if (config.SelectionStrategy() == "BUFFER_LEVEL") return std::make_unique<SelectionBufferLevel>();
-	if (config.SelectionStrategy() == "KEEP_SPACE") return std::make_unique<SelectionKeepSpace>();
-	if (config.SelectionStrategy() == "RANDOM_KEEP_SPACE") return std::make_unique<SelectionRandomKeepSpace>();
-	throw std::runtime_error("Configuration error: Invalid selection strategy [" + config.SelectionStrategy() + "].");
-}
-std::unique_ptr<TrafficManager> GetTraffic(const Configuration& config)
-{
-	if (config.TrafficDistribution() == "TRAFFIC_RANDOM") return std::make_unique<RandomTrafficManager>(
-		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate());
-	if (config.TrafficDistribution() == "TRAFFIC_HOTSPOT") return std::make_unique<HotspotTrafficManager>(
-		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate(), config.Hotspots());
-	if (config.TrafficDistribution() == "TRAFFIC_TABLE_BASED") return std::make_unique<TableTrafficManager>(
-		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.TrafficTableFilename(), config.PacketInjectionRate(), config.SimulationTime());
-	throw std::runtime_error("Configuration error: Invalid traffic distribution [" + config.TrafficDistribution() + "].");
-}
 std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
 {
 	return std::make_unique<Processor>(
@@ -66,12 +16,15 @@ std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32
 void NoC::InitBase()
 {
 	srand(Config.RndGeneratorSeed());
+	Factory factory(Config);
+	
 
-	if (Config.ReportFlitTrace()) Tracer = std::make_unique<FlitTracer>(
-		Timer, Config.FlitTraceStart(), Config.FlitTraceEnd());
-	Algorithm = GetAlgorithm(Config);
-	Strategy = GetStrategy(Config);
-	Traffic = GetTraffic(Config);
+	if (Config.ReportFlitTrace()) {
+		Tracer = std::make_unique<FlitTracer>(Timer, Config.FlitTraceStart(), Config.FlitTraceEnd());
+	}
+	Algorithm = factory.MakeAlgorithm();
+	Strategy = factory.MakeStrategy();
+	Traffic = factory.MakeTraffic();
 
 	auto &graph = Config.NetworkGraph();
 
@@ -79,17 +32,19 @@ void NoC::InitBase()
 	for (std::int32_t id = 0; id < Tiles.size(); id++)
 	{
 		std::unique_ptr<Router> RouterDevice = std::make_unique<Router>(Timer, id, graph[id].size());
-		for (std::size_t i = 0; i < RouterDevice->Size(); i++)
-		{
+		for (std::size_t i = 0; i < RouterDevice->Size(); i++) {
 			auto& relay = (*RouterDevice)[i];
 			relay.SetVirtualChannels(Config.VirtualChannels());
-			for (std::size_t vc = 0; vc < relay.Size(); vc++)
+			for (std::size_t vc = 0; vc < relay.Size(); vc++) {
 				relay[vc].Reserve(Config.BufferDepth());
+			}
 		}
 
 		RouterDevice->SetRoutingAlgorithm(*Algorithm);
 		RouterDevice->SetSelectionStrategy(*Strategy);
-		if (Tracer) RouterDevice->SetFlitTracer(*Tracer);
+		if (Tracer) {
+			RouterDevice->SetFlitTracer(*Tracer);
+		}
 		RouterDevice->SetUpdateSequence(Config.UpdateSequence());
 		
 		std::unique_ptr<Processor> ProcessorDevice = GetProcessor(Timer, id, Config);
@@ -125,10 +80,8 @@ void NoC::InitBase()
 			auto& connected_router = *connected_tile.RouterDevice;
 			auto& connected_node = graph[connected_id];
 			std::vector<std::int32_t> connected_relays = connected_node.links_to(id);
-			for (std::int32_t rel : connected_relays)
-			{
-				if (!connected_router[rel].Bound())
-				{
+			for (std::int32_t rel : connected_relays) {
+				if (!connected_router[rel].Bound()) {
 					router[relay].Bind(connected_router[rel]);
 					break;
 				}
