@@ -29,7 +29,7 @@ public:
 
 	void Route(const Router &router, const Flit &flit, std::vector<Connection>& result) const override
 	{
-		if (!VectorContains(SubnetworkTable[router.LocalID], flit.dir_in))
+		if (!VectorContains(SubnetworkTable[router.LocalID], flit.port_in))
 		{
 			const auto &ports = Table[router.LocalID][flit.dst_id];
 			for (auto port : ports)

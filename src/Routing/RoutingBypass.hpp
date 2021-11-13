@@ -53,7 +53,7 @@ public:
 				Connection con = { port, 0 };
 				if (!router.CanSend(con)) continue;
 
-				if (VectorContains(SubnetworkTable[router.LocalID], flit.dir_in))
+				if (VectorContains(SubnetworkTable[router.LocalID], flit.port_in))
 				{
 					if (router.DestinationFreeSlots(con) >= flit.sequence_length)
 					{

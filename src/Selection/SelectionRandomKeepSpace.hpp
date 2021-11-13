@@ -16,8 +16,8 @@ public:
 
 			std::int32_t free_slots = router.DestinationFreeSlots(dst);
 
-			if (flit.dir_in != router.LocalRelayID) best_dirs.push_back(dst);
-			else if (free_slots >= router[flit.dir_in][flit.vc_id].GetCapacity() - 0) best_dirs.push_back(dst);
+			if (flit.port_in != router.LocalRelayID) best_dirs.push_back(dst);
+			else if (free_slots >= router[flit.port_in][flit.vc_id].GetCapacity() - 0) best_dirs.push_back(dst);
 		}
 
 		if (best_dirs.size() > 0) return best_dirs[rand() % best_dirs.size()];

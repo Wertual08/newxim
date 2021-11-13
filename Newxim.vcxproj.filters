@@ -203,16 +203,10 @@
     <ClInclude Include="src\Routing\RoutingMeshXY.hpp">
       <Filter>Source files\Routing</Filter>
     </ClInclude>
-    <ClInclude Include="src\Routing\RoutingRingSplit.hpp">
-      <Filter>Source files\Routing</Filter>
-    </ClInclude>
     <ClInclude Include="src\Routing\RoutingSubnetwork.hpp">
       <Filter>Source files\Routing</Filter>
     </ClInclude>
     <ClInclude Include="src\Routing\RoutingTableBased.hpp">
-      <Filter>Source files\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Routing\RoutingVirtualRingSplit.hpp">
       <Filter>Source files\Routing</Filter>
     </ClInclude>
     <ClInclude Include="src\Routing\RoutingVirtualSubnetwork.hpp">

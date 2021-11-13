@@ -47,7 +47,7 @@ public:
 	void Update();
 	bool CanSend(const Flit &flit) const;
 	bool CanSend(std::size_t vc) const;
-	bool Send(const Flit& flit);
+	bool Send(Flit flit);
 	bool CanReceive() const;
 	Flit Receive();
 

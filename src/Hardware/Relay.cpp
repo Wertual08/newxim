@@ -104,10 +104,11 @@ bool Relay::CanSend(std::size_t vc) const
 {
 	return tx_current_level == tx_ack.read() && rx_free_slots[vc].read() > 0;
 }
-bool Relay::Send(const Flit& flit)
+bool Relay::Send(Flit flit)
 {
 	if (CanSend(flit))
 	{
+		flit.port_out = local_id;
 		tx_flit.write(flit);
 		tx_current_level = !tx_current_level;
 		tx_req.write(tx_current_level);
@@ -126,7 +127,7 @@ Flit Relay::Receive()
 	{
 		Flit flit = rx_flit.read();
 		flit.hop_no++;
-		flit.dir_in = local_id;
+		flit.port_in = local_id;
 
 		if (flit.vc_id < 0 || flit.vc_id >= num_virtual_channels) throw std::runtime_error(
 			"Relay error: Invalid virtual channel [" + std::to_string(flit.vc_id) + "] of received flit.");

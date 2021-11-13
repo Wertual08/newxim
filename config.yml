@@ -43,7 +43,7 @@ subnetwork: NONE
 # update sequence of router relays
 #   DEFAULT - round-robin update
 #   [a, b, c, ...] - custom sequence
-update_sequence: DEFAULT # [0, 1, 2, 3, 4]
+update_sequence: DEFAULT # DEFAULT : [0, 1, 2, 3, 4]
 
 # number of flits for each router buffer
 buffer_depth: 2
@@ -62,8 +62,6 @@ packet_injection_rate: 1
 #   FIXED_SUBNETWORK
 #   VIRTUAL_SUBNETWORK
 #   FIT_VIRTUAL_SUBNETWORK
-#   RING_SPLIT
-#   VIRTUAL_RING_SPLIT
 # Each of the above labels should match a corresponding
 # implementation in the Routing source code directory
 # TODO:
@@ -73,7 +71,7 @@ packet_injection_rate: 1
 #   NEGATIVE_FIRST
 #   OPT_Y
 #   O1TURN
-#   XY-YX
+#   XY_YX
 #   IX_Y
 #   DIA_MOT
 #   THE_PURE_ZIGZAG
@@ -81,7 +79,7 @@ packet_injection_rate: 1
 #   AB_TM
 #   ARM_WRESTLING
 #   TUG_WAR
-routing_algorithm: VIRTUAL_RING_SPLIT
+routing_algorithm: TABLE_BASED
 
 # Selection Strategies:
 #   RANDOM
@@ -93,7 +91,7 @@ routing_algorithm: VIRTUAL_RING_SPLIT
 #   
 # Each of the above labels should match a corresponding
 # implementation in the Selection source code directory
-selection_strategy: RANDOM
+selection_strategy: VIRTUAL_RING_SPLIT
 
 # Default routing table generators:
 #   DIJKSTRA

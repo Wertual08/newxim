@@ -90,10 +90,8 @@
     <ClInclude Include="src\Routing\RoutingFitVirtualSubnetwork.hpp" />
     <ClInclude Include="src\Routing\RoutingFixedSubnetwork.hpp" />
     <ClInclude Include="src\Routing\RoutingMeshXY.hpp" />
-    <ClInclude Include="src\Routing\RoutingRingSplit.hpp" />
     <ClInclude Include="src\Routing\RoutingSubnetwork.hpp" />
     <ClInclude Include="src\Routing\RoutingTableBased.hpp" />
-    <ClInclude Include="src\Routing\RoutingVirtualRingSplit.hpp" />
     <ClInclude Include="src\Routing\RoutingVirtualSubnetwork.hpp" />
     <ClInclude Include="src\Selection\SelectionBufferLevel.hpp" />
     <ClInclude Include="src\Selection\SelectionKeepSpace.hpp" />

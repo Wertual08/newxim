@@ -21,7 +21,7 @@ void FlitTracer::Register(Flit& flit)
 void FlitTracer::Remember(const Flit& flit, std::int32_t id)
 {
 	if (flit.id - IDOffset >= FlitHistory.size() || flit.id < IDOffset) return;
-	FlitHistory[flit.id - IDOffset].second.push_back({ id, flit.dir_in, flit.vc_id, Timer.SimulationTime() });
+	FlitHistory[flit.id - IDOffset].second.push_back({ id, flit.port_in, flit.vc_id, Timer.SimulationTime() });
 }
 
 std::ostream& operator<<(std::ostream& os, const FlitTracer& tracer)

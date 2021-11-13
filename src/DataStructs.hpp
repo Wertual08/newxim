@@ -59,7 +59,8 @@ struct Flit
 	std::uint64_t id;
 	int src_id = -1;
 	int dst_id = -1;
-	int dir_in = -1;
+	int port_in = -1;
+	int port_out = -1;
 	int vc_id = -1;							
 	FlitType flit_type = FlitType::None;	
 	int sequence_no = -1;					

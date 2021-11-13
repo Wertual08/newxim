@@ -10,12 +10,12 @@
 #include "Routing/RoutingFitSubnetwork.hpp"
 #include "Routing/RoutingFixedSubnetwork.hpp"
 #include "Routing/RoutingMeshXY.hpp"
-#include "Routing/RoutingRingSplit.hpp"
-#include "Routing/RoutingVirtualRingSplit.hpp"
 #include "Selection/SelectionRandom.hpp"
 #include "Selection/SelectionBufferLevel.hpp"
 #include "Selection/SelectionKeepSpace.hpp"
 #include "Selection/SelectionRandomKeepSpace.hpp"
+#include "Selection/SelectionRingSplit.hpp"
+#include "Selection/SelectionVirtualRingSplit.hpp"
 
 #include "Configuration/TrafficManagers/RandomTrafficManager.hpp"
 #include "Configuration/TrafficManagers/HotspotTrafficManager.hpp"
@@ -33,8 +33,6 @@ std::unique_ptr<RoutingAlgorithm> Factory::MakeAlgorithm() const
 	if (config.RoutingAlgorithm() == "FIXED_SUBNETWORK") return std::make_unique<RoutingFixedSubnetwork>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "VIRTUAL_SUBNETWORK") return std::make_unique<RoutingVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "FIT_VIRTUAL_SUBNETWORK") return std::make_unique<RoutingFitVirtualSubnetwork>(config.GRTable(), config.SubGRTable());
-	if (config.RoutingAlgorithm() == "RING_SPLIT") return std::make_unique<RoutingRingSplit>(config.NetworkGraph(), config.GRTable());
-	if (config.RoutingAlgorithm() == "VIRTUAL_RING_SPLIT") return std::make_unique<RoutingVirtualRingSplit>(config.NetworkGraph(), config.GRTable());
 	throw std::runtime_error("Configuration error: Invalid routing algorithm [" + config.RoutingAlgorithm() + "].");
 }
 
@@ -44,6 +42,8 @@ std::unique_ptr<SelectionStrategy> Factory::MakeStrategy() const
 	if (config.SelectionStrategy() == "BUFFER_LEVEL") return std::make_unique<SelectionBufferLevel>();
 	if (config.SelectionStrategy() == "KEEP_SPACE") return std::make_unique<SelectionKeepSpace>();
 	if (config.SelectionStrategy() == "RANDOM_KEEP_SPACE") return std::make_unique<SelectionRandomKeepSpace>();
+	if (config.SelectionStrategy() == "RING_SPLIT") return std::make_unique<SelectionRingSplit>();
+	if (config.SelectionStrategy() == "VIRTUAL_RING_SPLIT") return std::make_unique<SelectionVirtualRingSplit>(config.TopologyGraph());
 	throw std::runtime_error("Configuration error: Invalid selection strategy [" + config.SelectionStrategy() + "].");
 }
 
