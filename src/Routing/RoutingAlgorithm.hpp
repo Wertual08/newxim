@@ -9,5 +9,5 @@
 class RoutingAlgorithm
 {
 public:
-	virtual std::vector<Connection> Route(const Router& router, const Flit& flit) const = 0;
+	virtual void Route(const Router& router, const Flit& flit, std::vector<Connection>& result) const = 0;
 };

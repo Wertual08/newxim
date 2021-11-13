@@ -145,19 +145,16 @@ Flit Relay::Receive()
 	else return Flit();
 }
 
-bool Relay::FlitAvailable() const
-{
-	std::size_t i = 0;
-	while (i < num_virtual_channels && buffers[(current_virtual_channel + i) % num_virtual_channels].Empty()) i++;
-	return i < num_virtual_channels;
-}
 Flit Relay::Front() const
 {
 	std::size_t i = 0;
 	while (i < num_virtual_channels && buffers[(current_virtual_channel + i) % num_virtual_channels].Empty()) i++;
 
-	if (i < num_virtual_channels) return buffers[(current_virtual_channel + i) % num_virtual_channels].Front();
-	else return Flit();
+	if (i < num_virtual_channels) {
+		return buffers[(current_virtual_channel + i) % num_virtual_channels].Front();
+	} else {
+		return Flit();
+	}
 }
 void Relay::Skip()
 {
@@ -171,9 +168,10 @@ Flit Relay::Pop()
 	while (i < num_virtual_channels && buffers[(vc_offset + i) % num_virtual_channels].Empty()) i++;
 	std::size_t vc = (vc_offset + i) % num_virtual_channels;
 
-	if (i < num_virtual_channels)
-	{
+	if (i < num_virtual_channels) {
 		return buffers[vc].Pop();
 	}
-	else return Flit();
+	else {
+		return Flit();
+	}
 }

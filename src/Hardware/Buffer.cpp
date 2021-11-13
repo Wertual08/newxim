@@ -38,25 +38,13 @@ void Buffer::Push(const Flit& flit)
 }
 Flit Buffer::Pop()
 {
-	Flit f;
-
-	if (Empty()) assert(false);
-	else 
-	{
-		f = buffer.front();
-		buffer.pop();
-	}
-
+	Flit f = buffer.front();
+	buffer.pop();
 	return f;
 }
 Flit Buffer::Front() const
 {
-	Flit f;
-
-	if (Empty()) assert(false);
-	else f = buffer.front();
-	
-	return f;
+	return buffer.front();
 }
 std::int32_t Buffer::Size() const
 {

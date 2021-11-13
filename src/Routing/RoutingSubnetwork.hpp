@@ -18,10 +18,8 @@ public:
 	{
 	}
 
-	std::vector<Connection> Route(const Router &router, const Flit &flit) const override
+	void Route(const Router &router, const Flit &flit, std::vector<Connection>& result) const override
 	{
-		std::vector<Connection> result;
-
 		const auto &ports = Table[router.LocalID][flit.dst_id];
 		for (auto port : ports)
 		{
@@ -46,7 +44,5 @@ public:
 				}
 			}
 		}
-
-		return result;
 	}
 };

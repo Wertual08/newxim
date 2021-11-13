@@ -5,8 +5,9 @@
 #include "Configuration/Graph/Graph.hpp"
 #include "Configuration/Configuration.hpp"
 #include "Metrics/ProgressBar.hpp"
+#include <chrono>
 
-const static std::string Version = "0.0.1.0";
+const static std::string Version = "0.0.1.1";
 
 
 
@@ -37,12 +38,17 @@ int sc_main(int arg_num, char* arg_vet[]) {
 		std::cout << " Now running for " << Config.SimulationTime() << " cycles...\n";
 
 		if (Config.ReportProgress()) std::cout << " Progress: ";
+		auto start_time = std::chrono::high_resolution_clock::now();
 		sc_start(Config.SimulationTime(), SC_NS);
+		auto end_time = std::chrono::high_resolution_clock::now();
 		if (Config.ReportProgress()) std::cout << '\n';
 
-		std::cout << "Newxim simulation completed.";
-		std::cout << " (" << static_cast<std::int32_t>(Timer.SystemTime()) << " cycles executed)\n";
-		std::cout << '\n';
+		std::cout 
+			<< "Newxim simulation completed.\n"
+			<< static_cast<std::int32_t>(Timer.SystemTime()) 
+			<< " cycles executed in "
+			<< std::chrono::duration<double>(end_time - start_time).count()
+			<< "s\n\n";
 
 		std::cout << stats;
 		return 0;

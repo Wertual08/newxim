@@ -21,9 +21,7 @@ public:
 		Circulant(circulant), Table(table) {
 	}
 
-	std::vector<Connection> Route(const Router& router, const Flit& flit) const override {
-		std::vector<Connection> result;
-
+	void Route(const Router& router, const Flit& flit, std::vector<Connection>& result) const override {
 		const auto& ports = Table[router.LocalID][flit.dst_id];
 
 		std::int32_t max_dist = -1;
@@ -51,8 +49,5 @@ public:
 				result.push_back(con);
 			}
 		}
-
-
-		return result;
 	}
 };

@@ -15,12 +15,11 @@ public:
     {
     }
 
-	std::vector<Connection> Route(const Router& router, const Flit& flit) const override
+	void Route(const Router& router, const Flit& flit, std::vector<Connection>& result) const override
     {
-        std::vector<Connection> result(Table[router.LocalID][flit.dst_id].size());
-        for (std::size_t i = 0; i < Table[router.LocalID][flit.dst_id].size(); i++)
+        for (std::size_t i = 0; i < Table[router.LocalID][flit.dst_id].size(); i++) {
             result[i] = { Table[router.LocalID][flit.dst_id][i], 0 };
-        return result;
+        }
     }
 
 };

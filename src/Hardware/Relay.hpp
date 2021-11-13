@@ -60,7 +60,6 @@ public:
 		return rx_free_slots[vc].read(); // * CanSend(vc) ???
 	}
 
-	bool FlitAvailable() const;
 	Flit Front() const;
 	void Skip();
 	Flit Pop();

@@ -3,12 +3,12 @@
 
 
 
-class SelectionRandom : public SelectionStrategy 
+class SelectionRingSplit : public SelectionStrategy 
 {
 public:
-	Connection Apply(const Router& router, const Flit& flit, const std::vector<Connection>& directions) const override
+	Connection Apply(const Router& router, const Flit& flit, const std::vector<Connection>& connections) const override
     {
-        if (directions.size() == 0) return Connection();
-        else return directions[rand() % directions.size()];
+        if (connections.size() == 0) return Connection();
+        else return connections[rand() % connections.size()];
     }
 };

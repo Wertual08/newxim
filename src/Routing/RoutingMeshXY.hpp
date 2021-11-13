@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	std::vector<Connection> Route(const Router& router, const Flit& flit) const override
+	void Route(const Router& router, const Flit& flit, std::vector<Connection>& result) const override
 	{
 		std::int32_t id = router.LocalID;
 		std::int32_t x = GetXFromID(router.LocalID);
@@ -45,13 +45,10 @@ public:
 		std::int32_t dx = GetXFromID(flit.dst_id) - x;
 		std::int32_t dy = GetYFromID(flit.dst_id) - y;
 
-		std::vector<Connection> result;
 		if (dx > 0) for (std::int32_t l : GetLinksTo(id, x + 1, y)) result.push_back({ l, flit.vc_id });
 		else if (dx < 0) for (std::int32_t l : GetLinksTo(id, x - 1, y)) result.push_back({ l, flit.vc_id });
 		else if (dy > 0) for (std::int32_t l : GetLinksTo(id, x, y + 1)) result.push_back({ l, flit.vc_id });
 		else if (dy < 0) for (std::int32_t l : GetLinksTo(id, x, y - 1)) result.push_back({ l, flit.vc_id });
 		else result.push_back({ static_cast<std::int32_t>(TorusGraph[id].size()), flit.vc_id });
-
-		return result;
 	}
 };

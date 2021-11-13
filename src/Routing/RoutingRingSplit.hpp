@@ -14,7 +14,7 @@ private:
 
 	std::int32_t Distance(std::int32_t s, std::int32_t d) const
 	{
-		return std::min(std::abs(d - s), static_cast<std::int32_t>(Circulant.size()) - 1 - std::abs(d - s));
+		return std::min(std::abs(d - s), static_cast<std::int32_t>(Circulant.size()) - std::abs(d - s));
 	}
 
 public:
@@ -23,10 +23,8 @@ public:
 	{
 	}
 
-	std::vector<Connection> Route(const Router &router, const Flit &flit) const override
+	void Route(const Router &router, const Flit &flit, std::vector<Connection>& result) const override
 	{
-		std::vector<Connection> result;
-
 		const auto &ports = Table[router.LocalID][flit.dst_id];
 
 		std::int32_t max_dist = -1;
@@ -44,21 +42,10 @@ public:
 			Connection con = { port, flit.vc_id };
 			if (!router.CanSend(con)) continue;
 
-			//if (
-			//	//router.LocalID == 0 * Circulant.size() / 4 || 
-			//	//router.LocalID == 1 * Circulant.size() / 4 ||
-			//	//router.LocalID == 2 * Circulant.size() / 4 || 
-			//	//router.LocalID == 3 * Circulant.size() / 4
-			//	router.LocalID % 2 == 0
-			//) con.vc = !con.vc;
-
 			if (router.DestinationFreeSlots(con) >= 1)
 			{
 				result.push_back(con);
 			}
 		}
-		
-
-		return result;
 	}
 };

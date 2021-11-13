@@ -152,9 +152,9 @@ void Processor::TXProcess()
 void Processor::RXProcess()
 {
 	relay.Receive();
-	if (relay.FlitAvailable())
-	{
-		ReceiveFlit(relay.Pop());
+	Flit flit = relay.Pop();
+	if (flit.valid()) {
+		ReceiveFlit(flit);
 	}
 	relay.Update();
 }

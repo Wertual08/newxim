@@ -15,6 +15,8 @@ class Router : public sc_module
 {
 	SC_HAS_PROCESS(Router);
 private:
+	std::vector<Connection> routing_buffer;
+
 	const RoutingAlgorithm* Routing = nullptr;
 	const SelectionStrategy* Selection = nullptr;
 	FlitTracer* Tracer = nullptr;
