@@ -275,10 +275,6 @@ void Configuration::ReadSimulationParams(const YAML::Node& config) {
 	if (packet_injection_rate < 0) {
 		throw std::runtime_error("packet_injection_rate can not be less than 0.");
 	}
-	probability_of_retransmission = ReadParam<double>(config, "probability_of_retransmission");
-	if (probability_of_retransmission < 0) {
-		throw std::runtime_error("probability_of_retransmission can not be less than 0.");
-	}
 
 
 	if (max_packet_size < min_packet_size) {
@@ -482,10 +478,6 @@ const std::string& Configuration::SelectionStrategy() const {
 double Configuration::PacketInjectionRate() const {
 	if (!flit_injection_rate) return packet_injection_rate / (scale_with_nodes ? graph.size() : 1.0);
 	else return packet_injection_rate * 2.0 / (min_packet_size + max_packet_size) / (scale_with_nodes ? graph.size() : 1.0);
-}
-double Configuration::ProbabilityOfRetransmission() const {
-	if (!flit_injection_rate) return probability_of_retransmission / (scale_with_nodes ? graph.size() : 1.0);
-	else return probability_of_retransmission * 2.0 / (min_packet_size + max_packet_size) / (scale_with_nodes ? graph.size() : 1.0);
 }
 double Configuration::Locality() const {
 	return locality;

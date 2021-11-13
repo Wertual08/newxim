@@ -55,7 +55,6 @@ public:
 
 	// Registers
 	const std::int32_t local_id;		// Unique identification number
-	bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
 	Processor(const SimulationTimer& timer, std::int32_t id,
 		std::int32_t min_packet_size, std::int32_t max_packet_size);

@@ -1,7 +1,7 @@
 #include "Router.hpp"
 #include <iomanip>
-#include "RoutingSelection/RoutingAlgorithm.hpp"
-#include "RoutingSelection/SelectionStrategy.hpp"
+#include "Routing/RoutingAlgorithm.hpp"
+#include "Selection/SelectionStrategy.hpp"
 
 
 

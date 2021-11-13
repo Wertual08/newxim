@@ -15,10 +15,10 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: MESH
-topology_args: [8, 8]
+topology: CIRCULANT
+topology_args: [64, 5, 6]
 topology_channels: 1
-virtual_channels: 1
+virtual_channels: 2
 
 # Supported subtopologies:
 #   NONE
@@ -33,12 +33,12 @@ virtual_channels: 1
 #   TREE - future reserved
 #   RING - future reserved
 #   MESH - future reserved
-subtopology: TGEN_0  
+subtopology: NONE  
 
 # NONE
 # VIRTUAL
 # PHYSICAL
-subnetwork: PHYSICAL
+subnetwork: NONE
 
 # update sequence of router relays
 #   DEFAULT - round-robin update
@@ -53,7 +53,6 @@ max_packet_size: 1
 flit_injection_rate: false
 scale_with_nodes: false
 packet_injection_rate: 1
-probability_of_retransmission: 1
 
 # Routing algorithms:
 #   TABLE_BASED
@@ -66,16 +65,34 @@ probability_of_retransmission: 1
 #   RING_SPLIT
 #   VIRTUAL_RING_SPLIT
 # Each of the above labels should match a corresponding
-# implementation in the routingAlgorithms source code directory
-routing_algorithm: SUBNETWORK
+# implementation in the Routing source code directory
+# TODO:
+#   TURN_MODEL
+#   WEST_FIRST
+#   NORTH_LAST
+#   NEGATIVE_FIRST
+#   OPT_Y
+#   O1TURN
+#   XY-YX
+#   IX_Y
+#   DIA_MOT
+#   THE_PURE_ZIGZAG
+#   MILP
+#   AB_TM
+#   ARM_WRESTLING
+#   TUG_WAR
+routing_algorithm: VIRTUAL_RING_SPLIT
 
 # Selection Strategies:
 #   RANDOM
 #   BUFFER_LEVEL
 #   KEEP_SPACE
 #   RANDOM_KEEP_SPACE
+#   RING_SPLIT
+#   VIRTUAL_RING_SPLIT
+#   
 # Each of the above labels should match a corresponding
-# implementation in the selectionStrategies source code directory
+# implementation in the Selection source code directory
 selection_strategy: RANDOM
 
 # Default routing table generators:
@@ -109,8 +126,8 @@ stats_warm_up_time: 0
 #   TRAFFIC_TABLE_BASED
 traffic_distribution: TRAFFIC_RANDOM
 traffic_hotspots: [
-  [34, 2, 2], 
-  [35, 2, 2], 
+  #[34, 2, 2], 
+  #[35, 2, 2], 
 ]
 # When traffic table based is specified, use the following configuration file
 traffic_table_filename: "t.txt"
@@ -118,7 +135,7 @@ traffic_table_filename: "t.txt"
 
 # Output format
 report_progress: true
-json_result: true
+json_result: false
 
 report_topology_graph: false
 report_topology_graph_adjacency_matrix: false

@@ -112,7 +112,6 @@ void Processor::Update()
 	if (reset.read())
 	{
 		relay.Reset();
-		transmittedAtPreviousCycle = false;
 
 		TotalPacketsReceived = 0;
 		TotalFlitsSent = 0;
@@ -127,12 +126,9 @@ void Processor::Update()
 	}
 	else
 	{
-		if (Traffic->FirePacket(local_id, Timer.SystemTime(), transmittedAtPreviousCycle))
-		{
+		if (Traffic->FirePacket(local_id, Timer.SystemTime())) {
 			Queue.Push(Timer.SystemTime());
-			transmittedAtPreviousCycle = true;
 		}
-		else transmittedAtPreviousCycle = false;
 
 		TXProcess();
 		RXProcess();

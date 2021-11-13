@@ -4,9 +4,6 @@
     <Filter Include="Source files">
       <UniqueIdentifier>{e6080770-8066-4e72-8e26-6d3223ebbfa2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source files\RoutingSelection">
-      <UniqueIdentifier>{9d2ea3a4-a2dc-4203-8f50-07cb44e22d6a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source files\Configuration">
       <UniqueIdentifier>{1dbc2a40-c52c-4cf3-ab94-796eac3bbf71}</UniqueIdentifier>
     </Filter>
@@ -19,14 +16,14 @@
     <Filter Include="Source files\Metrics">
       <UniqueIdentifier>{fdb7496e-d03f-4614-9734-43d69ac1d784}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source files\RoutingSelection\Routing">
-      <UniqueIdentifier>{619ed280-3792-44c8-9b62-da1f4db3cdd8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\RoutingSelection\Selection">
-      <UniqueIdentifier>{af8d9d36-9508-441f-a79e-abaa014ea695}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source files\Configuration\Graph">
       <UniqueIdentifier>{31e6273a-1139-4c1f-8875-ce6dd6a25183}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Routing">
+      <UniqueIdentifier>{619ed280-3792-44c8-9b62-da1f4db3cdd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Selection">
+      <UniqueIdentifier>{af8d9d36-9508-441f-a79e-abaa014ea695}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +102,7 @@
     <ClCompile Include="src\Configuration\Graph\CirculantGraph.cpp">
       <Filter>Source files\Configuration\Graph</Filter>
     </ClCompile>
+    <ClCompile Include="src\Configuration\Factory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Configuration\TrafficManagers\HotspotTrafficManager.hpp">
@@ -164,56 +162,8 @@
     <ClInclude Include="src\Metrics\Stats.hpp">
       <Filter>Source files\Metrics</Filter>
     </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingAlgorithm.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingMeshXY.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingTableBased.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionBufferLevel.hpp">
-      <Filter>Source files\RoutingSelection\Selection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionKeepSpace.hpp">
-      <Filter>Source files\RoutingSelection\Selection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionRandom.hpp">
-      <Filter>Source files\RoutingSelection\Selection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionRandomKeepSpace.hpp">
-      <Filter>Source files\RoutingSelection\Selection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\SelectionStrategy.hpp">
-      <Filter>Source files\RoutingSelection\Selection</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingVirtualSubnetwork.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingFitVirtualSubnetwork.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingSubnetwork.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingFitSubnetwork.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingFixedSubnetwork.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
     <ClInclude Include="src\Hardware\Router.hpp">
       <Filter>Source files\Hardware</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingBypass.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingVirtualRingSplit.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RoutingSelection\RoutingRingSplit.hpp">
-      <Filter>Source files\RoutingSelection\Routing</Filter>
     </ClInclude>
     <ClInclude Include="src\DataStructs.hpp">
       <Filter>Source files</Filter>
@@ -233,5 +183,60 @@
     <ClInclude Include="src\Configuration\Graph\CirculantGraph.hpp">
       <Filter>Source files\Configuration\Graph</Filter>
     </ClInclude>
+    <ClInclude Include="src\Routing\RoutingAlgorithm.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingBypass.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingFitSubnetwork.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingFitVirtualSubnetwork.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingFixedSubnetwork.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshXY.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingRingSplit.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingSubnetwork.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingTableBased.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingVirtualRingSplit.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingVirtualSubnetwork.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionBufferLevel.hpp">
+      <Filter>Source files\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionKeepSpace.hpp">
+      <Filter>Source files\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionRandom.hpp">
+      <Filter>Source files\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionRandomKeepSpace.hpp">
+      <Filter>Source files\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionRingSplit.hpp">
+      <Filter>Source files\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionStrategy.hpp">
+      <Filter>Source files\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionVirtualRingSplit.hpp">
+      <Filter>Source files\Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Configuration\Factory.hpp" />
   </ItemGroup>
 </Project>

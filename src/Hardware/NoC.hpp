@@ -6,8 +6,8 @@
 #include "Configuration/Graph/Graph.hpp"
 #include "Configuration/TrafficManagers/TrafficManager.hpp"
 #include "Metrics/FlitTracer.hpp"
-#include "RoutingSelection/RoutingAlgorithm.hpp"
-#include "RoutingSelection/SelectionStrategy.hpp"
+#include "Routing/RoutingAlgorithm.hpp"
+#include "Selection/SelectionStrategy.hpp"
 
 
 

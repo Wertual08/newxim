@@ -2,9 +2,9 @@
 
 
 
-HotspotTrafficManager::HotspotTrafficManager(std::uint32_t seed, std::int32_t count, double pir, double por,
+HotspotTrafficManager::HotspotTrafficManager(std::uint32_t seed, std::int32_t count, double pir,
 	const std::vector<std::pair<std::int32_t, std::pair<std::int32_t, std::int32_t>>>& hotspots) :
-	Random(seed), PacketInjectionRate(pir), ProbabilityOfRetransmission(por),
+	Random(seed), PacketInjectionRate(pir),
 	TrafficLoad(count, std::make_pair(1, 1))
 {
 	for (const auto& hotspot : hotspots) TrafficLoad[hotspot.first] = hotspot.second;
@@ -16,9 +16,9 @@ HotspotTrafficManager::HotspotTrafficManager(std::uint32_t seed, std::int32_t co
 	FireDistribution = std::uniform_real_distribution<double>(0, 1);
 }
 
-bool HotspotTrafficManager::FirePacket(std::int32_t from, double time, bool retransmitting) const
+bool HotspotTrafficManager::FirePacket(std::int32_t from, double time) const
 {
-	return FireDistribution(Random) * TrafficLoad[from].first < (retransmitting ? ProbabilityOfRetransmission : PacketInjectionRate);
+	return FireDistribution(Random) * TrafficLoad[from].first < PacketInjectionRate;
 }
 std::int32_t HotspotTrafficManager::FindDestination(std::int32_t from) const
 {

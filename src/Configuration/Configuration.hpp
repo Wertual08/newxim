@@ -28,7 +28,6 @@ private:
 	bool flit_injection_rate;
 	bool scale_with_nodes;
 	double packet_injection_rate;
-	double probability_of_retransmission;
 	double locality;
 	std::string traffic_distribution;
 	std::string traffic_table_filename;
@@ -95,7 +94,6 @@ public:
 	const std::string& RoutingAlgorithm() const;
 	const std::string& SelectionStrategy() const;
 	double PacketInjectionRate() const;
-	double ProbabilityOfRetransmission() const;
 	double Locality() const;
 	const std::string& TrafficDistribution() const;
 	const std::string& TrafficTableFilename() const;

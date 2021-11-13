@@ -2,15 +2,15 @@
 
 
 
-RandomTrafficManager::RandomTrafficManager(std::uint32_t seed, std::int32_t count, double pir, double por) :
+RandomTrafficManager::RandomTrafficManager(std::uint32_t seed, std::int32_t count, double pir) :
 	Random(seed), DestDistribution(0, count - 1), FireDistribution(0, 1),
-	PacketInjectionRate(pir), ProbabilityOfRetransmission(por)
+	PacketInjectionRate(pir)
 {
 }
 
-bool RandomTrafficManager::FirePacket(std::int32_t from, double time, bool retransmitting) const
+bool RandomTrafficManager::FirePacket(std::int32_t from, double time) const
 {
-	return FireDistribution(Random) < (retransmitting ? ProbabilityOfRetransmission : PacketInjectionRate);
+	return FireDistribution(Random) < PacketInjectionRate;
 }
 std::int32_t RandomTrafficManager::FindDestination(std::int32_t from) const
 {

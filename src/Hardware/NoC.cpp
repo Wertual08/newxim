@@ -1,18 +1,18 @@
 #include "NoC.hpp"
-#include "RoutingSelection/RoutingTableBased.hpp"
-#include "RoutingSelection/RoutingBypass.hpp"
-#include "RoutingSelection/RoutingVirtualSubnetwork.hpp"
-#include "RoutingSelection/RoutingFitVirtualSubnetwork.hpp"
-#include "RoutingSelection/RoutingSubnetwork.hpp"
-#include "RoutingSelection/RoutingFitSubnetwork.hpp"
-#include "RoutingSelection/RoutingFixedSubnetwork.hpp"
-#include "RoutingSelection/SelectionRandom.hpp"
-#include "RoutingSelection/SelectionBufferLevel.hpp"
-#include "RoutingSelection/SelectionKeepSpace.hpp"
-#include "RoutingSelection/SelectionRandomKeepSpace.hpp"
-#include "RoutingSelection/RoutingMeshXY.hpp"
-#include "RoutingSelection/RoutingRingSplit.hpp"
-#include "RoutingSelection/RoutingVirtualRingSplit.hpp"
+#include "Routing/RoutingTableBased.hpp"
+#include "Routing/RoutingBypass.hpp"
+#include "Routing/RoutingVirtualSubnetwork.hpp"
+#include "Routing/RoutingFitVirtualSubnetwork.hpp"
+#include "Routing/RoutingSubnetwork.hpp"
+#include "Routing/RoutingFitSubnetwork.hpp"
+#include "Routing/RoutingFixedSubnetwork.hpp"
+#include "Routing/RoutingMeshXY.hpp"
+#include "Routing/RoutingRingSplit.hpp"
+#include "Routing/RoutingVirtualRingSplit.hpp"
+#include "Selection/SelectionRandom.hpp"
+#include "Selection/SelectionBufferLevel.hpp"
+#include "Selection/SelectionKeepSpace.hpp"
+#include "Selection/SelectionRandomKeepSpace.hpp"
 
 #include "Configuration/TrafficManagers/RandomTrafficManager.hpp"
 #include "Configuration/TrafficManagers/HotspotTrafficManager.hpp"
@@ -47,11 +47,11 @@ std::unique_ptr<SelectionStrategy> GetStrategy(const Configuration& config)
 std::unique_ptr<TrafficManager> GetTraffic(const Configuration& config)
 {
 	if (config.TrafficDistribution() == "TRAFFIC_RANDOM") return std::make_unique<RandomTrafficManager>(
-		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate(), config.ProbabilityOfRetransmission());
+		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate());
 	if (config.TrafficDistribution() == "TRAFFIC_HOTSPOT") return std::make_unique<HotspotTrafficManager>(
-		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate(), config.ProbabilityOfRetransmission(), config.Hotspots());
+		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.PacketInjectionRate(), config.Hotspots());
 	if (config.TrafficDistribution() == "TRAFFIC_TABLE_BASED") return std::make_unique<TableTrafficManager>(
-		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.TrafficTableFilename(), config.PacketInjectionRate(), config.ProbabilityOfRetransmission());
+		config.RndGeneratorSeed(), config.TopologyGraph().size(), config.TrafficTableFilename(), config.PacketInjectionRate(), config.SimulationTime());
 	throw std::runtime_error("Configuration error: Invalid traffic distribution [" + config.TrafficDistribution() + "].");
 }
 std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32_t id, const Configuration& config)
