@@ -20,8 +20,9 @@ Router::Router(sc_module_name, const SimulationTimer& timer, std::int32_t id, st
 	Routing(nullptr),
 	Selection(nullptr)
 {
-	for (std::int32_t i = 0; i < Relays.size(); i++)
+	for (std::int32_t i = 0; i < Relays.size(); i++) {
 		Relays[i].SetLocalID(i);
+	}
 
 	SC_METHOD(Update);
 	sensitive << reset << clock.pos();
@@ -85,9 +86,11 @@ bool Router::Route(std::int32_t in_port, Connection dst)
 		in_relay.Pop();
 
 		// --------------- Stats --------------- //
+		stats.FlitRouted();
 		stats.StopStuckTimer(in_port, flit.vc_id);
-		if (in_relay[flit.vc_id].Size()) 
+		if (in_relay[flit.vc_id].Size()) {
 			stats.StartStuckTimer(in_port, flit.vc_id);
+		}
 		// --------------- ----- --------------- //
 
 		return true;
@@ -107,7 +110,9 @@ void Router::RXProcess()
 
 			// --------------- Stats --------------- //
 			stats.StartStuckTimer(i, flit.vc_id);
-			if (Tracer) Tracer->Remember(flit, LocalID);
+			if (Tracer) {
+				Tracer->Remember(flit, LocalID);
+			}
 			// --------------- ----- --------------- //
 		}
 	}
@@ -123,7 +128,9 @@ void Router::TXProcess()
 		}
 	} else {
 		for (std::int32_t in_port : update_sequence) {
-			Reservation(in_port);
+			if (in_port < Relays.size()) {
+				Reservation(in_port);
+			}
 		}
 	}
 

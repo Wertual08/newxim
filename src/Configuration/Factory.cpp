@@ -2,6 +2,7 @@
 #include <memory>
 
 #include "Configuration/Configuration.hpp"
+
 #include "Routing/RoutingTableBased.hpp"
 #include "Routing/RoutingBypass.hpp"
 #include "Routing/RoutingVirtualSubnetwork.hpp"
@@ -10,6 +11,13 @@
 #include "Routing/RoutingFitSubnetwork.hpp"
 #include "Routing/RoutingFixedSubnetwork.hpp"
 #include "Routing/RoutingMeshXY.hpp"
+#include "Routing/RoutingMeshWestFirst.hpp"
+#include "Routing/RoutingMeshO1TURN.hpp"
+#include "Routing/RoutingMeshXYYX.hpp"
+#include "Routing/RoutingMeshNegativeFirst.hpp"
+#include "Routing/RoutingMeshNorthLast.hpp"
+#include "Routing/RoutingMeshOddEven.hpp"
+
 #include "Selection/SelectionRandom.hpp"
 #include "Selection/SelectionBufferLevel.hpp"
 #include "Selection/SelectionKeepSpace.hpp"
@@ -26,7 +34,15 @@
 std::unique_ptr<RoutingAlgorithm> Factory::MakeAlgorithm() const
 {
 	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
+
 	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "MESH_WEST_FIRST") return std::make_unique<RoutingMeshWestFirst>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "MESH_O1TURN") return std::make_unique<RoutingMeshO1TURN>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "MESH_XY_YX") return std::make_unique<RoutingMeshXYYX>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "MESH_NEGATIVE_FIRST") return std::make_unique<RoutingMeshNegativeFirst>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "MESH_NORTH_LAST") return std::make_unique<RoutingMeshNorthLast>(config.DimX(), config.DimY(), config.TopologyGraph());
+	if (config.RoutingAlgorithm() == "MESH_ODD_EVEN") return std::make_unique<RoutingMeshOddEven>(config.DimX(), config.DimY(), config.TopologyGraph());
+
 	if (config.RoutingAlgorithm() == "BYPASS") return std::make_unique<RoutingBypass>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "SUBNETWORK") return std::make_unique<RoutingSubnetwork>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "FIT_SUBNETWORK") return std::make_unique<RoutingFitSubnetwork>(config.GRTable(), config.SubGRTable());

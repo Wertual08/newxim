@@ -7,7 +7,7 @@
 #include "Metrics/ProgressBar.hpp"
 #include <chrono>
 
-const static std::string Version = "0.0.1.1";
+const static std::string Version = "0.0.1.2";
 
 
 

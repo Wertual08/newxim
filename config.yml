@@ -15,8 +15,8 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: CIRCULANT
-topology_args: [64, 5, 6]
+topology: MESH
+topology_args: [8, 8]
 topology_channels: 1
 virtual_channels: 2
 
@@ -41,8 +41,8 @@ subtopology: NONE
 subnetwork: NONE
 
 # update sequence of router relays
-#   DEFAULT - round-robin update
-#   [a, b, c, ...] - custom sequence
+#   DEFAULT - round-robin update sequence
+#   [a, b, c, ...] - fixed update sequence
 update_sequence: DEFAULT # DEFAULT : [0, 1, 2, 3, 4]
 
 # number of flits for each router buffer
@@ -57,6 +57,12 @@ packet_injection_rate: 1
 # Routing algorithms:
 #   TABLE_BASED
 #   MESH_XY
+#   MESH_WEST_FIRST
+#   MESH_O1TURN
+#   MESH_XY_YX
+#   MESH_NEGATIVE_FIRST
+#   MESH_NORTH_LAST
+#   MESH_ODD_EVEN
 #   SUBNETWORK
 #   FIT_SUBNETWORK
 #   FIXED_SUBNETWORK
@@ -65,21 +71,15 @@ packet_injection_rate: 1
 # Each of the above labels should match a corresponding
 # implementation in the Routing source code directory
 # TODO:
-#   TURN_MODEL
-#   WEST_FIRST
-#   NORTH_LAST
-#   NEGATIVE_FIRST
-#   OPT_Y
-#   O1TURN
-#   XY_YX
-#   IX_Y
-#   DIA_MOT
-#   THE_PURE_ZIGZAG
-#   MILP
-#   AB_TM
-#   ARM_WRESTLING
-#   TUG_WAR
-routing_algorithm: TABLE_BASED
+#   MESH_OPT_Y
+#   MESH_IX_Y
+#   MESH_DIA_MOT
+#   MESH_THE_PURE_ZIGZAG
+#   MESH_MILP
+#   MESH_AB_TM
+#   MESH_ARM_WRESTLING
+#   MESH_TUG_WAR
+routing_algorithm: MESH_ODD_EVEN
 
 # Selection Strategies:
 #   RANDOM
@@ -91,7 +91,7 @@ routing_algorithm: TABLE_BASED
 #   
 # Each of the above labels should match a corresponding
 # implementation in the Selection source code directory
-selection_strategy: VIRTUAL_RING_SPLIT
+selection_strategy: BUFFER_LEVEL
 
 # Default routing table generators:
 #   DIJKSTRA
@@ -111,9 +111,9 @@ rnd_generator_seed: 0
 # Clock signal period
 clock_period_ps: 1000
 # Duration of reset signal assertion, expressed in cycles
-reset_time: 1000
+reset_time: 1
 # Overal simulation lenght, expressed in cycles
-simulation_time: 100000
+simulation_time: 20000
 # Collect stats after a given number of cycles
 stats_warm_up_time: 0
 

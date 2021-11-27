@@ -6,8 +6,8 @@
 
 struct RelaySignature
 {
-	std::size_t relay_id;
-	std::size_t vc_id;
+	std::int32_t relay_id;
+	std::int32_t vc_id;
 
 	bool operator<(const RelaySignature& sig) const
 	{
@@ -29,17 +29,21 @@ class Stats
 {
 private:
 	std::map<RelaySignature, BufferStats> Buffers;
+	std::int32_t flits_routed;
 
 public:
 	const SimulationTimer Timer;
 	Stats(const SimulationTimer& timer);
 
-	void StartStuckTimer(std::size_t relay, std::size_t vc);
-	void StopStuckTimer(std::size_t relay, std::size_t vc);
-	void PushLoad(std::size_t relay, std::size_t vc, double load);
+	void FlitRouted();
 
-	double GetMaxBufferStuckDelay(std::size_t relay, std::size_t vc);
+	void StartStuckTimer(std::int32_t relay, std::int32_t vc);
+	void StopStuckTimer(std::int32_t relay, std::int32_t vc);
+	void PushLoad(std::int32_t relay, std::int32_t vc, double load);
+
+	double GetMaxBufferStuckDelay(std::int32_t relay, std::int32_t vc);
 	double GetMaxBufferStuckDelay();
-	double GetAverageBufferLoad(std::size_t relay, std::size_t vc) const;
+	double GetAverageBufferLoad(std::int32_t relay, std::int32_t vc) const;
 	double GetAverageBufferLoad() const;
+	std::int32_t GetFlitsRouted() const;
 };

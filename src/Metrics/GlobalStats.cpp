@@ -128,7 +128,9 @@ double GlobalStats::GetAverageDelay() const {
 		}
 	}
 
-	avg_delay /= static_cast<double>(total_packets);
+	if (total_packets != 0) {
+		avg_delay /= static_cast<double>(total_packets);
+	}
 
 	return avg_delay;
 }

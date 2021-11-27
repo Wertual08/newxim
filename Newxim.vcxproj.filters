@@ -236,5 +236,26 @@
     <ClInclude Include="src\Configuration\Factory.hpp">
       <Filter>Source files\Configuration</Filter>
     </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshWestFirst.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshO1TURN.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshXYYX.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshNorthLast.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshNegativeFirst.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshAlgorithm.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingMeshOddEven.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

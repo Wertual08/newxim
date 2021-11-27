@@ -39,12 +39,12 @@ void Configuration::ReadTopologyParams(const YAML::Node& config) {
 	
 	channels_count = ReadParam<std::int32_t>(config, "topology_channels");
 	if (channels_count < 1) {
-		throw new std::runtime_error("topology_channels can not be less than 1.");
+		throw std::runtime_error("topology_channels can not be less than 1.");
 	}
 
 	virtual_channels_count = ReadParam<std::size_t>(config, "virtual_channels");
 	if (virtual_channels_count < 1) {
-		throw new std::runtime_error("virtual_channels can not be less than 1.");
+		throw std::runtime_error("virtual_channels can not be less than 1.");
 	}
 
 	const auto& args = config["topology_args"];
@@ -69,14 +69,14 @@ void Configuration::ReadTopologyParams(const YAML::Node& config) {
 		);
 	} else if (topology == "MESH") {
 		graph = MeshGraph(
-			args[0].as<std::int32_t>(),
-			args[1].as<std::int32_t>(),
+			dim_x = args[0].as<std::int32_t>(),
+			dim_y = args[1].as<std::int32_t>(),
 			channels_count
 		);
 	} else if (topology == "TORUS") {
 		graph = TorusGraph(
-			args[0].as<std::int32_t>(),
-			args[1].as<std::int32_t>(),
+			dim_x = args[0].as<std::int32_t>(),
+			dim_y = args[1].as<std::int32_t>(),
 			channels_count
 		);
 	} else if (topology == "TREE") {
@@ -130,7 +130,7 @@ void Configuration::ReadRouterParams(const YAML::Node& config) {
 
 	buffer_depth = ReadParam<std::int32_t>(config, "buffer_depth");
 	if (buffer_depth < 1) {
-		throw new std::runtime_error("buffer_depth can not be less than 1.");
+		throw std::runtime_error("buffer_depth can not be less than 1.");
 	}
 	routing_algorithm = ReadParam<std::string>(config, "routing_algorithm");
 	selection_strategy = ReadParam<std::string>(config, "selection_strategy");
