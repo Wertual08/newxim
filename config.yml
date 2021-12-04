@@ -15,7 +15,7 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: MESH
+topology: TORUS
 topology_args: [8, 8]
 topology_channels: 1
 virtual_channels: 2
@@ -63,6 +63,7 @@ packet_injection_rate: 1
 #   MESH_NEGATIVE_FIRST
 #   MESH_NORTH_LAST
 #   MESH_ODD_EVEN
+#   TORUS_CLUE
 #   SUBNETWORK
 #   FIT_SUBNETWORK
 #   FIXED_SUBNETWORK
@@ -79,7 +80,7 @@ packet_injection_rate: 1
 #   MESH_AB_TM
 #   MESH_ARM_WRESTLING
 #   MESH_TUG_WAR
-routing_algorithm: MESH_ODD_EVEN
+routing_algorithm: TORUS_CLUE
 
 # Selection Strategies:
 #   RANDOM

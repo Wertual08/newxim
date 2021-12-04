@@ -17,6 +17,7 @@
 #include "Routing/RoutingMeshNegativeFirst.hpp"
 #include "Routing/RoutingMeshNorthLast.hpp"
 #include "Routing/RoutingMeshOddEven.hpp"
+#include "Routing/RoutingTorusCLUE.hpp"
 
 #include "Selection/SelectionRandom.hpp"
 #include "Selection/SelectionBufferLevel.hpp"
@@ -42,6 +43,8 @@ std::unique_ptr<RoutingAlgorithm> Factory::MakeAlgorithm() const
 	if (config.RoutingAlgorithm() == "MESH_NEGATIVE_FIRST") return std::make_unique<RoutingMeshNegativeFirst>(config.DimX(), config.DimY(), config.TopologyGraph());
 	if (config.RoutingAlgorithm() == "MESH_NORTH_LAST") return std::make_unique<RoutingMeshNorthLast>(config.DimX(), config.DimY(), config.TopologyGraph());
 	if (config.RoutingAlgorithm() == "MESH_ODD_EVEN") return std::make_unique<RoutingMeshOddEven>(config.DimX(), config.DimY(), config.TopologyGraph());
+
+	if (config.RoutingAlgorithm() == "TORUS_CLUE") return std::make_unique<RoutingTorusCLUE>(config.DimX(), config.DimY(), config.TopologyGraph());
 
 	if (config.RoutingAlgorithm() == "BYPASS") return std::make_unique<RoutingBypass>(config.GRTable(), config.SubGRTable());
 	if (config.RoutingAlgorithm() == "SUBNETWORK") return std::make_unique<RoutingSubnetwork>(config.GRTable(), config.SubGRTable());

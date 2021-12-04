@@ -257,5 +257,11 @@
     <ClInclude Include="src\Routing\RoutingMeshOddEven.hpp">
       <Filter>Source files\Routing</Filter>
     </ClInclude>
+    <ClInclude Include="src\Routing\RoutingTorusAlgorithm.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Routing\RoutingTorusCLUE.hpp">
+      <Filter>Source files\Routing</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

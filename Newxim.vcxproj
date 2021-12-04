@@ -97,6 +97,8 @@
     <ClInclude Include="src\Routing\RoutingMeshXY.hpp" />
     <ClInclude Include="src\Routing\RoutingSubnetwork.hpp" />
     <ClInclude Include="src\Routing\RoutingTableBased.hpp" />
+    <ClInclude Include="src\Routing\RoutingTorusAlgorithm.hpp" />
+    <ClInclude Include="src\Routing\RoutingTorusCLUE.hpp" />
     <ClInclude Include="src\Routing\RoutingVirtualSubnetwork.hpp" />
     <ClInclude Include="src\Routing\RoutingMeshWestFirst.hpp" />
     <ClInclude Include="src\Routing\RoutingMeshXYYX.hpp" />
