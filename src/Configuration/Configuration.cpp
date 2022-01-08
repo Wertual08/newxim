@@ -3,7 +3,7 @@
 #include <systemc.h>
 #include <iostream>
 #include <fstream>
-#include <cassert>
+#include <cstring>
 #include <ctime>
 #include <filesystem>
 #include <iomanip>
@@ -427,7 +427,33 @@ Configuration::Configuration(std::int32_t arg_num, char* arg_vet[]) {
 void Configuration::ParseArgs(YAML::Node& node, std::int32_t arg_num, char* arg_vet[]) {
 	for (std::int32_t i = 1; i < arg_num; i++) {
 		if (arg_vet[i][0] == '-') {
-			node[arg_vet[i] + 1] = arg_vet[++i];
+			if (i + 1 >= arg_num) {
+				throw std::runtime_error((std::stringstream()
+					<< "Option ["
+					<< arg_vet[i]
+					<< "] requires an argument."
+				).str());
+			}
+
+			char* value = arg_vet[++i];
+			if (value[0] != '[') {
+				node[arg_vet[i] + 1] = value;
+			} else {
+				node[arg_vet[i] + 1] = YAML::Node(YAML::NodeType::Sequence);
+				std::string item;
+				char *c = value + 1;
+				while (*c != '\0') {
+					if (std::isspace(*c) || *c == ',' || *c == ']') {
+						if (!item.empty()) {
+							node[arg_vet[i] + 1].push_back(item);
+						}
+						item.clear();
+					} else {
+						item += *c;
+					}
+					c++;
+				}
+			}
 		} else {
 			throw std::runtime_error((std::stringstream()
 				<< "Invalid option ["
