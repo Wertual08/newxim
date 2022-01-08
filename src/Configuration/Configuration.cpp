@@ -435,17 +435,18 @@ void Configuration::ParseArgs(YAML::Node& node, std::int32_t arg_num, char* arg_
 				).str());
 			}
 
+			char* key = arg_vet[i] + 1;
 			char* value = arg_vet[++i];
 			if (value[0] != '[') {
-				node[arg_vet[i] + 1] = value;
+				node[key] = value;
 			} else {
-				node[arg_vet[i] + 1] = YAML::Node(YAML::NodeType::Sequence);
+				node[key] = YAML::Node(YAML::NodeType::Sequence);
 				std::string item;
 				char *c = value + 1;
 				while (*c != '\0') {
 					if (std::isspace(*c) || *c == ',' || *c == ']') {
 						if (!item.empty()) {
-							node[arg_vet[i] + 1].push_back(item);
+							node[key].push_back(item);
 						}
 						item.clear();
 					} else {
