@@ -45,7 +45,7 @@
     <ClCompile Include="src\Configuration\TrafficManagers\TableTrafficManager.cpp">
       <Filter>Source files\Configuration\TrafficManagers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hardware\NoC.cpp">
+    <ClCompile Include="src\Hardware\Network.cpp">
       <Filter>Source files\Hardware</Filter>
     </ClCompile>
     <ClCompile Include="src\Hardware\Buffer.cpp">
@@ -131,7 +131,7 @@
     <ClInclude Include="src\Hardware\Connection.hpp">
       <Filter>Source files\Hardware</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hardware\NoC.hpp">
+    <ClInclude Include="src\Hardware\Network.hpp">
       <Filter>Source files\Hardware</Filter>
     </ClInclude>
     <ClInclude Include="src\Hardware\Processor.hpp">

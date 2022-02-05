@@ -1,4 +1,4 @@
-#include "NoC.hpp"
+#include "Network.hpp"
 #include "Hardware/Router.hpp"
 #include "Configuration/Factory.hpp"
 
@@ -13,7 +13,7 @@ std::unique_ptr<Processor> GetProcessor(const SimulationTimer& timer, std::int32
 		config.MaxPacketSize());
 }
 
-void NoC::InitBase()
+void Network::InitBase()
 {
 	srand(Config.RndGeneratorSeed());
 	Factory factory(Config);
@@ -90,7 +90,7 @@ void NoC::InitBase()
 	}
 }
 
-NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name) :
+Network::Network(const Configuration& config, const SimulationTimer& timer, sc_module_name) :
 	Config(config),
 	clock("clock", config.ClockPeriodPS(), SC_PS), 
 	Timer(timer), 
@@ -98,11 +98,11 @@ NoC::NoC(const Configuration& config, const SimulationTimer& timer, sc_module_na
 {
 	InitBase();
 }
-NoC::~NoC()
+Network::~Network()
 {
 }
 
-std::ostream& operator<<(std::ostream& os, const NoC& network)
+std::ostream& operator<<(std::ostream& os, const Network& network)
 {
 	return os;
 }

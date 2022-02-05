@@ -22,7 +22,7 @@ were improved along with the number of accumulated
 simulation metrics. 
 
 # Contacts
-nmmyachin@hse.ru (Nikolay Myachin)    
+Developer: wertual08@gmail.com (Nikolay Myachin)    
 a.romanov@hse.ru (Aleksandr Romanov, PhD)   
 https://www.hse.ru/en/staff/a.romanov#sci     
 https://www.researchgate.net/profile/Aleksandr-Romanov    
@@ -158,23 +158,30 @@ packet_injection_rate: <rate>
 ```yml
 routing_algorithm: <type>
 ```
-##### ```TABLE_BASED``` - table based routing<br>
-##### ```MESH_XY``` - XY routing algorithm for mesh<br>
-##### ```SUBNETWORK``` - table based algorithm which also uses physical subnetwork with permission for packets to leave subnetwork<br>
-##### ```FIXED_SUBNETWORK``` - table based algorithm which also uses physical subnetwork without permission for packets to leave subnetwork<br>
-##### ```VIRTUAL_SUBNETWORK``` - table based algorithm which also uses virtual subnetwork with permission for packets to leave subnetwork<br>
-##### ```RING_SPLIT``` - ring-split routing algorithm for circulants which also uses routing table<br>
-##### ```VIRTUAL_RING_SPLIT``` - ring-split routing algorithm with virtual channels for circulants which also uses routing table
+##### ```TABLE_BASED```         - table based routing
+##### ```MESH_XY```             - XY routing algorithm for mesh
+##### ```MESH_WEST_FIRST```     - West First algorithm for mesh
+##### ```MESH_O1TURN```         - O1TURN algorithm for mesh
+##### ```MESH_XY_YX```          - XY-YX algorithm for mesh
+##### ```MESH_NEGATIVE_FIRST``` - Negative First algorithm for mesh
+##### ```MESH_NORTH_LAST```     - North Last algorithm for mesh
+##### ```MESH_ODD_EVEN```       - Odd-Even algorithm for mesh
+##### ```TORUS_CLUE```          - CLUE algorithm for torues
+##### ```SUBNETWORK```          - table based algorithm which also uses physical subnetwork with permission for packets to leave subnetwork
+##### ```FIXED_SUBNETWORK```    - table based algorithm which also uses physical subnetwork without permission for packets to leave subnetwork
+##### ```VIRTUAL_SUBNETWORK```  - table based algorithm which also uses virtual subnetwork with permission for packets to leave subnetwork
 
 
 #### 14. Strategy of selecting one of ports provided by routing algorithm
 ```yml
 selection_strategy: <type>
 ```
-##### ```RANDOM``` - random port selection<br>
-##### ```BUFFER_LEVEL``` - less loaded port selection<br>
-##### ```KEEP_SPACE``` - less loaded port selection with control of network load
-##### ```RANDOM_KEEP_SPACE``` - random port selection with control of network load
+##### ```RANDOM```              - random port selection
+##### ```BUFFER_LEVEL```        - less loaded port selection
+##### ```KEEP_SPACE```          - less loaded port selection with control of network load
+##### ```RANDOM_KEEP_SPACE```   - random port selection with control of network load
+##### ```RING_SPLIT```          - ring-split selection strategy for circulants
+##### ```VIRTUAL_RING_SPLIT```  - ring-split selection strategy with virtual channels for circulants
 
 
 #### 15. Routing table configuration
@@ -326,4 +333,70 @@ traffic_hotspots: [[N, S, R], ...]
 #### 36. Traffic table file path
 ```yml
 traffic_table_filename: <path> 
+```
+
+
+#### 37. Simulation progress visualization
+```yml
+report_progress: <true/false>
+```
+
+#### 38. Report simulation result as JSON
+```yml
+json_result: <true/false>
+```
+
+#### 39. Report simulation topology graph
+```yml
+report_topology_graph: <true/false>
+```
+
+#### 40. Report simulation topology graph adjency matrix
+```yml
+report_topology_graph_adjacency_matrix: <true/false>
+```
+
+#### 41. Report simulation routing table
+```yml
+report_routing_table: <true/false>
+```
+
+#### 42. Report simulation topology subgraph
+```yml
+report_topology_sub_graph: <true/false>
+```
+
+#### 43. Report simulation topology subgraph adjency matrix
+```yml
+report_topology_sub_graph_adjacency_matrix: <true/false>
+```
+
+#### 44. Report simulatio subnetwork routing table
+```yml
+report_sub_routing_table: <true/false>
+```
+
+#### 45. Report possible routes inside given topology
+```yml
+report_possible_routes: <true/false>
+```
+
+#### 46. Report some stats for possible routes
+```yml
+report_routes_stats: <true/false>
+```
+
+#### 47. Report metrics for each cycle
+```yml
+report_cycle_result: <true/false>
+```
+
+#### 48. Report buffer statuses after simulation
+```yml
+report_buffers: <true/false>
+```
+
+#### 49. Report traces for flits
+```yml
+report_flit_trace: <true/false>
 ```

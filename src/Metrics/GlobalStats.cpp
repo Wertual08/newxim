@@ -206,7 +206,7 @@ void GlobalStats::FinishStats() const {
 	}
 }
 
-GlobalStats::GlobalStats(sc_module_name name, const NoC& network, const Configuration& config) :
+GlobalStats::GlobalStats(sc_module_name name, const Network& network, const Configuration& config) :
 	Network(network), Config(config) {
 	if (config.ReportCycleResult()) {
 		SC_METHOD(Update);

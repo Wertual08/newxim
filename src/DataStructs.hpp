@@ -4,29 +4,24 @@
 
 
 
-enum class FlitType : std::int32_t
-{
+enum class FlitType : std::int32_t {
 	None = 0b000,
 	Head = 0b001,
 	Body = 0b010, 
 	Tail = 0b100
 };
-static FlitType operator|(FlitType l, FlitType r)
-{
+static FlitType operator|(FlitType l, FlitType r) {
 	return static_cast<FlitType>(static_cast<std::int32_t>(l) | static_cast<std::int32_t>(r));
 }
-static FlitType operator&(FlitType l, FlitType r)
-{
+static FlitType operator&(FlitType l, FlitType r) {
 	return static_cast<FlitType>(static_cast<std::int32_t>(l) & static_cast<std::int32_t>(r));
 }
 template<typename T>
-static bool HasFlag(T flit, T flag)
-{
+static bool HasFlag(T flit, T flag) {
 	return (flit & flag) == flag;
 }
 
-struct Packet 
-{
+struct Packet  {
 	std::int32_t src_id;
 	std::int32_t dst_id;
 	std::int32_t vc_id;
@@ -34,8 +29,7 @@ struct Packet
 	std::int32_t size;
 	std::int32_t flit_left;	
 
-	Packet() 
-	{
+	Packet() {
 		src_id = -1;
 		dst_id = -1;
 		vc_id = -1;
@@ -43,8 +37,7 @@ struct Packet
 		size = -1;
 		flit_left = -1;
 	}
-	Packet(std::int32_t s, std::int32_t d, std::int32_t vc, double ts, std::int32_t sz)
-	{
+	Packet(std::int32_t s, std::int32_t d, std::int32_t vc, double ts, std::int32_t sz) {
 		src_id = s;
 		dst_id = d;
 		vc_id = vc;
@@ -54,8 +47,7 @@ struct Packet
 	}
 };
 
-struct Flit 
-{
+struct Flit {
 	std::uint64_t id;
 	int src_id = -1;
 	int dst_id = -1;
@@ -69,8 +61,7 @@ struct Flit
 	double accept_timestamp = - 1;
 	int hop_no = -1;						
 
-	inline bool operator==(const Flit& flit) const 
-	{
+	inline bool operator==(const Flit& flit) const {
 		return flit.id == id
 			&& flit.src_id == src_id
 			&& flit.dst_id == dst_id

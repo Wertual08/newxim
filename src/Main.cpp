@@ -1,5 +1,5 @@
 #include "Hardware/SimulationTimer.hpp"
-#include "Hardware/NoC.hpp"
+#include "Hardware/Network.hpp"
 #include "Metrics/GlobalStats.hpp"
 #include "DataStructs.hpp"
 #include "Configuration/Graph/Graph.hpp"
@@ -7,7 +7,7 @@
 #include "Metrics/ProgressBar.hpp"
 #include <chrono>
 
-const static std::string Version = "0.0.1.2";
+const static std::string Version = "0.0.1.3";
 
 
 
@@ -23,7 +23,7 @@ int sc_main(int arg_num, char* arg_vet[]) {
 
 		Configuration Config(arg_num, arg_vet);
 		SimulationTimer Timer(Config.ClockPeriodPS(), Config.ResetTime(), Config.StatsWarmUpTime(), Config.SimulationTime());
-		NoC Network(Config, Timer);
+		Network Network(Config, Timer);
 		GlobalStats stats(Network, Config);
 
 		std::unique_ptr<ProgressBar> Bar;

@@ -14,7 +14,7 @@ class GlobalStats : public sc_module
 
 private:
 	const Configuration& Config;
-	const NoC& Network;
+	const Network& Network;
 
 	std::size_t GetActualFlitsReceived() const;
 	std::size_t GetActualFlitsAccepted() const;
@@ -50,13 +50,13 @@ private:
 
 	void FinishStats() const;
 
-	GlobalStats(sc_module_name name, const NoC& network, const Configuration& config);
+	GlobalStats(sc_module_name name, const Network& network, const Configuration& config);
 
 public:
 	sc_in_clk clock; 
 	sc_in<bool> reset;
 	
-	GlobalStats(const NoC& network, const Configuration& config) :
+	GlobalStats(const Network& network, const Configuration& config) :
 		GlobalStats("GS", network, config) { } 
 
 	// Shows global statistics

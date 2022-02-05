@@ -11,7 +11,7 @@
 
 
 
-class NoC : sc_module
+class Network : sc_module
 {
 private:
 	const Configuration& Config;
@@ -29,8 +29,8 @@ public:
 
 	std::vector<Tile> Tiles;
 
-	NoC(const Configuration& config, const SimulationTimer& timer, sc_module_name = "NoC");
-	~NoC();
+	Network(const Configuration& config, const SimulationTimer& timer, sc_module_name = "NoC");
+	~Network();
 
-	friend std::ostream& operator<<(std::ostream& os, const NoC& network);
+	friend std::ostream& operator<<(std::ostream& os, const Network& network);
 };

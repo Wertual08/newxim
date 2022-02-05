@@ -43,7 +43,7 @@
     <ClCompile Include="src\Configuration\TrafficManagers\TableTrafficManager.cpp" />
     <ClCompile Include="src\DataStructs.cpp" />
     <ClCompile Include="src\Hardware\Buffer.cpp" />
-    <ClCompile Include="src\Hardware\NoC.cpp" />
+    <ClCompile Include="src\Hardware\Network.cpp" />
     <ClCompile Include="src\Hardware\Processor.cpp" />
     <ClCompile Include="src\Hardware\ProcessorQueue.cpp" />
     <ClCompile Include="src\Hardware\Relay.cpp" />
@@ -71,7 +71,7 @@
     <ClInclude Include="src\Configuration\TrafficManagers\TrafficManager.hpp" />
     <ClInclude Include="src\DataStructs.hpp" />
     <ClInclude Include="src\Hardware\Buffer.hpp" />
-    <ClInclude Include="src\Hardware\NoC.hpp" />
+    <ClInclude Include="src\Hardware\Network.hpp" />
     <ClInclude Include="src\Hardware\Processor.hpp" />
     <ClInclude Include="src\Hardware\ProcessorQueue.hpp" />
     <ClInclude Include="src\Hardware\Relay.hpp" />
