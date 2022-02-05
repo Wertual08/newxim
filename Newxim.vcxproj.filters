@@ -28,6 +28,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="config.yml" />
+    <None Include="README.md" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Configuration\RoutingTable.cpp">

@@ -27,7 +27,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="config.yml" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Configuration\Configuration.cpp" />
