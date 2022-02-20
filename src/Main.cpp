@@ -1,7 +1,7 @@
 #include "Hardware/SimulationTimer.hpp"
 #include "Hardware/Network.hpp"
 #include "Metrics/GlobalStats.hpp"
-#include "DataStructs.hpp"
+#include "Data/Flit.hpp"
 #include "Configuration/Graph/Graph.hpp"
 #include "Configuration/Configuration.hpp"
 #include "Metrics/ProgressBar.hpp"

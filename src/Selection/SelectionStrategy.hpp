@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "DataStructs.hpp"
+#include "Data/Flit.hpp"
 #include "Hardware/Connection.hpp"
 
 

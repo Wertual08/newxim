@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include "Configuration/Configuration.hpp"
-#include "Hardware/NoC.hpp"
+#include "Hardware/Network.hpp"
 
 
 
@@ -50,13 +50,13 @@ private:
 
 	void FinishStats() const;
 
-	GlobalStats(sc_module_name name, const Network& network, const Configuration& config);
+	GlobalStats(sc_module_name name, const ::Network& network, const Configuration& config);
 
 public:
 	sc_in_clk clock; 
 	sc_in<bool> reset;
 	
-	GlobalStats(const Network& network, const Configuration& config) :
+	GlobalStats(const ::Network& network, const Configuration& config) :
 		GlobalStats("GS", network, config) { } 
 
 	// Shows global statistics

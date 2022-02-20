@@ -1,5 +1,5 @@
 #pragma once
-#include "DataStructs.hpp"
+#include "Data/Packet.hpp"
 
 
 

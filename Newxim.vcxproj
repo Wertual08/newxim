@@ -43,7 +43,7 @@
     <ClCompile Include="src\Configuration\TrafficManagers\HotspotTrafficManager.cpp" />
     <ClCompile Include="src\Configuration\TrafficManagers\RandomTrafficManager.cpp" />
     <ClCompile Include="src\Configuration\TrafficManagers\TableTrafficManager.cpp" />
-    <ClCompile Include="src\DataStructs.cpp" />
+    <ClCompile Include="src\Data\Flit.cpp" />
     <ClCompile Include="src\Hardware\Buffer.cpp" />
     <ClCompile Include="src\Hardware\Network.cpp" />
     <ClCompile Include="src\Hardware\Processor.cpp" />
@@ -71,7 +71,9 @@
     <ClInclude Include="src\Configuration\TrafficManagers\RandomTrafficManager.hpp" />
     <ClInclude Include="src\Configuration\TrafficManagers\TableTrafficManager.hpp" />
     <ClInclude Include="src\Configuration\TrafficManagers\TrafficManager.hpp" />
-    <ClInclude Include="src\DataStructs.hpp" />
+    <ClInclude Include="src\Data\Flit.hpp" />
+    <ClInclude Include="src\Data\FlitType.hpp" />
+    <ClInclude Include="src\Data\Packet.hpp" />
     <ClInclude Include="src\Hardware\Buffer.hpp" />
     <ClInclude Include="src\Hardware\Network.hpp" />
     <ClInclude Include="src\Hardware\Processor.hpp" />

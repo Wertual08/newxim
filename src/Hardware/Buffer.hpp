@@ -1,6 +1,6 @@
 #pragma once
 #include <queue>
-#include "DataStructs.hpp"
+#include "Data/Flit.hpp"
 
 
 

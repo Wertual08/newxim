@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include "DataStructs.hpp"
+#include "Data/Flit.hpp"
 #include "Hardware/SimulationTimer.hpp"
 
 

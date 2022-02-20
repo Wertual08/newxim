@@ -1,4 +1,4 @@
-#include "DataStructs.hpp"
+#include "Flit.hpp"
 #include <systemc.h>
 
 
