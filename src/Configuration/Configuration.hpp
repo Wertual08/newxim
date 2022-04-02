@@ -33,6 +33,7 @@ private:
 	std::string traffic_table_filename;
 	std::int32_t clock_period_ps;
 	std::int32_t simulation_time;
+	std::int32_t production_time;
 	std::int32_t reset_time;
 	std::int32_t stats_warm_up_time;
 	std::int32_t rnd_generator_seed;
@@ -52,6 +53,7 @@ private:
 	bool report_topology_sub_graph_adjacency_matrix;
 	bool report_cycle_result;
 	bool report_flit_trace;
+	bool report_distribution;
 	double flit_trace_start;
 	double flit_trace_end;
 
@@ -99,6 +101,7 @@ public:
 	const std::string& TrafficTableFilename() const;
 	std::int32_t ClockPeriodPS() const;
 	std::int32_t SimulationTime() const;
+	std::int32_t ProductionTime() const;
 	std::int32_t ResetTime() const;
 	std::int32_t StatsWarmUpTime() const;
 	std::int32_t RndGeneratorSeed() const;
@@ -107,6 +110,7 @@ public:
 	bool ReportBuffers() const;
 	bool ReportCycleResult() const;
 	bool ReportFlitTrace() const;
+	bool ReportDistribution() const;
 	double FlitTraceStart() const;
 	double FlitTraceEnd() const;
 

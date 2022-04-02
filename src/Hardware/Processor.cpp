@@ -126,8 +126,10 @@ void Processor::Update()
 	}
 	else
 	{
-		if (Traffic->FirePacket(local_id, Timer.SystemTime())) {
-			Queue.Push(Timer.SystemTime());
+		if (Timer.SimulationTime() < Timer.ProductionTime()) {
+			if (Traffic->FirePacket(local_id, Timer.SystemTime())) {
+				Queue.Push(Timer.SystemTime());
+			}
 		}
 
 		TXProcess();

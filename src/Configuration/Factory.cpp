@@ -23,8 +23,9 @@
 #include "Selection/SelectionBufferLevel.hpp"
 #include "Selection/SelectionKeepSpace.hpp"
 #include "Selection/SelectionRandomKeepSpace.hpp"
-#include "Selection/SelectionRingSplit.hpp"
-#include "Selection/SelectionVirtualRingSplit.hpp"
+#include "Selection/SelectionCirculantRingSplit.hpp"
+#include "Selection/SelectionCirculantVirtualRingSplit.hpp"
+#include "Selection/SelectionCirculantVirtualDistribution.hpp"
 
 #include "Configuration/TrafficManagers/RandomTrafficManager.hpp"
 #include "Configuration/TrafficManagers/HotspotTrafficManager.hpp"
@@ -34,6 +35,7 @@
 
 std::unique_ptr<RoutingAlgorithm> Factory::MakeAlgorithm() const
 {
+	
 	if (config.RoutingAlgorithm() == "TABLE_BASED") return std::make_unique<RoutingTableBased>(config.GRTable());
 
 	if (config.RoutingAlgorithm() == "MESH_XY") return std::make_unique<RoutingMeshXY>(config.DimX(), config.DimY(), config.TopologyGraph());
@@ -61,8 +63,9 @@ std::unique_ptr<SelectionStrategy> Factory::MakeStrategy() const
 	if (config.SelectionStrategy() == "BUFFER_LEVEL") return std::make_unique<SelectionBufferLevel>();
 	if (config.SelectionStrategy() == "KEEP_SPACE") return std::make_unique<SelectionKeepSpace>();
 	if (config.SelectionStrategy() == "RANDOM_KEEP_SPACE") return std::make_unique<SelectionRandomKeepSpace>();
-	if (config.SelectionStrategy() == "RING_SPLIT") return std::make_unique<SelectionRingSplit>();
-	if (config.SelectionStrategy() == "VIRTUAL_RING_SPLIT") return std::make_unique<SelectionVirtualRingSplit>(config.TopologyGraph());
+	if (config.SelectionStrategy() == "CIRCULANT_RING_SPLIT") return std::make_unique<SelectionCirculantRingSplit>();
+	if (config.SelectionStrategy() == "CIRCULANT_VIRTUAL_RING_SPLIT") return std::make_unique<SelectionCirculantVirtualRingSplit>(config.TopologyGraph());
+	if (config.SelectionStrategy() == "CIRCULANT_VIRTUAL_DISTRIBUTION") return std::make_unique<SelectionCirculantVirtualDistribution>(config.TopologyGraph());
 	throw std::runtime_error("Configuration error: Invalid selection strategy [" + config.SelectionStrategy() + "].");
 }
 

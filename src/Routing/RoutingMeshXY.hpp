@@ -8,9 +8,9 @@ public:
 	using RoutingMeshAlgorithm::RoutingMeshAlgorithm;
 
 	void Route(const Router& router, const Flit& flit, std::vector<Connection>& result) const override {
-		std::int32_t id = router.LocalID;
-		std::int32_t x = GetXFromID(router.LocalID);
-		std::int32_t y = GetYFromID(router.LocalID);
+		std::int32_t id = router.LocalId;
+		std::int32_t x = GetXFromID(router.LocalId);
+		std::int32_t y = GetYFromID(router.LocalId);
 		std::int32_t dx = GetXFromID(flit.dst_id) - x;
 		std::int32_t dy = GetYFromID(flit.dst_id) - y;
 

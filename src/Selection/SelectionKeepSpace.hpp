@@ -17,7 +17,7 @@ public:
 
 			std::int32_t free_slots = router.DestinationFreeSlots(dst);
 
-			if (flit.port_in != router.LocalRelayID)
+			if (flit.port_in != router.LocalRelayId)
 			{
 				if (free_slots > max_free_slots)
 				{

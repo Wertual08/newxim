@@ -6,36 +6,42 @@ Stats::Stats(const SimulationTimer& timer) : Timer(timer), flits_routed(0)
 {
 }
 
-void Stats::FlitRouted()
+void Stats::FlitRouted(const Flit& flit)
 {
 	flits_routed++;
+}
+
+void Stats::FlitReceived(std::int32_t relay, std::int32_t vc)
+{
+	auto& stats = Buffers[{ relay, vc }];
+	stats.flits_recived++;
 }
 
 void Stats::StartStuckTimer(std::int32_t relay, std::int32_t vc)
 {
 	auto &stats = Buffers[{ relay, vc }];
-	if (stats.StuckTimer >= 0) {
+	if (stats.stuck_timer >= 0) {
 		return;
 	}
-	stats.StuckTimer = Timer.StatisticsTime();
+	stats.stuck_timer = Timer.StatisticsTime();
 }
 void Stats::StopStuckTimer(std::int32_t relay, std::int32_t vc)
 {
 	auto& stats = Buffers[{ relay, vc }];
-	if (stats.StuckTimer < 0) {
+	if (stats.stuck_timer < 0) {
 		return;
 	}
-	double delay = Timer.StatisticsTime() - stats.StuckTimer;
-	if (delay > stats.MaxStuckDelay) {
-		stats.MaxStuckDelay = delay;
+	double delay = Timer.StatisticsTime() - stats.stuck_timer;
+	if (delay > stats.max_suck_delay) {
+		stats.max_suck_delay = delay;
 	}
-	stats.StuckTimer = -1;
+	stats.stuck_timer = -1;
 }
 void Stats::PushLoad(std::int32_t relay, std::int32_t vc, double load)
 {
 	auto& stats = Buffers[{ relay, vc }];
-	stats.LoadSamples++;
-	stats.TotalLoad += load;
+	stats.load_samples++;
+	stats.total_load += load;
 }
 
 double Stats::GetMaxBufferStuckDelay(std::int32_t relay, std::int32_t vc)
@@ -43,18 +49,28 @@ double Stats::GetMaxBufferStuckDelay(std::int32_t relay, std::int32_t vc)
 	auto it = Buffers.find({ relay, vc });
 
 	if (it != Buffers.end()) {
-		return it->second.MaxStuckDelay;
+		return it->second.max_suck_delay;
 	} else {
 		return -1;
+	}
+}
+std::int32_t Stats::GetBufferFlitsReceived(std::int32_t relay, std::int32_t vc)
+{
+	auto it = Buffers.find({ relay, vc });
+
+	if (it != Buffers.end()) {
+		return it->second.flits_recived;
+	} else {
+		return 0;
 	}
 }
 double Stats::GetMaxBufferStuckDelay() 
 {
 	double result = -1;
 	for (const auto& n : Buffers) {
-		StopStuckTimer(n.first.relay_id, n.first.vc_id);
-		if (n.second.MaxStuckDelay > result) {
-			result = n.second.MaxStuckDelay;
+		StopStuckTimer(n.first.port, n.first.vc);
+		if (n.second.max_suck_delay > result) {
+			result = n.second.max_suck_delay;
 		}
 	}
 	return result;
@@ -64,7 +80,7 @@ double Stats::GetAverageBufferLoad(std::int32_t relay, std::int32_t vc) const
 	auto it = Buffers.find({ relay, vc });
 
 	if (it != Buffers.end()) {
-		return it->second.TotalLoad / it->second.LoadSamples;
+		return it->second.total_load / it->second.load_samples;
 	} else {
 		return -1;
 	}
@@ -76,7 +92,7 @@ double Stats::GetAverageBufferLoad() const
 	} else {
 		double result = 0;
 		for (const auto& n : Buffers) {
-			result += n.second.TotalLoad / n.second.LoadSamples;
+			result += n.second.total_load / n.second.load_samples;
 		}
 		return result / Buffers.size();
 	}

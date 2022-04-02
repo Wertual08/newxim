@@ -16,6 +16,7 @@ struct Connection
 	bool operator<(Connection con) const 
 	{ 
 		if (port < con.port) return true;
+		if (port > con.port) return false;
 		return vc < con.vc;
 	}
 

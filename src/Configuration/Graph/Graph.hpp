@@ -29,7 +29,7 @@ public:
 		result.reserve(2);
 		for (std::int32_t i = 0; i < size(); i++)
 			if (at(i) == id) result.push_back(i);
-		return std::move(result);
+		return result;
 	}
 };
 class Graph : public std::vector<GraphNode>

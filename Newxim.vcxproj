@@ -107,12 +107,13 @@
     <ClInclude Include="src\Routing\RoutingMeshWestFirst.hpp" />
     <ClInclude Include="src\Routing\RoutingMeshXYYX.hpp" />
     <ClInclude Include="src\Selection\SelectionBufferLevel.hpp" />
+    <ClInclude Include="src\Selection\SelectionCirculantVirtualDistribution.hpp" />
     <ClInclude Include="src\Selection\SelectionKeepSpace.hpp" />
     <ClInclude Include="src\Selection\SelectionRandom.hpp" />
     <ClInclude Include="src\Selection\SelectionRandomKeepSpace.hpp" />
-    <ClInclude Include="src\Selection\SelectionRingSplit.hpp" />
+    <ClInclude Include="src\Selection\SelectionCirculantRingSplit.hpp" />
     <ClInclude Include="src\Selection\SelectionStrategy.hpp" />
-    <ClInclude Include="src\Selection\SelectionVirtualRingSplit.hpp" />
+    <ClInclude Include="src\Selection\SelectionCirculantVirtualRingSplit.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

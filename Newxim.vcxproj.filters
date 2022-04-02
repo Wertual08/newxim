@@ -226,13 +226,13 @@
     <ClInclude Include="src\Selection\SelectionRandomKeepSpace.hpp">
       <Filter>Source files\Selection</Filter>
     </ClInclude>
-    <ClInclude Include="src\Selection\SelectionRingSplit.hpp">
+    <ClInclude Include="src\Selection\SelectionCirculantRingSplit.hpp">
       <Filter>Source files\Selection</Filter>
     </ClInclude>
     <ClInclude Include="src\Selection\SelectionStrategy.hpp">
       <Filter>Source files\Selection</Filter>
     </ClInclude>
-    <ClInclude Include="src\Selection\SelectionVirtualRingSplit.hpp">
+    <ClInclude Include="src\Selection\SelectionCirculantVirtualRingSplit.hpp">
       <Filter>Source files\Selection</Filter>
     </ClInclude>
     <ClInclude Include="src\Configuration\Factory.hpp">
@@ -273,6 +273,9 @@
     </ClInclude>
     <ClInclude Include="src\Data\Packet.hpp">
       <Filter>Source files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Selection\SelectionCirculantVirtualDistribution.hpp">
+      <Filter>Source files\Selection</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

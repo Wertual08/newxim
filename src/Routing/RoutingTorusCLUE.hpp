@@ -8,7 +8,7 @@ public:
 	using RoutingTorusAlgorithm::RoutingTorusAlgorithm;
 
 	void Route(const Router& router, const Flit& flit, std::vector<Connection>& result) const override {
-		std::int32_t id = router.LocalID;
+		std::int32_t id = router.LocalId;
 		std::int32_t x = GetXFromID(id);
 		std::int32_t y = GetYFromID(id);
 		std::int32_t dx = GetXFromID(flit.dst_id) - x;

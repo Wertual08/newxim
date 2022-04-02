@@ -4,19 +4,23 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-config "../../../../Newxim/config.yml" -packet_injection_rate "0.05" -topology "TORUS" -routing_algorithm "TABLE_BASED" -selection_strategy "RANDOM" -report_progress false -json_result true -report_topology_graph false -report_topology_graph_adjacency_matrix false -report_routing_table false -report_topology_sub_graph false -report_topology_sub_graph_adjacency_matrix false -report_sub_routing_table false -report_possible_routes false -report_routes_stats false -report_cycle_result false -report_buffers false -report_flit_trace false </LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-config "../../../../Newxim/config.yml" -packet_injection_rate "0.05" -topology "TORUS" -routing_algorithm "TABLE_BASED" -selection_strategy "RANDOM" -report_progress false -json_result true -report_topology_graph false -report_topology_graph_adjacency_matrix false -report_routing_table false -report_topology_sub_graph false -report_topology_sub_graph_adjacency_matrix false -report_sub_routing_table false -report_possible_routes false -report_routes_stats false -report_cycle_result false -report_buffers false -report_flit_trace false </LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-config "../../../../Newxim/config.yml" -packet_injection_rate "0.05" -topology "TORUS" -routing_algorithm "TABLE_BASED" -selection_strategy "RANDOM" -report_progress false -json_result true -report_topology_graph false -report_topology_graph_adjacency_matrix false -report_routing_table false -report_topology_sub_graph false -report_topology_sub_graph_adjacency_matrix false -report_sub_routing_table false -report_possible_routes false -report_routes_stats false -report_cycle_result false -report_buffers false -report_flit_trace false </LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommandArguments>-config "../../../../Newxim/config.yml" -packet_injection_rate "0.05" -topology "TORUS" -routing_algorithm "TABLE_BASED" -selection_strategy "RANDOM" -report_progress false -json_result true -report_topology_graph false -report_topology_graph_adjacency_matrix false -report_routing_table false -report_topology_sub_graph false -report_topology_sub_graph_adjacency_matrix false -report_sub_routing_table false -report_possible_routes false -report_routes_stats false -report_cycle_result false -report_buffers false -report_flit_trace false </LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>
+    </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

@@ -7,7 +7,7 @@
 #include "Metrics/ProgressBar.hpp"
 #include <chrono>
 
-const static std::string Version = "0.0.1.3";
+const static std::string Version = "0.0.1.4";
 
 
 
@@ -22,7 +22,13 @@ int sc_main(int arg_num, char* arg_vet[]) {
 		std::cout << "\n\n";
 
 		Configuration Config(arg_num, arg_vet);
-		SimulationTimer Timer(Config.ClockPeriodPS(), Config.ResetTime(), Config.StatsWarmUpTime(), Config.SimulationTime());
+		SimulationTimer Timer(
+			Config.ClockPeriodPS(),
+			Config.ResetTime(), 
+			Config.StatsWarmUpTime(), 
+			Config.SimulationTime(),
+			Config.ProductionTime()
+		);
 		Network Network(Config, Timer);
 		GlobalStats stats(Network, Config);
 

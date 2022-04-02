@@ -5,6 +5,7 @@
 
 
 
+// TODO: Rewrite this shit
 class TableTrafficManager : public TrafficManager
 {
 private:

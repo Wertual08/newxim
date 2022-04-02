@@ -1,47 +1,40 @@
 #pragma once
 #include <map>
 #include "Hardware/SimulationTimer.hpp"
+#include "Data/Flit.hpp"
+#include "Hardware/Connection.hpp"
 
 
 
-struct RelaySignature
-{
-	std::int32_t relay_id;
-	std::int32_t vc_id;
 
-	bool operator<(const RelaySignature& sig) const
-	{
-		if (relay_id < sig.relay_id) return true;
-		if (relay_id > sig.relay_id) return false;
-		if (vc_id < sig.vc_id) return true;
-		return false;
-	}
-};
 struct BufferStats
 {
-	double StuckTimer = -1;
-	double MaxStuckDelay = 0;
-	double TotalLoad = 0;
-	double LoadSamples = 0;
+	double stuck_timer = -1;
+	double max_suck_delay = -1;
+	double total_load = 0;
+	double load_samples = 0;
+	std::int32_t flits_recived = 0;
 };
 
 class Stats 
 {
 private:
-	std::map<RelaySignature, BufferStats> Buffers;
+	std::map<Connection, BufferStats> Buffers;
 	std::int32_t flits_routed;
 
 public:
 	const SimulationTimer Timer;
 	Stats(const SimulationTimer& timer);
 
-	void FlitRouted();
+	void FlitRouted(const Flit& flit);
+	void FlitReceived(std::int32_t relay, std::int32_t vc);
 
 	void StartStuckTimer(std::int32_t relay, std::int32_t vc);
 	void StopStuckTimer(std::int32_t relay, std::int32_t vc);
 	void PushLoad(std::int32_t relay, std::int32_t vc, double load);
 
 	double GetMaxBufferStuckDelay(std::int32_t relay, std::int32_t vc);
+	std::int32_t GetBufferFlitsReceived(std::int32_t relay, std::int32_t vc);
 	double GetMaxBufferStuckDelay();
 	double GetAverageBufferLoad(std::int32_t relay, std::int32_t vc) const;
 	double GetAverageBufferLoad() const;

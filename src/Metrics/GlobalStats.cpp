@@ -169,10 +169,26 @@ void GlobalStats::ShowBuffers(std::ostream& out) const {
 				if (r < node.size()) out << '[' << node[r];
 				else out << "[L";
 				out << "--(" << r << ':' << vc << ")->" << i << ']';
-				out << ": " << static_cast<std::int32_t>(stats.GetMaxBufferStuckDelay(r, vc)) << " ";
+				out << ": R(" << stats.GetBufferFlitsReceived(r, vc) << ") D(";
+				out << static_cast<std::int32_t>(stats.GetMaxBufferStuckDelay(r, vc)) << ") ";
 				out << relay[vc] << '\n';
 			}
 		}
+	}
+}
+
+void GlobalStats::ShowDistribution(std::ostream& out) const {
+	out << "% Flits distribution:\n";
+	for (auto& tile : Network.Tiles) {
+		out
+			<< std::setfill('0')
+			<< std::setw(4)
+			<< tile.ProcessorDevice->local_id
+			<< ": R("
+			<< tile.ProcessorDevice->FlitsReceived()
+			<< ") S("
+			<< tile.ProcessorDevice->FlitsSent()
+			<< ")\n";
 	}
 }
 
@@ -260,6 +276,9 @@ std::ostream& operator<<(std::ostream& out, const GlobalStats& gs) {
 		}
 		if (gs.Config.ReportBuffers()) {
 			gs.ShowBuffers(out);
+		}
+		if (gs.Config.ReportDistribution()) {
+			gs.ShowDistribution(out);
 		}
 	}
 

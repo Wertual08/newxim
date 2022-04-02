@@ -15,8 +15,8 @@
 #     topology_args: [width, height]
 #   TREE: 
 #     topology_args: [nodes count, subnodes count]
-topology: TORUS
-topology_args: [8, 8]
+topology: CIRCULANT
+topology_args: [10, 1, 3, 5]
 topology_channels: 1
 virtual_channels: 2
 
@@ -80,19 +80,19 @@ packet_injection_rate: 1
 #   MESH_AB_TM
 #   MESH_ARM_WRESTLING
 #   MESH_TUG_WAR
-routing_algorithm: TORUS_CLUE
+routing_algorithm: TABLE_BASED
 
 # Selection Strategies:
 #   RANDOM
 #   BUFFER_LEVEL
 #   KEEP_SPACE
 #   RANDOM_KEEP_SPACE
-#   RING_SPLIT
-#   VIRTUAL_RING_SPLIT
+#   CIRCULANT_RING_SPLIT
+#   CIRCULANT_VIRTUAL_RING_SPLIT
 #   
 # Each of the above labels should match a corresponding
 # implementation in the Selection source code directory
-selection_strategy: BUFFER_LEVEL
+selection_strategy: CIRCULANT_VIRTUAL_DISTRIBUTION
 
 # Default routing table generators:
 #   DIJKSTRA
@@ -113,8 +113,10 @@ rnd_generator_seed: 0
 clock_period_ps: 1000
 # Duration of reset signal assertion, expressed in cycles
 reset_time: 1
-# Overal simulation lenght, expressed in cycles
-simulation_time: 20000
+# Overal simulation duration, expressed in cycles
+simulation_time: 100000
+# Duration of processors productivity during simulation
+production_time: 100000
 # Collect stats after a given number of cycles
 stats_warm_up_time: 0
 
@@ -146,5 +148,6 @@ report_possible_routes: false
 report_routes_stats: false
 
 report_cycle_result: false
-report_buffers: false
 report_flit_trace: false
+report_buffers: true
+report_distribution: true

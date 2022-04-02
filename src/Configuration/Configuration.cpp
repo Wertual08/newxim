@@ -240,6 +240,7 @@ void Configuration::ReadSimulationParams(const YAML::Node& config) {
 	} else {
 		report_flit_trace = node.as<bool>();
 	}
+	report_distribution = ReadParam<bool>(config, "report_distribution");
 
 	clock_period_ps = ReadParam<std::int32_t>(config, "clock_period_ps");
 	if (clock_period_ps < 1) {
@@ -252,6 +253,10 @@ void Configuration::ReadSimulationParams(const YAML::Node& config) {
 	simulation_time = ReadParam<std::int32_t>(config, "simulation_time");
 	if (simulation_time < 1) {
 		throw std::runtime_error("simulation_time can not be less than 1.");
+	}
+	production_time = ReadParam<std::int32_t>(config, "production_time");
+	if (production_time < 1 || production_time > simulation_time) {
+		throw std::runtime_error("production_time can not be less than 1 or grater than simulation_time.");
 	}
 	stats_warm_up_time = ReadParam<std::int32_t>(config, "stats_warm_up_time");
 	if (stats_warm_up_time < 0) {
@@ -521,6 +526,10 @@ std::int32_t Configuration::ClockPeriodPS() const {
 std::int32_t Configuration::SimulationTime() const {
 	return simulation_time;
 }
+std::int32_t Configuration::ProductionTime() const
+{
+	return production_time;
+}
 std::int32_t Configuration::ResetTime() const {
 	return reset_time;
 }
@@ -544,6 +553,10 @@ bool Configuration::ReportCycleResult() const {
 }
 bool Configuration::ReportFlitTrace() const {
 	return report_flit_trace;
+}
+bool Configuration::ReportDistribution() const
+{
+	return report_distribution;
 }
 double Configuration::FlitTraceStart() const {
 	return flit_trace_start;

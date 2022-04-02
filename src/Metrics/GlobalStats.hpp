@@ -45,6 +45,7 @@ private:
 	double GetAverageBufferLoad() const;
 
 	void ShowBuffers(std::ostream& out) const;
+	void ShowDistribution(std::ostream& out) const;
 
 	void Update();
 

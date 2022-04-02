@@ -3,29 +3,43 @@
 
 
 
-SimulationTimer::SimulationTimer(double clock_period_sp, double reset_time, double warm_up_time, double total_time) :
-	ClockPeriodPS(clock_period_sp), ResetTime(reset_time), WarmUpTime(warm_up_time), TotalTime(total_time) {
+SimulationTimer::SimulationTimer(
+	double clock_period_ps_, 
+	double reset_time_, 
+	double warm_up_time_, 
+	double total_time_,
+	double production_time_
+) :
+	clock_period_ps(clock_period_ps_),
+	reset_time(reset_time_),
+	warm_up_time(warm_up_time_),
+	total_time(total_time_),
+	production_time(production_time_) {
 }
 SimulationTimer::SimulationTimer(const SimulationTimer& timer) :
-	ClockPeriodPS(timer.ClockPeriodPS), 
-	ResetTime(timer.ResetTime),
-	WarmUpTime(timer.WarmUpTime), 
-	TotalTime(timer.TotalTime) {
+	clock_period_ps(timer.clock_period_ps), 
+	reset_time(timer.reset_time),
+	warm_up_time(timer.warm_up_time), 
+	total_time(timer.total_time),
+	production_time(timer.production_time) {
 }
 
 double SimulationTimer::ClockPeriod() const {
-	return ClockPeriodPS;
+	return clock_period_ps;
 }
 
 double SimulationTimer::SystemTime() const {
-	return sc_time_stamp().to_double() / ClockPeriodPS;
+	return sc_time_stamp().to_double() / clock_period_ps;
 }
 double SimulationTimer::SimulationTime() const {
-	return SystemTime() - ResetTime;
+	return SystemTime() - reset_time;
 }
 double SimulationTimer::StatisticsTime() const {
-	return SimulationTime() - WarmUpTime;
+	return SimulationTime() - warm_up_time;
+}
+double SimulationTimer::ProductionTime() const {
+	return production_time;
 }
 double SimulationTimer::Progress() const {
-	return SimulationTime() / TotalTime;
+	return SimulationTime() / total_time;
 }

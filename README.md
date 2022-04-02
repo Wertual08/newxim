@@ -210,12 +210,6 @@ rnd_generator_seed: <seed>
 ```
 
 
-#### 17. Simulation random seed
-```yml
-rnd_generator_seed: <seed>
-```
-
-
 #### 18. Report simulation progress as progress bar
 ```yml
 report_progress: <true/false>
@@ -240,7 +234,7 @@ report_topology_graph_adjency_matrix: <true/false>
 ```
 
 
-#### 22. Report routin table used in current simulation
+#### 22. Report routing table used in current simulation
 ```yml
 report_routing_table: <true/false>
 ```

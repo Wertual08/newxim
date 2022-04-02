@@ -20,7 +20,7 @@ public:
 
 	void Route(const Router& router, const Flit& flit, std::vector<Connection>& result) const override
 	{
-		const auto &ports = Table[router.LocalID][flit.dst_id];
+		const auto &ports = Table[router.LocalId][flit.dst_id];
 		for (auto port : ports)
 		{
 			Connection con = { port, 0 };
@@ -33,7 +33,7 @@ public:
 
 		if (result.empty())
 		{
-			const auto &ports = SubnetworkTable[router.LocalID][flit.dst_id];
+			const auto &ports = SubnetworkTable[router.LocalId][flit.dst_id];
 			for (auto port : ports)
 			{
 				Connection con = { port, 1 };
