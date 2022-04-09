@@ -26,8 +26,8 @@ void FlitTracer::Remember(const Flit& flit, std::int32_t id)
 
 std::ostream& operator<<(std::ostream& os, const FlitTracer& tracer)
 {
-	for (const auto& story : tracer.FlitHistory)
-	{
+	os << "Flit trace:\n";
+	for (const auto& story : tracer.FlitHistory) {
 		const auto& f = story.first;
 		os << '[' << std::left << std::setw(6) << f.id << ']';
 		if (HasFlag(f.flit_type, FlitType::Head)) os << 'H';

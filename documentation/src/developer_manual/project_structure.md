@@ -2,7 +2,7 @@
 
 
 
-Source code is organization follows area of responsibility for components.<br>
+Source code organization follows area of responsibility for components.<br>
 Project directories tree:
 ```
 - src                   # source code files
