@@ -1,4 +1,4 @@
-# NewXim
+# Newxim
 Network-on-Chip Simulator. 
 
 
@@ -21,10 +21,17 @@ In addition, overall code structure and performance
 were improved along with the number of accumulated 
 simulation metrics. 
 
-# Documentation
+
+## Related projects
+[NewximManager](https://github.com/Wertual08/NewximManager) 
+\- utility for running multiple simulation instances and results aggregation
+
+
+## Documentation
 https://wertual08.github.io/newxim
 
-## Contacts
+
+### Contacts
 Developer: wertual08@gmail.com (Nikolay Myachin)    
 a.romanov@hse.ru (Aleksandr Romanov, PhD)   
 https://www.hse.ru/en/staff/a.romanov#sci     
