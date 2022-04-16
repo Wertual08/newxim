@@ -60,6 +60,8 @@ virtual_channels: <count>
 ```
 
 #### 4. Subtopology type
+Type of subtopology, generated for main graph. It is used as 
+workaround paths for stuck packets.
 ```yml
 subtopology: <type>
 ```

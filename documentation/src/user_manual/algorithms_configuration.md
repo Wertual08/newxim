@@ -69,7 +69,7 @@ traffic_distribution: <type>
 ```
 ##### ```TRAFFIC_RANDOM``` - random traffic distribution<br>
 ##### ```TRAFFIC_HOTSPOT``` - hotspot traffic distribution<br>
-##### ```TRAFFIC_TABLE_BASED``` - traffic distribu;tion based on table from file
+##### ```TRAFFIC_TABLE_BASED``` - traffic distribution based on table from file
 
 
 #### 6. Configuration of hotspots
