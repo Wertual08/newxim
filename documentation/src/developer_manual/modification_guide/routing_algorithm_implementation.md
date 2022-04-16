@@ -84,7 +84,7 @@ void Route(const Router& router, const Flit& flit, std::vector<Connection>& resu
 ```
 
 ```Route(...)``` is marked as override because it implements abstract method of base 
-[```RoutingAlgorithm```](/developer_manual/class_description/routing/routing_algorithm.md) class. 
+[```RoutingAlgorithm```](../class_description/routing/routing_algorithm.md) class. 
 It accepts references to router, flit and vector of result connections instances. 
 Reference to router can be used in more complex algorithms which relies on current network state. 
 For now, we only require ```LocalID``` as it represents the current node. Flit instance have some useful 
@@ -93,9 +93,9 @@ Each connection is just a pair of port number and virtual channel index.
 At first step, all variables, required for algorithm to operate are calculated, then it chose direction based on dx and dy. 
 Links for the chosen direction are written in result vector along with current flit virtual channel id (XY algorithm have no reasons to change it).
 Now algorithm is fully functional, but it needs to be registered in the 
-[```Factory```](/developer_manual/class_description/configuration/factory.md). 
+[```Factory```](../class_description/configuration/factory.md). 
 It is required because at configuration step, 
-[```Factory```](/developer_manual/class_description/configuration/factory.md) 
+[```Factory```](../class_description/configuration/factory.md) 
 needs to find specific algorithm implementation by its name. 
 Found algorithm implementation will then be injected into each router of the network.
 Function: 

@@ -14,7 +14,7 @@ In general, simulator consists of four stages:
 - [Network](network_stage.md)
 - [GlobalStats](global_stats_stage.md)
 
-![General Newxim structure](/images/general_structure.svg)
+![General Newxim structure](../../images/general_structure.svg)
 
-Those stages are initialized and executed sequentially through the [Simulation life cycle](/developer_manual/simulation_life_cycle/main.md) 
+Those stages are initialized and executed sequentially through the [Simulation life cycle](../simulation_life_cycle/main.md) 
 and determine the behavior in the following steps.

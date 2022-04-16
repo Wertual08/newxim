@@ -7,7 +7,7 @@ Represents processing element of the network. It is used as source or destinatio
 Packet& GetQueueFront()
 ```
 Updates first 
-[```Packet```](/developer_manual/class_description/data/packet.md) 
+[```Packet```](../data/packet.md) 
 if it is required and returns first packet from the 
 [```ProcessorQueue```](processor_queue.md). 
 
@@ -15,32 +15,32 @@ if it is required and returns first packet from the
 ```c++
 void ReceiveFlit(Flit flit)
 ```
-Updates statistics for received [```Flit```](/developer_manual/class_description/data/flit.md)s.
+Updates statistics for received [```Flit```](../data/flit.md)s.
 
 ### Method
 ```c++
 void SendFlit(Flit flit)
 ```
-Updates statistics for sent [```Flit```](/developer_manual/class_description/data/flit.md)s.
+Updates statistics for sent [```Flit```](../data/flit.md)s.
 
 ### Method
 ```c++
 Flit NextFlit()
 ```
-Returns next [```Flit```](/developer_manual/class_description/data/flit.md) of current front packet of the [```ProcessorQueue```](processor_queue.md).
+Returns next [```Flit```](../data/flit.md) of current front packet of the [```ProcessorQueue```](processor_queue.md).
 
 ### Method
 ```c++
 void PopFlit()
 ```
 Removes 
-[```Flit```](/developer_manual/class_description/data/flit.md) 
+[```Flit```](../data/flit.md) 
 from the current 
-[```Packet```](/developer_manual/class_description/data/packet.md). 
+[```Packet```](../data/packet.md). 
 If there is no 
-[```Flit```](/developer_manual/class_description/data/flit.md)s 
-left in the current [```Packet```](/developer_manual/class_description/data/packet.md), 
-removes [```Packet```](/developer_manual/class_description/data/packet.md) from the [```ProcessorQueue```](processor_queue.md).
+[```Flit```](../data/flit.md)s 
+left in the current [```Packet```](../data/packet.md), 
+removes [```Packet```](../data/packet.md) from the [```ProcessorQueue```](processor_queue.md).
 
 ### Constructor
 ```c++
@@ -53,7 +53,7 @@ Creates new instance of the [```Processor```](processor.md).
 ```c++
 void SetTrafficManager(const TrafficManager& traffic)
 ```
-Sets [```TrafficManager```](/developer_manual/class_description/configuration/traffic_manager.md) pointer to given instance.
+Sets [```TrafficManager```](../configuration/traffic_manager.md) pointer to given instance.
 
 ### Method
 ```c++

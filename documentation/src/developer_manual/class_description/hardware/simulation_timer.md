@@ -32,7 +32,7 @@ Returns timestamp from the start statistics aggregation
 double ProductionTime() const
 ```
 Returns timestamp when production of the 
-[```Flit```](/developer_manual/class_description/data/flit.md)s 
+[```Flit```](../data/flit.md)s 
 in the [```Processor```](processor.md)s must be stopped
 
 ### Method

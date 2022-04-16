@@ -1,6 +1,6 @@
 # FlitTracer
 
-Class instance is used to trace [```Flit```](/developer_manual/class_description/data/flit.md)s paths through the network.
+Class instance is used to trace [```Flit```](../data/flit.md)s paths through the network.
 
 ### Constructor
 ```c++
@@ -12,13 +12,13 @@ Initializes new [```FlitTracer```](flit_tracer.md) instance
 ```c++
 void Register(Flit& flit)
 ```
-Registers [```Flit```](/developer_manual/class_description/data/flit.md) in tracer
+Registers [```Flit```](../data/flit.md) in tracer
 
 ### Method
 ```c++
 void Remember(const Flit& flit, std::int32_t id)
 ```
-Remembers [```Flit```](/developer_manual/class_description/data/flit.md) location
+Remembers [```Flit```](../data/flit.md) location
 
 ### Method
 ```c++

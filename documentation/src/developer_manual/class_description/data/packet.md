@@ -36,4 +36,4 @@ Number of flits in packet
 ```c++ 
 std::int32_t flit_left
 ```
-Flits in the packet that are left to send from [```Processor```](/developer_manual/class_description/hardware/processor.md)
+Flits in the packet that are left to send from [```Processor```](../../class_description/hardware/processor.md)

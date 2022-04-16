@@ -1,7 +1,7 @@
 # Introduction
 The given software provides modeling functionality for 
-networks on chip with [custom topology](/user_manual/topology_parameters.md), 
-[routing algorithm and selection strategy](/user_manual/algorithms_configuration.md). 
+networks on chip with [custom topology](../user_manual/topology_parameters.md), 
+[routing algorithm and selection strategy](../user_manual/algorithms_configuration.md). 
 There is simple programming interface for introducing new modeling capabilities. 
 The project was originally inspired by the [Noxim](https://github.com/davidepatti/noxim), 
 but the goal of flexibility led to complete rework of the whole simulator. 

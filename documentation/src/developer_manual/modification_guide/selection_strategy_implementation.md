@@ -19,7 +19,7 @@ public:
 ```
 
 ```Apply(...)``` is marked as override because it implements abstract method of base 
-[```SelectionStrategy```](/developer_manual/class_description/routing/selection_strategy.md)
+[```SelectionStrategy```](../class_description/selection/selection_strategy.md)
 class. 
 It accepts references to router, flit and vector of direction instances. 
 References to router and flit can be used in more complex selection 

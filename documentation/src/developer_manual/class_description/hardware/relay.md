@@ -54,32 +54,32 @@ Performs per-cycle update
 ```c++
 bool CanSend(const Flit &flit)
 ```
-Returns true if [```Flit```](/developer_manual/class_description/data/flit.md) can be send
+Returns true if [```Flit```](../data/flit.md) can be send
 
 ### Method
 ```c++
 bool CanSend(std::size_t vc)
 ```
-Returns true if [```Flit```](/developer_manual/class_description/data/flit.md) can be send through specified virtual channel
+Returns true if [```Flit```](../data/flit.md) can be send through specified virtual channel
 
 ### Method
 ```c++
 bool Send(Flit flit)
 ```
-Tries to send [```Flit```](/developer_manual/class_description/data/flit.md). Returns true on success
+Tries to send [```Flit```](../data/flit.md). Returns true on success
 
 ### Method
 ```c++
 bool CanReceive()
 ```
-Returns true if [```Flit```](/developer_manual/class_description/data/flit.md) can be received
+Returns true if [```Flit```](../data/flit.md) can be received
 
 ### Method
 ```c++
 Flit Receive()
 ```
-Returns [```Flit```](/developer_manual/class_description/data/flit.md) if receive succeed, 
-otherwise returns invalid [```Flit```](/developer_manual/class_description/data/flit.md) instance
+Returns [```Flit```](../data/flit.md) if receive succeed, 
+otherwise returns invalid [```Flit```](../data/flit.md) instance
 
 ### Method
 ```c++
@@ -91,7 +91,7 @@ Returns number of free slots in the [```Buffer```](buffer.md) for given virtual 
 ```c++
 Flit Front()
 ```
-Returns front [```Flit```](/developer_manual/class_description/data/flit.md) 
+Returns front [```Flit```](../data/flit.md) 
 from the [```Buffer```](buffer.md) of current virtual channel
 
 ### Method
@@ -104,7 +104,7 @@ Skips current virtual channel
 ```c++
 Flit Pop()
 ```
-Removes [```Flit```](/developer_manual/class_description/data/flit.md) from the current virtual channel [```Buffer```](buffer.md)
+Removes [```Flit```](../data/flit.md) from the current virtual channel [```Buffer```](buffer.md)
 
 ### Method
 ```c++

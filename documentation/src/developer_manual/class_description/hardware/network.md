@@ -2,11 +2,11 @@
 
 Class is used to store all of the network components. 
 It includes instances of: 
-[```Configuration```](/developer_manual/class_description/configuration/configuration.md), 
-[```RoutingAlgorithm```](/developer_manual/class_description/routing/routing_algorithm.md), 
-[```SelectionStrategy```](/developer_manual/class_description/selection/selection_strategy.md), 
-[```TrafficManager```](/developer_manual/class_description/configuration/traffic_manager.md), 
-[```FlitTracer```](/developer_manual/class_description/metrics/flit_tracer.md), 
+[```Configuration```](../configuration/configuration.md), 
+[```RoutingAlgorithm```](../routing/routing_algorithm.md), 
+[```SelectionStrategy```](../selection/selection_strategy.md), 
+[```TrafficManager```](../configuration/traffic_manager.md), 
+[```FlitTracer```](../metrics/flit_tracer.md), 
 [```SimulationTimer```](simulation_timer.md), 
 clock signal, reset signal, array of 
 [```Tile```](tile.md)s.

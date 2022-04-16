@@ -2,6 +2,6 @@
 
 
 
-During that stage, [```Configuration```](/developer_manual/class_description/configuration/configuration.md) class parses the config file and command line arguments. 
+During that stage, [```Configuration```](../class_description/configuration/configuration.md) class parses the config file and command line arguments. 
 Then it validates all of the passed parameters to prevent invalid arguments from braking the simulation process.
 Every validation is accompanied by special error message, describing valid parameter values.

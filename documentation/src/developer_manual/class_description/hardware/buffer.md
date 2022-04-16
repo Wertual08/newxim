@@ -1,6 +1,6 @@
 # Buffer
 
-Buffer is used to store [```Flit```](/developer_manual/class_description/data/flit.md) s for one virtual channel.
+Buffer is used to store [```Flit```](../data/flit.md) s for one virtual channel.
 
 ### Method
 ```c++
@@ -42,37 +42,37 @@ Clears the [```Buffer```](buffer.md)
 ```c++
 void Push(const Flit& flit)
 ```
-Appends [```Flit```](/developer_manual/class_description/data/flit.md)  to the end of the [```Buffer```](buffer.md)
+Appends [```Flit```](../data/flit.md)  to the end of the [```Buffer```](buffer.md)
 
 ### Method
 ```c++
 Flit Pop()
 ```
-Remove and return front [```Flit```](/developer_manual/class_description/data/flit.md)  from the [```Buffer```](buffer.md)
+Remove and return front [```Flit```](../data/flit.md)  from the [```Buffer```](buffer.md)
 
 ### Method
 ```c++
 Flit Front()
 ```
-Returns front [```Flit```](/developer_manual/class_description/data/flit.md)  from the [```Buffer```](buffer.md)
+Returns front [```Flit```](../data/flit.md)  from the [```Buffer```](buffer.md)
 
 ### Method
 ```c++
 std::int32_t Size()
 ```
-Returns number of the [```Flit```](/developer_manual/class_description/data/flit.md)s in the [```Buffer```](buffer.md)
+Returns number of the [```Flit```](../data/flit.md)s in the [```Buffer```](buffer.md)
 
 ### Method
 ```c++
 double GetOldest()
 ```
-Returns timestamp of the oldest [```Flit```](/developer_manual/class_description/data/flit.md) in the [```Buffer```](buffer.md)
+Returns timestamp of the oldest [```Flit```](../data/flit.md) in the [```Buffer```](buffer.md)
 
 ### Method
 ```c++
 double GetOldestAccepted()
 ```
-Returns accepted timestamp of the oldest [```Flit```](/developer_manual/class_description/data/flit.md) in the [```Buffer```](buffer.md)
+Returns accepted timestamp of the oldest [```Flit```](../data/flit.md) in the [```Buffer```](buffer.md)
 
 ### Method
 ```c++

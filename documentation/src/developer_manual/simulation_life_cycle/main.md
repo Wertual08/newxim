@@ -1,18 +1,18 @@
 # Simulation life cycle
 
 When you run program, sc_main entry point is called. It initializes 
-[```Configuration```](/developer_manual/class_description/configuration/configuration.md)
+[```Configuration```](../class_description/configuration/configuration.md)
 instance and 
 creates 
-[```SimulationTimer```](/developer_manual/class_description/hardware/simulation_timer.md), 
-[```GlobalStats```](/developer_manual/class_description/metrics/global_stats.md)
+[```SimulationTimer```](../class_description/hardware/simulation_timer.md), 
+[```GlobalStats```](../class_description/metrics/global_stats.md)
 and 
-[```ProgressBar```](/developer_manual/class_description/metrics/progress_bar.md)
+[```ProgressBar```](../class_description/metrics/progress_bar.md)
 objects. 
 Then it rises reset signal and run simulation for reset time, specified in config. 
 Next, reset signal is lowered to zero and simulation is run for required time. 
 When the simulation completes, 
-[```GlobalStats```](/developer_manual/class_description/metrics/global_stats.md)
+[```GlobalStats```](../class_description/metrics/global_stats.md)
 object is serialized to the standard output stream of program.<br>
 
 Each simulation cycle consists of three unordered stages:

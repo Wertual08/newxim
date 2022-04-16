@@ -1,14 +1,14 @@
 # Router
 
 Represents main network unit, which is responsible for routing 
-[```Flit```](/developer_manual/class_description/data/flit.md) s over the network.
+[```Flit```](../data/flit.md) s over the network.
 
 ### Method
 ```c++
 void Reservation(std::int32_t in_port)
 ```
 Performs reservation process for given port if it has head 
-[```Flit```](/developer_manual/class_description/data/flit.md)  in it.
+[```Flit```](../data/flit.md)  in it.
 
 ### Method
 ```c++
@@ -21,7 +21,7 @@ Calls per-cycle update operations.
 Connection FindDestination(const Flit& flit)
 ```
 Computes target connection for given 
-[```Flit```](/developer_manual/class_description/data/flit.md) 
+[```Flit```](../data/flit.md) 
 via routing algorithm and selection strategy.
 
 ### Method
