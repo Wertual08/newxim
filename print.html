@@ -1,0 +1,1493 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>The Newxim simulator</title>
+        <meta name="robots" content="noindex" />
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction/main.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="introduction/basic_terms.html"><strong aria-hidden="true">1.1.</strong> Basic terms</a></li><li class="chapter-item expanded "><a href="introduction/features.html"><strong aria-hidden="true">1.2.</strong> Features</a></li></ol></li><li class="chapter-item expanded "><a href="user_manual/main.html"><strong aria-hidden="true">2.</strong> User manual</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="user_manual/config.html"><strong aria-hidden="true">2.1.</strong> Config file</a></li><li class="chapter-item expanded "><a href="user_manual/topology_parameters.html"><strong aria-hidden="true">2.2.</strong> Topology parameters</a></li><li class="chapter-item expanded "><a href="user_manual/routers_configuration.html"><strong aria-hidden="true">2.3.</strong> Routers configuration</a></li><li class="chapter-item expanded "><a href="user_manual/algorithms_configuration.html"><strong aria-hidden="true">2.4.</strong> Algorithms configuration</a></li><li class="chapter-item expanded "><a href="user_manual/simulation_parameters.html"><strong aria-hidden="true">2.5.</strong> Simulation parameters</a></li><li class="chapter-item expanded "><a href="user_manual/metrics_options.html"><strong aria-hidden="true">2.6.</strong> Metrics options</a></li><li class="chapter-item expanded "><a href="user_manual/simulation_output.html"><strong aria-hidden="true">2.7.</strong> Simulation output</a></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/main.html"><strong aria-hidden="true">3.</strong> Developer manual</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/project_structure.html"><strong aria-hidden="true">3.1.</strong> Project structure</a></li><li class="chapter-item expanded "><a href="developer_manual/general_simulator_structure/main.html"><strong aria-hidden="true">3.2.</strong> General simulator structure</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/general_simulator_structure/configuration_stage.html"><strong aria-hidden="true">3.2.1.</strong> Configuration stage</a></li><li class="chapter-item expanded "><a href="developer_manual/general_simulator_structure/setup_stage.html"><strong aria-hidden="true">3.2.2.</strong> Setup stage</a></li><li class="chapter-item expanded "><a href="developer_manual/general_simulator_structure/network_stage.html"><strong aria-hidden="true">3.2.3.</strong> Network stage</a></li><li class="chapter-item expanded "><a href="developer_manual/general_simulator_structure/global_stats_stage.html"><strong aria-hidden="true">3.2.4.</strong> GlobalStats stage</a></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/simulator_core_structure/main.html"><strong aria-hidden="true">3.3.</strong> Simulator core structure</a></li><li class="chapter-item expanded "><a href="developer_manual/simulation_life_cycle/main.html"><strong aria-hidden="true">3.4.</strong> Simulation life cycle</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/main.html"><strong aria-hidden="true">3.5.</strong> Class description</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/class_description/configuration/main.html"><strong aria-hidden="true">3.5.1.</strong> Configuration classes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/class_description/configuration/configuration.html"><strong aria-hidden="true">3.5.1.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/configuration/graph.html"><strong aria-hidden="true">3.5.1.2.</strong> Graph</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/configuration/traffic_manager.html"><strong aria-hidden="true">3.5.1.3.</strong> TrafficManager</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/configuration/routing_table.html"><strong aria-hidden="true">3.5.1.4.</strong> RoutingTable</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/configuration/factory.html"><strong aria-hidden="true">3.5.1.5.</strong> Factory</a></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/class_description/data/main.html"><strong aria-hidden="true">3.5.2.</strong> Data classes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/class_description/data/flit_type.html"><strong aria-hidden="true">3.5.2.1.</strong> FlitType</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/data/flit.html"><strong aria-hidden="true">3.5.2.2.</strong> Flit</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/data/packet.html"><strong aria-hidden="true">3.5.2.3.</strong> Packet</a></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/main.html"><strong aria-hidden="true">3.5.3.</strong> Hardware classes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/network.html"><strong aria-hidden="true">3.5.3.1.</strong> Network</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/tile.html"><strong aria-hidden="true">3.5.3.2.</strong> Tile</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/router.html"><strong aria-hidden="true">3.5.3.3.</strong> Router</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/processor.html"><strong aria-hidden="true">3.5.3.4.</strong> Processor</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/relay.html"><strong aria-hidden="true">3.5.3.5.</strong> Relay</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/buffer.html"><strong aria-hidden="true">3.5.3.6.</strong> Buffer</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/processor_queue.html"><strong aria-hidden="true">3.5.3.7.</strong> ProcessorQueue</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/reservation_table.html"><strong aria-hidden="true">3.5.3.8.</strong> ReservationTable</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/simulation_timer.html"><strong aria-hidden="true">3.5.3.9.</strong> SimulationTimer</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/hardware/connection.html"><strong aria-hidden="true">3.5.3.10.</strong> Connection</a></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/class_description/routing/main.html"><strong aria-hidden="true">3.5.4.</strong> Routing classes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/class_description/routing/routing_algorithm.html"><strong aria-hidden="true">3.5.4.1.</strong> RoutingAlgorithm</a></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/class_description/selection/main.html"><strong aria-hidden="true">3.5.5.</strong> Selection classes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/class_description/selection/selection_strategy.html"><strong aria-hidden="true">3.5.5.1.</strong> SelectionStrategy</a></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/class_description/metrics/main.html"><strong aria-hidden="true">3.5.6.</strong> Metrics classes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/class_description/metrics/flit_tracer.html"><strong aria-hidden="true">3.5.6.1.</strong> FlitTracer</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/metrics/stats.html"><strong aria-hidden="true">3.5.6.2.</strong> Stats</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/metrics/global_stats.html"><strong aria-hidden="true">3.5.6.3.</strong> GlobalStats</a></li><li class="chapter-item expanded "><a href="developer_manual/class_description/metrics/progress_bar.html"><strong aria-hidden="true">3.5.6.4.</strong> ProgressBar</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="developer_manual/modification_guide/main.html"><strong aria-hidden="true">3.6.</strong> Modification guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="developer_manual/modification_guide/routing_algorithm_implementation.html"><strong aria-hidden="true">3.6.1.</strong> Routing algorithm implementation</a></li><li class="chapter-item expanded "><a href="developer_manual/modification_guide/selection_strategy_implementation.html"><strong aria-hidden="true">3.6.2.</strong> Selection strategy implementation</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The Newxim simulator</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>The given software provides modeling functionality for 
+networks on chip with <a href="introduction/../user_manual/topology_parameters.html">custom topology</a>, 
+<a href="introduction/../user_manual/algorithms_configuration.html">routing algorithm and selection strategy</a>. 
+There is simple programming interface for introducing new modeling capabilities. 
+The project was originally inspired by the <a href="https://github.com/davidepatti/noxim">Noxim</a>, 
+but the goal of flexibility led to complete rework of the whole simulator. 
+Modeling of signals is driven by the <a href="https://www.accellera.org/downloads/standards/systemc">SystemC</a> library 
+which allows cycle accurate communication between components of the network. 
+The main purpose of development was to create universal toolset for high level modeling, 
+evaluation and comparison of different network topologies. 
+Such properties as performance and ease of modifications became the basis of the Newxim.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="basic-terms"><a class="header" href="#basic-terms">Basic terms</a></h1>
+<h4 id="simulator"><a class="header" href="#simulator">Simulator</a></h4>
+<p>Software, which provides tooling for modeling and aggregation of metrics from the network and routing algorithms.</p>
+<h4 id="modeling"><a class="header" href="#modeling">Modeling</a></h4>
+<p>Process of communications inside network with preconfigured parameters.</p>
+<h4 id="topology"><a class="header" href="#topology">Topology</a></h4>
+<p>Graph which describes nodes and links of the network.</p>
+<h4 id="routing-algorithm"><a class="header" href="#routing-algorithm">Routing algorithm</a></h4>
+<p>Algorithm for computing next possible destination nodes for the packet without 
+taking into consideration current state of the network.</p>
+<h4 id="selection-strategy"><a class="header" href="#selection-strategy">Selection strategy</a></h4>
+<p>Algorithm for selecting single destination from the array, provided by routing 
+algorithm. It is possible to use current state of the network in selection process.</p>
+<h4 id="processor"><a class="header" href="#processor">Processor</a></h4>
+<p>Unit which acts as source or destination for each packet.</p>
+<h4 id="router"><a class="header" href="#router">Router</a></h4>
+<p>Operational node of the network used to route the packets.</p>
+<h4 id="relay"><a class="header" href="#relay">Relay</a></h4>
+<p>Port of the router which must be connected to relay of another router to form link.</p>
+<h4 id="topology-channel"><a class="header" href="#topology-channel">Topology channel</a></h4>
+<p>Physical links between nodes.</p>
+<h4 id="virtual-channel"><a class="header" href="#virtual-channel">Virtual channel</a></h4>
+<p>Virtual link created inside physical link. </p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="newxim-simulator-features"><a class="header" href="#newxim-simulator-features">Newxim simulator features</a></h1>
+<p>Simulator was built to bring maximum extencibility.
+Most of it's components can be extended via simple modifications.
+Due to performance and simplification reasons, all modifications must be done in source code 
+because scripting languages drastically harm simulation time.</p>
+<h2 id="built-in-features"><a class="header" href="#built-in-features">Built-in features:</a></h2>
+<ul>
+<li>Fully customizable network topology</li>
+<li>A lot of implemented routing algorithms</li>
+<li>Various selection strategies</li>
+<li>Configurable traffic distribution</li>
+<li>Custom simulation parameters</li>
+<li>Expressive configurable metrics</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="user-manual"><a class="header" href="#user-manual">User manual</a></h1>
+<p>Software is provided as CLI. The only purpose of it is to simulate network with given parameters. 
+Simulation is single threaded, but in most cases, you will require multiple of them, so you are 
+able to run as many parallel instances as you want. All automatizations are done with other modules 
+such as [NewximManager]. There are two ways of configuring simulation process. With config file or 
+via command line arguments. Due to higher priority of command line arguments, any file configuration 
+can be overwritten on program startup. Config file (by default “config.yml” and can be set via -config 
+command line option) must be in yaml format and contains network, simulation and metrics properties.</p>
+<h2 id="command-line-arguments"><a class="header" href="#command-line-arguments">Command line arguments</a></h2>
+<p>Each config option have dedicatied command line argument.
+To override option, just pass <code>-&lt;config option name&gt; &lt;config option value&gt;</code><br>
+For example: <code>-topology CIRCULANT -packet_injection_rate 0.2</code></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="config-file"><a class="header" href="#config-file">Config file</a></h1>
+<p>Config file consists of 6 sections:</p>
+<ul>
+<li>Topology parameters</li>
+<li>Routers configuration</li>
+<li>Algorithms configuration</li>
+<li>Simulation parameters</li>
+<li>Metrics options</li>
+</ul>
+<p>Each section describes corresponding properties. 
+During simulator startup config is loaded and all
+fields are validated. So, any invalid configuration
+will result in error message, describing the mistake.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="topology-parameters"><a class="header" href="#topology-parameters">Topology parameters</a></h1>
+<h4 id="1-topology-configuration"><a class="header" href="#1-topology-configuration">1. Topology configuration</a></h4>
+<pre><code class="language-yml">topology: &lt;type&gt;
+</code></pre>
+<p>Possible values:<br></p>
+<h5 id="circulant---circulant-topology"><a class="header" href="#circulant---circulant-topology"><code>CIRCULANT</code> - circulant topology<br></a></h5>
+<pre><code class="language-yml">topology_args: [N, G1, G2, …]
+</code></pre>
+<p><code>N</code> - number of nodes<br>
+<code>Gk</code> - generators of the circulant<br><br></p>
+<h5 id="mesh---mesh-topology"><a class="header" href="#mesh---mesh-topology"><code>MESH</code> - mesh topology</a></h5>
+<pre><code class="language-yml">topology_args: [W, H]
+</code></pre>
+<p><code>W</code> - number of nodes horizontally<br>
+<code>H</code> - number of nodes vertically<br><br></p>
+<h5 id="torus---torus-topology"><a class="header" href="#torus---torus-topology"><code>TORUS</code> - torus topology</a></h5>
+<pre><code class="language-yml">topology_args: [W, H]
+</code></pre>
+<p><code>W</code> - number of nodes horizontally<br>
+<code>H</code> - number of nodes vertically<br><br></p>
+<h5 id="tree---tree-topology"><a class="header" href="#tree---tree-topology"><code>TREE</code> - tree topology</a></h5>
+<pre><code class="language-yml">topology_args: [N, C]
+</code></pre>
+<p><code>N</code> - number of nodes<br>
+<code>C</code> - maximum number of child nodes<br><br></p>
+<h5 id="custom---custom-topology"><a class="header" href="#custom---custom-topology"><code>CUSTOM</code> - custom topology</a></h5>
+<pre><code class="language-yml">topology_args: [
+  [N00, N01, ...],
+  [N10, N11, ...],
+  ...
+]
+</code></pre>
+<p><code>Nab</code> - index of node b which is connected to node a<br></p>
+<h4 id="2-number-of-physically-allocated-channels"><a class="header" href="#2-number-of-physically-allocated-channels">2. Number of physically allocated channels</a></h4>
+<pre><code class="language-yml">topology_channels: &lt;count&gt;
+</code></pre>
+<h4 id="3-number-of-virtually-allocated-channels"><a class="header" href="#3-number-of-virtually-allocated-channels">3. Number of virtually allocated channels</a></h4>
+<pre><code class="language-yml">virtual_channels: &lt;count&gt;
+</code></pre>
+<h4 id="4-subtopology-type"><a class="header" href="#4-subtopology-type">4. Subtopology type</a></h4>
+<p>Type of subtopology, generated for main graph. It is used as 
+workaround paths for stuck packets.</p>
+<pre><code class="language-yml">subtopology: &lt;type&gt;
+</code></pre>
+<p><code>NONE</code> - no subtopology<br>
+<code>TREE</code> - spanning tree with minimum possible Wiener index</p>
+<h4 id="5-subnetwork-links-allocation-type"><a class="header" href="#5-subnetwork-links-allocation-type">5. Subnetwork links allocation type</a></h4>
+<pre><code class="language-yml">subnetwork: &lt;type&gt;
+</code></pre>
+<p><code>NONE</code> - no subnetwork<br>
+<code>VIRTUAL</code> - virtually allocated links<br>
+<code>PHYSICAL</code> - physically allocated links<br></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="routers-configuration"><a class="header" href="#routers-configuration">Routers configuration</a></h1>
+<h4 id="1-order-of-port-buffers-update"><a class="header" href="#1-order-of-port-buffers-update">1. Order of port buffers update</a></h4>
+<pre><code class="language-yml">update_sequence: &lt;type&gt;
+</code></pre>
+<h5 id="default---rund-robin-update-order"><a class="header" href="#default---rund-robin-update-order"><code>DEFAULT</code> - rund-robin update order</a></h5>
+<h5 id="p1-p2----fixed-update-order-of-ports"><a class="header" href="#p1-p2----fixed-update-order-of-ports"><code>[P1, P2, ...]</code> - fixed update order of ports</a></h5>
+<h4 id="2-number-of-flit-slots-per-buffer"><a class="header" href="#2-number-of-flit-slots-per-buffer">2. Number of flit slots per buffer</a></h4>
+<pre><code class="language-yml">buffer_depth: &lt;depth&gt;
+</code></pre>
+<h4 id="3-minimum-length-in-flits-of-generated-packets"><a class="header" href="#3-minimum-length-in-flits-of-generated-packets">3. Minimum length in flits of generated packets</a></h4>
+<pre><code class="language-yml">min_packet_size: &lt;size&gt;
+</code></pre>
+<h4 id="4-maximum-length-in-flits-of-generated-packets"><a class="header" href="#4-maximum-length-in-flits-of-generated-packets">4. Maximum length in flits of generated packets</a></h4>
+<pre><code class="language-yml">max_packet_size: &lt;size&gt;
+</code></pre>
+<h4 id="5-controls-injection-rate-in-number-of-flits-instead-of-packets"><a class="header" href="#5-controls-injection-rate-in-number-of-flits-instead-of-packets">5. Controls injection rate in number of flits instead of packets</a></h4>
+<pre><code class="language-yml">flit_injection_rate: &lt;true/false&gt;
+</code></pre>
+<h4 id="6-controls-scaling-of-generated-packets--flits-with-number-of-nodes"><a class="header" href="#6-controls-scaling-of-generated-packets--flits-with-number-of-nodes">6. Controls scaling of generated packets / flits with number of nodes</a></h4>
+<pre><code class="language-yml">scale_with_nodes: &lt;true/false&gt;
+</code></pre>
+<h4 id="7-probability-of-packet--flit-generation-for-node-per-every-simulation-iteration"><a class="header" href="#7-probability-of-packet--flit-generation-for-node-per-every-simulation-iteration">7. Probability of packet / flit generation for node per every simulation iteration</a></h4>
+<pre><code class="language-yml">packet_injection_rate: &lt;rate&gt;
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="algorithms-configuration"><a class="header" href="#algorithms-configuration">Algorithms configuration</a></h1>
+<h4 id="1-routing-algorithm-selection"><a class="header" href="#1-routing-algorithm-selection">1. Routing algorithm selection</a></h4>
+<pre><code class="language-yml">routing_algorithm: &lt;type&gt;
+</code></pre>
+<h5 id="table_based---------------table-based-routing"><a class="header" href="#table_based---------------table-based-routing"><code>TABLE_BASED</code>             - table based routing</a></h5>
+<h5 id="mesh_xy-------------------xy-routing-algorithm-for-mesh"><a class="header" href="#mesh_xy-------------------xy-routing-algorithm-for-mesh"><code>MESH_XY</code>                 - XY routing algorithm for mesh</a></h5>
+<h5 id="mesh_west_first-----------west-first-algorithm-for-mesh"><a class="header" href="#mesh_west_first-----------west-first-algorithm-for-mesh"><code>MESH_WEST_FIRST</code>         - West First algorithm for mesh</a></h5>
+<h5 id="mesh_o1turn---------------o1turn-algorithm-for-mesh"><a class="header" href="#mesh_o1turn---------------o1turn-algorithm-for-mesh"><code>MESH_O1TURN</code>             - O1TURN algorithm for mesh</a></h5>
+<h5 id="mesh_xy_yx----------------xy-yx-algorithm-for-mesh"><a class="header" href="#mesh_xy_yx----------------xy-yx-algorithm-for-mesh"><code>MESH_XY_YX</code>              - XY-YX algorithm for mesh</a></h5>
+<h5 id="mesh_negative_first-------negative-first-algorithm-for-mesh"><a class="header" href="#mesh_negative_first-------negative-first-algorithm-for-mesh"><code>MESH_NEGATIVE_FIRST</code>     - Negative First algorithm for mesh</a></h5>
+<h5 id="mesh_north_last-----------north-last-algorithm-for-mesh"><a class="header" href="#mesh_north_last-----------north-last-algorithm-for-mesh"><code>MESH_NORTH_LAST</code>         - North Last algorithm for mesh</a></h5>
+<h5 id="mesh_odd_even-------------odd-even-algorithm-for-mesh"><a class="header" href="#mesh_odd_even-------------odd-even-algorithm-for-mesh"><code>MESH_ODD_EVEN</code>           - Odd-Even algorithm for mesh</a></h5>
+<h5 id="torus_clue----------------clue-algorithm-for-torues"><a class="header" href="#torus_clue----------------clue-algorithm-for-torues"><code>TORUS_CLUE</code>              - CLUE algorithm for torues</a></h5>
+<h5 id="subnetwork----------------table-based-algorithm-which-also-uses-physical-subnetwork-with-permission-for-packets-to-leave-subnetwork"><a class="header" href="#subnetwork----------------table-based-algorithm-which-also-uses-physical-subnetwork-with-permission-for-packets-to-leave-subnetwork"><code>SUBNETWORK</code>              - table based algorithm which also uses physical subnetwork with permission for packets to leave subnetwork</a></h5>
+<h5 id="fixed_subnetwork----------table-based-algorithm-which-also-uses-physical-subnetwork-without-permission-for-packets-to-leave-subnetwork"><a class="header" href="#fixed_subnetwork----------table-based-algorithm-which-also-uses-physical-subnetwork-without-permission-for-packets-to-leave-subnetwork"><code>FIXED_SUBNETWORK</code>        - table based algorithm which also uses physical subnetwork without permission for packets to leave subnetwork</a></h5>
+<h5 id="virtual_subnetwork--------table-based-algorithm-which-also-uses-virtual-subnetwork-with-permission-for-packets-to-leave-subnetwork"><a class="header" href="#virtual_subnetwork--------table-based-algorithm-which-also-uses-virtual-subnetwork-with-permission-for-packets-to-leave-subnetwork"><code>VIRTUAL_SUBNETWORK</code>      - table based algorithm which also uses virtual subnetwork with permission for packets to leave subnetwork</a></h5>
+<h5 id="fit_virtual_subnetwork----table-based-algorithm-which-also-uses-virtual-subnetwork-without-permission-for-packets-to-leave-subnetwork-and-buffers-load-control"><a class="header" href="#fit_virtual_subnetwork----table-based-algorithm-which-also-uses-virtual-subnetwork-without-permission-for-packets-to-leave-subnetwork-and-buffers-load-control"><code>FIT_VIRTUAL_SUBNETWORK</code>  - table based algorithm which also uses virtual subnetwork without permission for packets to leave subnetwork and buffers load control</a></h5>
+<h4 id="2-strategy-of-selecting-one-of-ports-and-virtual-channels-provided-by-the-routing-algorithm"><a class="header" href="#2-strategy-of-selecting-one-of-ports-and-virtual-channels-provided-by-the-routing-algorithm">2. Strategy of selecting one of ports and virtual channels provided by the routing algorithm</a></h4>
+<pre><code class="language-yml">selection_strategy: &lt;type&gt;
+</code></pre>
+<h5 id="random----------------random-port-selection"><a class="header" href="#random----------------random-port-selection"><code>RANDOM</code>              - random port selection</a></h5>
+<h5 id="buffer_level----------less-loaded-port-selection"><a class="header" href="#buffer_level----------less-loaded-port-selection"><code>BUFFER_LEVEL</code>        - less loaded port selection</a></h5>
+<h5 id="keep_space------------less-loaded-port-selection-with-control-of-network-load"><a class="header" href="#keep_space------------less-loaded-port-selection-with-control-of-network-load"><code>KEEP_SPACE</code>          - less loaded port selection with control of network load</a></h5>
+<h5 id="random_keep_space-----random-port-selection-with-control-of-network-load"><a class="header" href="#random_keep_space-----random-port-selection-with-control-of-network-load"><code>RANDOM_KEEP_SPACE</code>   - random port selection with control of network load</a></h5>
+<h5 id="circulant_ring_split------------ring-split-selection-strategy-for-circulants"><a class="header" href="#circulant_ring_split------------ring-split-selection-strategy-for-circulants"><code>CIRCULANT_RING_SPLIT</code>          - ring-split selection strategy for circulants</a></h5>
+<h5 id="circulant_virtual_ring_split----ring-split-selection-strategy-with-virtual-channels-for-circulants"><a class="header" href="#circulant_virtual_ring_split----ring-split-selection-strategy-with-virtual-channels-for-circulants"><code>CIRCULANT_VIRTUAL_RING_SPLIT</code>  - ring-split selection strategy with virtual channels for circulants</a></h5>
+<h4 id="3-routing-table-configuration"><a class="header" href="#3-routing-table-configuration">3. Routing table configuration</a></h4>
+<pre><code class="language-yml">routing_table: &lt;type&gt;
+</code></pre>
+<h5 id="dijkstra---routing-table-is-based-on-dijkstra-algorithm"><a class="header" href="#dijkstra---routing-table-is-based-on-dijkstra-algorithm"><code>DIJKSTRA</code> - routing table is based on Dijkstra algorithm<br></a></h5>
+<h5 id="up_down---routing-table-is-based-on-up-down-algorithm"><a class="header" href="#up_down---routing-table-is-based-on-up-down-algorithm"><code>UP_DOWN</code> - routing table is based on up-down algorithm<br></a></h5>
+<h5 id="mesh_xy---routing-table-is-based-on-xy-algorithm-for-mesh"><a class="header" href="#mesh_xy---routing-table-is-based-on-xy-algorithm-for-mesh"><code>MESH_XY</code> - routing table is based on XY algorithm for mesh<br></a></h5>
+<h5 id="circulant_pair_exchange---routing-table-is-based-on-pair-exchange-algorithm-for-circulant"><a class="header" href="#circulant_pair_exchange---routing-table-is-based-on-pair-exchange-algorithm-for-circulant"><code>CIRCULANT_PAIR_EXCHANGE</code> - routing table is based on pair-exchange algorithm for circulant<br></a></h5>
+<h5 id="circulant_multiplicative---routing-table-is-based-on-routing-algorithm-for-multiplicative-cicrulant"><a class="header" href="#circulant_multiplicative---routing-table-is-based-on-routing-algorithm-for-multiplicative-cicrulant"><code>CIRCULANT_MULTIPLICATIVE</code> - routing table is based on routing algorithm for multiplicative cicrulant<br></a></h5>
+<h5 id="circulant_clockwise---routing-table-is-based-on-clockwise-algorithm-for-circulant"><a class="header" href="#circulant_clockwise---routing-table-is-based-on-clockwise-algorithm-for-circulant"><code>CIRCULANT_CLOCKWISE</code> - routing table is based on clockwise algorithm for circulant<br></a></h5>
+<h5 id="greedy_promotion---routing-table-is-based-on-greedy-promotion-algorithm"><a class="header" href="#greedy_promotion---routing-table-is-based-on-greedy-promotion-algorithm"><code>GREEDY_PROMOTION</code> - routing table is based on greedy promotion algorithm<br></a></h5>
+<h5 id="---just-routing-table"><a class="header" href="#---just-routing-table"><code>[...]</code> - just routing table</a></h5>
+<h5 id="custom-routing-table-format"><a class="header" href="#custom-routing-table-format">Custom routing table format</a></h5>
+<pre><code class="language-yml">[
+    [X, Y, Z, [A, B, C], ...],
+    [U, V, W, ...]
+    ...
+]
+</code></pre>
+<p>Each row in table corresponds to one router. Each value in 
+that row represents port or id of the router (or array of those) 
+in which packet must be sent on routing stage.</p>
+<h4 id="4-routing-table-format"><a class="header" href="#4-routing-table-format">4. Routing table format</a></h4>
+<pre><code class="language-yml">routing_table_id_based: &lt;true/false&gt;
+</code></pre>
+<h4 id="5-type-of-traffic-distribution"><a class="header" href="#5-type-of-traffic-distribution">5. Type of traffic distribution</a></h4>
+<pre><code class="language-yml">traffic_distribution: &lt;type&gt;
+</code></pre>
+<h5 id="traffic_random---random-traffic-distribution"><a class="header" href="#traffic_random---random-traffic-distribution"><code>TRAFFIC_RANDOM</code> - random traffic distribution<br></a></h5>
+<h5 id="traffic_hotspot---hotspot-traffic-distribution"><a class="header" href="#traffic_hotspot---hotspot-traffic-distribution"><code>TRAFFIC_HOTSPOT</code> - hotspot traffic distribution<br></a></h5>
+<h5 id="traffic_table_based---traffic-distribution-based-on-table-from-file"><a class="header" href="#traffic_table_based---traffic-distribution-based-on-table-from-file"><code>TRAFFIC_TABLE_BASED</code> - traffic distribution based on table from file</a></h5>
+<h4 id="6-configuration-of-hotspots"><a class="header" href="#6-configuration-of-hotspots">6. Configuration of hotspots</a></h4>
+<pre><code class="language-yml">traffic_hotspots: [[N, S, R], ...]
+</code></pre>
+<h5 id="n---node-index"><a class="header" href="#n---node-index"><code>N</code> - node index<br></a></h5>
+<h5 id="s---send-probability-multiplier"><a class="header" href="#s---send-probability-multiplier"><code>S</code> - send probability multiplier<br></a></h5>
+<h5 id="r---receive-probability-multiplier"><a class="header" href="#r---receive-probability-multiplier"><code>R</code> - receive probability multiplier</a></h5>
+<h4 id="7-traffic-table-file-path"><a class="header" href="#7-traffic-table-file-path">7. Traffic table file path</a></h4>
+<pre><code class="language-yml">traffic_table_filename: &lt;path&gt; 
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="simulation-parameters"><a class="header" href="#simulation-parameters">Simulation parameters</a></h1>
+<h4 id="1-simulation-random-seed"><a class="header" href="#1-simulation-random-seed">1. Simulation random seed</a></h4>
+<pre><code class="language-yml">rnd_generator_seed: &lt;seed&gt;
+</code></pre>
+<h4 id="2-duration-of-simulation-cycle-in-ps"><a class="header" href="#2-duration-of-simulation-cycle-in-ps">2. Duration of simulation cycle in ps</a></h4>
+<pre><code class="language-yml">clock_period_ps: &lt;count&gt;
+</code></pre>
+<h4 id="3-duration-of-reset-signal-in-cycles"><a class="header" href="#3-duration-of-reset-signal-in-cycles">3. Duration of reset signal in cycles</a></h4>
+<pre><code class="language-yml">reset_time: &lt;count&gt;
+</code></pre>
+<h4 id="4-duration-of-simulation-in-cycles"><a class="header" href="#4-duration-of-simulation-in-cycles">4. Duration of simulation in cycles</a></h4>
+<pre><code class="language-yml">simulation_time: &lt;count&gt;
+</code></pre>
+<h4 id="5-duration-of-processors-flits-production-in-cycles"><a class="header" href="#5-duration-of-processors-flits-production-in-cycles">5. Duration of processors flits production in cycles</a></h4>
+<pre><code class="language-yml">production_time: &lt;count&gt;
+</code></pre>
+<h4 id="6-duration-of-the-period-which-is-ignored-in-stats-accumulation-in-cycles"><a class="header" href="#6-duration-of-the-period-which-is-ignored-in-stats-accumulation-in-cycles">6. Duration of the period which is ignored in stats accumulation in cycles</a></h4>
+<pre><code class="language-yml">stats_warm_up_time: &lt;count&gt;
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="metrics-options"><a class="header" href="#metrics-options">Metrics options</a></h1>
+<h4 id="1-report-simulation-progress-as-progress-bar"><a class="header" href="#1-report-simulation-progress-as-progress-bar">1. Report simulation progress as progress bar</a></h4>
+<pre><code class="language-yml">report_progress: &lt;true/false&gt;
+</code></pre>
+<h4 id="2-report-simulation-result-as-json"><a class="header" href="#2-report-simulation-result-as-json">2. Report simulation result as JSON</a></h4>
+<pre><code class="language-yml">json_result: &lt;true/false&gt;
+</code></pre>
+<h4 id="3-report-simulation-topology-graph"><a class="header" href="#3-report-simulation-topology-graph">3. Report simulation topology graph</a></h4>
+<pre><code class="language-yml">report_topology_graph: &lt;true/false&gt;
+</code></pre>
+<h4 id="4-report-simulation-topology-graph-adjency-matrix"><a class="header" href="#4-report-simulation-topology-graph-adjency-matrix">4. Report simulation topology graph adjency matrix</a></h4>
+<pre><code class="language-yml">report_topology_graph_adjacency_matrix: &lt;true/false&gt;
+</code></pre>
+<h4 id="5-report-simulation-routing-table"><a class="header" href="#5-report-simulation-routing-table">5. Report simulation routing table</a></h4>
+<pre><code class="language-yml">report_routing_table: &lt;true/false&gt;
+</code></pre>
+<h4 id="6-report-simulation-topology-subgraph"><a class="header" href="#6-report-simulation-topology-subgraph">6. Report simulation topology subgraph</a></h4>
+<pre><code class="language-yml">report_topology_sub_graph: &lt;true/false&gt;
+</code></pre>
+<h4 id="7-report-simulation-topology-subgraph-adjency-matrix"><a class="header" href="#7-report-simulation-topology-subgraph-adjency-matrix">7. Report simulation topology subgraph adjency matrix</a></h4>
+<pre><code class="language-yml">report_topology_sub_graph_adjacency_matrix: &lt;true/false&gt;
+</code></pre>
+<h4 id="8-report-simulatio-subnetwork-routing-table"><a class="header" href="#8-report-simulatio-subnetwork-routing-table">8. Report simulatio subnetwork routing table</a></h4>
+<pre><code class="language-yml">report_sub_routing_table: &lt;true/false&gt;
+</code></pre>
+<h4 id="9-report-possible-routes-inside-given-topology"><a class="header" href="#9-report-possible-routes-inside-given-topology">9. Report possible routes inside given topology</a></h4>
+<pre><code class="language-yml">report_possible_routes: &lt;true/false&gt;
+</code></pre>
+<h4 id="10-report-some-stats-for-possible-routes"><a class="header" href="#10-report-some-stats-for-possible-routes">10. Report some stats for possible routes</a></h4>
+<pre><code class="language-yml">report_routes_stats: &lt;true/false&gt;
+</code></pre>
+<h4 id="11-report-metrics-for-each-cycle"><a class="header" href="#11-report-metrics-for-each-cycle">11. Report metrics for each cycle</a></h4>
+<pre><code class="language-yml">report_cycle_result: &lt;true/false&gt;
+</code></pre>
+<h4 id="12-report-traces-for-flits"><a class="header" href="#12-report-traces-for-flits">12. Report traces for flits</a></h4>
+<pre><code class="language-yml">report_flit_trace: &lt;true/false&gt;
+</code></pre>
+<h4 id="13-report-buffer-statuses-after-simulation"><a class="header" href="#13-report-buffer-statuses-after-simulation">13. Report buffer statuses after simulation</a></h4>
+<pre><code class="language-yml">report_buffers: &lt;true/false&gt;
+</code></pre>
+<h4 id="14-report-distribution-of-sentreceived-flits-among-processors"><a class="header" href="#14-report-distribution-of-sentreceived-flits-among-processors">14. Report distribution of sent/received flits among processors</a></h4>
+<pre><code class="language-yml">report_distribution: &lt;true/false&gt;
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="simulation-output"><a class="header" href="#simulation-output">Simulation output</a></h1>
+<p>Simulation output depends on <a href="user_manual/metrics_options.html">configuration file</a>. 
+Basically, it consists of general metrics section and configurable sections.
+General metrics can be shown in json or plain text format.</p>
+<h2 id="general-metrics"><a class="header" href="#general-metrics">General metrics</a></h2>
+<ul>
+<li>
+<h4 id="total-produced-flits"><a class="header" href="#total-produced-flits">Total produced flits</a></h4>
+The number of flits produced by projessors during the simulation</li>
+<li>
+<h4 id="total-accepted-flits"><a class="header" href="#total-accepted-flits">Total accepted flits</a></h4>
+The number of flits received in the network from processors during the simulation</li>
+<li>
+<h4 id="total-received-flits"><a class="header" href="#total-received-flits">Total received flits</a></h4>
+The number of flits received by processors during the simulation</li>
+<li>
+<h4 id="network-production-flitscycle"><a class="header" href="#network-production-flitscycle">Network production (flits/cycle)</a></h4>
+Average number of flits produced by processors per cycle</li>
+<li>
+<h4 id="network-acceptance-flitscycle"><a class="header" href="#network-acceptance-flitscycle">Network acceptance (flits/cycle)</a></h4>
+Average number of flits received in the network from processors per cycle</li>
+<li>
+<h4 id="network-throughput-flitscycle"><a class="header" href="#network-throughput-flitscycle">Network throughput (flits/cycle)</a></h4>
+Average number of flits delivered by the network to processors per cycle</li>
+<li>
+<h4 id="ip-throughput-flitscycleip"><a class="header" href="#ip-throughput-flitscycleip">IP throughput (flits/cycle/IP)</a></h4>
+Average number of flits delivered by the network to each processor per cycle</li>
+<li>
+<h4 id="last-time-flit-received-cycles"><a class="header" href="#last-time-flit-received-cycles">Last time flit received (cycles)</a></h4>
+Last cycle where any of flits was received by any of processors</li>
+<li>
+<h4 id="max-buffer-stuck-delay-cycles"><a class="header" href="#max-buffer-stuck-delay-cycles">Max buffer stuck delay (cycles)</a></h4>
+Maximum time in cycles between pulling outs of flits from any of buffers</li>
+<li>
+<h4 id="max-time-flit-in-network-cycles"><a class="header" href="#max-time-flit-in-network-cycles">Max time flit in network (cycles)</a></h4>
+Maximum time in cycles flit took to be delivered</li>
+<li>
+<h4 id="total-received-packets"><a class="header" href="#total-received-packets">Total received packets</a></h4>
+The number of complete packets, received by processors during the simulation</li>
+<li>
+<h4 id="total-flits-lost"><a class="header" href="#total-flits-lost">Total flits lost</a></h4>
+The number of flits, lost in network (should be zero if simulation is working correctly)</li>
+<li>
+<h4 id="global-average-delay-cycles"><a class="header" href="#global-average-delay-cycles">Global average delay (cycles)</a></h4>
+Average delay in cycles between packet creation and consumption</li>
+<li>
+<h4 id="max-delay-cycles"><a class="header" href="#max-delay-cycles">Max delay (cycles)</a></h4>
+Maximum delay in cycles between packet creation and consumption</li>
+<li>
+<h4 id="average-buffer-utilization"><a class="header" href="#average-buffer-utilization">Average buffer utilization:</a></h4>
+Average flit slots utilized among all buffers and cycles</li>
+</ul>
+<h2 id="configurable-sections"><a class="header" href="#configurable-sections">Configurable sections</a></h2>
+<ul>
+<li>
+<h4 id="flit-trace"><a class="header" href="#flit-trace">Flit trace</a></h4>
+Reports path of each flit through the network</li>
+<li>
+<h4 id="buffer-statuses"><a class="header" href="#buffer-statuses">Buffer statuses</a></h4>
+Reports metrics for each buffer and flits left in them before the simulation ended</li>
+<li>
+<h4 id="flits-distribution"><a class="header" href="#flits-distribution">Flits distribution</a></h4>
+Reports number of sent and received flits for each processor</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="developer-manual"><a class="header" href="#developer-manual">Developer manual</a></h1>
+<p>The power of Newxim is in it's extencibility, performance and structure.
+This section is dedicated to description of simulator concepts and code structure.
+It also reveals the process of modifications.
+Because of requirenment to introduce all modifications via source code, this process may look complicated.
+<a href="developer_manual/modification_guide/main.html">Example implementations</a> of some algorithms are provided to help understand it`s basics.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="project-structure"><a class="header" href="#project-structure">Project structure</a></h1>
+<p>Source code organization follows area of responsibility for components.<br>
+Project directories tree:</p>
+<pre><code>- src                   # source code files
+  - Configuration       # classes for initial simulator configuration
+    - Graph             # classes for working with graphs
+    - TrafficManagers   # traffic manager implementations
+  - Data                # basic data structures
+  - Hardware            # hardware elements of the network
+  - Metrics             # metrics aggregation and display
+  - Routing             # routing algorithm implementations
+  - Selection           # selection strategy implementations  
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="general-simulator-structure"><a class="header" href="#general-simulator-structure">General simulator structure</a></h1>
+<p>In general, simulator consists of four stages:</p>
+<ul>
+<li><a href="developer_manual/general_simulator_structure/configuration_stage.html">Configuration</a></li>
+<li><a href="developer_manual/general_simulator_structure/setup_stage.html">Setup</a>
+<ul>
+<li>RoutingTable</li>
+<li>Graph</li>
+<li>Factory
+<ul>
+<li>TrafficManager</li>
+<li>SelectionStrategy</li>
+<li>RoutingAlgorithm</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="developer_manual/general_simulator_structure/network_stage.html">Network</a></li>
+<li><a href="developer_manual/general_simulator_structure/global_stats_stage.html">GlobalStats</a></li>
+</ul>
+<p><img src="developer_manual/general_simulator_structure/../../images/general_structure.svg" alt="General Newxim structure" /></p>
+<p>Those stages are initialized and executed sequentially through the <a href="developer_manual/general_simulator_structure/../simulation_life_cycle/main.html">Simulation life cycle</a> 
+and determine the behavior in the following steps.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configuration-stage"><a class="header" href="#configuration-stage">Configuration stage</a></h1>
+<p>During that stage, <a href="developer_manual/general_simulator_structure/../class_description/configuration/configuration.html"><code>Configuration</code></a> class parses the config file and command line arguments. 
+Then it validates all of the passed parameters to prevent invalid arguments from braking the simulation process.
+Every validation is accompanied by special error message, describing valid parameter values.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="setup-stage"><a class="header" href="#setup-stage">Setup stage</a></h1>
+<p>On the setup 
+<a href="developer_manual/general_simulator_structure/../configuration/routing_table.html"><code>RoutingTable</code></a>, 
+<a href="developer_manual/general_simulator_structure/../configuration/graph.html"><code>Graph</code></a>
+and 
+<a href="developer_manual/general_simulator_structure/../configuration/factory.html"><code>Factory</code></a>
+objects are built from configuration.
+<a href="developer_manual/general_simulator_structure/../configuration/graph.html"><code>Graph</code></a>
+object will be used as a network topology, while the 
+<a href="developer_manual/general_simulator_structure/../configuration/factory.html"><code>Factory</code></a>
+serves as a provider
+of the 
+<a href="developer_manual/general_simulator_structure/../configuration/traffic_manager.html"><code>TrafficManager</code></a>, 
+<a href="developer_manual/general_simulator_structure/../selection/selection_strategy.html"><code>SelectionStrategy</code></a> 
+and 
+<a href="developer_manual/general_simulator_structure/../routing/routing_algorithm.html"><code>RotuingAlgorithm</code></a> 
+instances for 
+network processors and routers. 
+<a href="developer_manual/general_simulator_structure/../configuration/factory.html"><code>Factory</code></a>
+is also used for <a href="developer_manual/general_simulator_structure/../modification_guide/main.html">registering</a> 
+your own algorithms for configuration.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="network-stage"><a class="header" href="#network-stage">Network stage</a></h1>
+<p>On this stage whole simulation process happens. 
+Simulation can be described as a state machine.
+On each iteration, new simulation state is produced from the current state.
+All calculations are done via <code>Update</code> methods bound to the clock signal.
+During the simulation most of operational units record some metrics. 
+Those will be used in the <a href="developer_manual/general_simulator_structure/global_stats_stage.html">final stage</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="globalstats-stage"><a class="header" href="#globalstats-stage">GlobalStats stage</a></h1>
+<p>On the final step, all collected metrics is processed. 
+Processed metrics is then printed to the <code>stdout</code> of the program. 
+Format of the output is described in <a href="developer_manual/general_simulator_structure/../../user_manual/simulation_output.html">Simulation output</a> chapter.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="sumulator-core-structure"><a class="header" href="#sumulator-core-structure">Sumulator core structure</a></h1>
+<p><img src="developer_manual/simulator_core_structure/../../images/core_structure.svg" alt="Core Newxim structure" /></p>
+<p><a href="developer_manual/simulator_core_structure/../class_description/hardware/network.html"><code>Network</code></a>
+class acts as a container for network components. 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/network.html"><code>Network</code></a>
+consists of tiles, each of them is represented as pair of Processor and Router.<br> 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/processor.html"><code>Processor</code></a>
+class is responsible for generating network traffic and connected with 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/router.html"><code>Router</code></a>
+through local 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/relay.html"><code>Relay</code></a>. 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/processor.html"><code>Processor</code></a>
+is using 
+<a href="developer_manual/simulator_core_structure/../class_description/configuration/traffic_manager.html"><code>TrafficManager</code></a>
+for decisions on packet production per each cycle.<br>
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/router.html"><code>Router</code></a>
+class have an array of 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/relay.html"><code>Relay</code></a>s, 
+connected with other routers and local processor. 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/router.html"><code>Router</code></a>
+operations are determined by 
+<a href="developer_manual/simulator_core_structure/../class_description/routing/routing_algorithm.html"><code>SelectionStrategy</code></a> 
+and 
+<a href="developer_manual/simulator_core_structure/../class_description/selection/selection_strategy.html"><code>SelectionStrategy</code></a> 
+instances.
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/relay.html"><code>Relay</code></a> 
+represents port of the device. 
+Each 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/relay.html"><code>Relay</code></a> 
+must be connected with another 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/relay.html"><code>Relay</code></a>. 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/relay.html"><code>Relay</code></a> 
+have dedicated <a href="developer_manual/simulator_core_structure/../class_description/data/flit.html"><code>Flit</code></a><br />
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/buffer.html"><code>Buffer</code></a> s 
+with configurable capacity. 
+Each 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/buffer.html"><code>Buffer</code></a> 
+represents separate virtual channel. 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/relay.html"><code>Relay</code></a>s 
+are used as transfer links for flits.<br>
+<a href="developer_manual/simulator_core_structure/../class_description/data/flit.html"><code>Flit</code></a> 
+is basic unit of packet. 
+It holds some information about its sender, 
+current state, destination 
+<a href="developer_manual/simulator_core_structure/../class_description/hardware/processor.html"><code>Processor</code></a>
+and 
+<a href="developer_manual/simulator_core_structure/../class_description/data/packet.html"><code>Packet</code></a> section.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="simulation-life-cycle"><a class="header" href="#simulation-life-cycle">Simulation life cycle</a></h1>
+<p>When you run program, sc_main entry point is called. It initializes 
+<a href="developer_manual/simulation_life_cycle/../class_description/configuration/configuration.html"><code>Configuration</code></a>
+instance and 
+creates 
+<a href="developer_manual/simulation_life_cycle/../class_description/hardware/simulation_timer.html"><code>SimulationTimer</code></a>, 
+<a href="developer_manual/simulation_life_cycle/../class_description/metrics/global_stats.html"><code>GlobalStats</code></a>
+and 
+<a href="developer_manual/simulation_life_cycle/../class_description/metrics/progress_bar.html"><code>ProgressBar</code></a>
+objects. 
+Then it rises reset signal and run simulation for reset time, specified in config. 
+Next, reset signal is lowered to zero and simulation is run for required time. 
+When the simulation completes, 
+<a href="developer_manual/simulation_life_cycle/../class_description/metrics/global_stats.html"><code>GlobalStats</code></a>
+object is serialized to the standard output stream of program.<br></p>
+<p>Each simulation cycle consists of three unordered stages:</p>
+<ul>
+<li>
+<h4 id="flit-generation-in-processors"><a class="header" href="#flit-generation-in-processors">Flit generation in processors</a></h4>
+Each processor asks the traffic manager for permission to spawn packet. If packet should be created, router adds it to the packet queue. Queue is not actually holding every packet instance for memory efficiency. Instead, it just remembers how many packets it should spawn and current generated packet. Current packet is hold until each of its flits are sent. Then, the next packet is generated if it exists in queue. After generating packet, processor checks if it tries to send next flit of the queue to the router. On success flit is removed from queue.</li>
+<li>
+<h4 id="flit-consumption"><a class="header" href="#flit-consumption">Flit consumption</a></h4>
+Processors check for incoming flits and record statistics on each received one.</li>
+<li>
+<h4 id="flits-routing"><a class="header" href="#flits-routing">Flits routing</a></h4>
+Router loop through each port and tries to calculate the output port. If destination port is available, it reserves source port to destination port and place that record in reservation table. Then, for each record in reservation table flit transmission is performed.</li>
+</ul>
+<p>Many operations, such flit consumption and routing records some information to the stats object. After simulation those objects are aggregated in global stats and printed as a result of simulation.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="class-description"><a class="header" href="#class-description">Class description</a></h1>
+<p>This chapter contains description for most of classes in the simulator source.
+It will not get into deep source code details, instead it provides an overview of 
+classes, their roles and methods.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configuration-classes"><a class="header" href="#configuration-classes">Configuration classes</a></h1>
+<p>The following classes are mostly used during configuration stage.
+They are responsible for config parsing and instantiation of simulator modules. </p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p><code>Configuration</code> class object is used as a container of the simulation parameters.
+It is passed throug most other classes to provide them access to rules of their behaviour.</p>
+<h3 id="constructor"><a class="header" href="#constructor">Constructor</a></h3>
+<pre><code class="language-c++">Configuration(std::int32_t arg_num, char* arg_vet[])
+</code></pre>
+<p>Accepts command line arguments number and array of strings, representing passed arguments.
+Used to initialize whole simulator configuration from command line arguments and configuration file.</p>
+<h3 id="method"><a class="header" href="#method">Method</a></h3>
+<pre><code class="language-c++">void ParseArgs(YAML::Node &amp;node, std::int32_t arg_num, char* arg_vet[])
+</code></pre>
+<ul>
+<li>Accepts root yaml node, command line arguments number and array of strings, representing passed arguments.</li>
+<li>Used to override existing configuration, initialized from file with command line arguments.</li>
+</ul>
+<h3 id="method-1"><a class="header" href="#method-1">Method</a></h3>
+<pre><code class="language-c++">void ReadTopologyParams(const YAML::Node&amp; config)
+</code></pre>
+<ul>
+<li>Accepts root yaml node</li>
+<li>Used to read topology parameters from yaml root node.</li>
+</ul>
+<h3 id="method-2"><a class="header" href="#method-2">Method</a></h3>
+<pre><code class="language-c++">void ReadRouterParams(const YAML::Node&amp; config)
+</code></pre>
+<ul>
+<li>Accepts root yaml node</li>
+<li>Used to read router parameters from yaml root node.</li>
+</ul>
+<h3 id="method-3"><a class="header" href="#method-3">Method</a></h3>
+<pre><code class="language-c++">void ReadRoutingTableParams(const YAML::Node&amp; config)
+</code></pre>
+<ul>
+<li>Accepts root yaml node</li>
+<li>Used to read routing table parameters from yaml root node.</li>
+</ul>
+<h3 id="method-4"><a class="header" href="#method-4">Method</a></h3>
+<pre><code class="language-c++">void ReadSimulationParams(const YAML::Node&amp; config)
+</code></pre>
+<ul>
+<li>Accepts root yaml node</li>
+<li>Used to read simulation parameters from yaml root node.</li>
+</ul>
+<h3 id="method-5"><a class="header" href="#method-5">Method</a></h3>
+<pre><code class="language-c++">void ReadTrafficDistributionParams(const YAML::Node&amp; config)
+</code></pre>
+<ul>
+<li>Accepts root yaml node</li>
+<li>Used to read traffic distribution parameters from yaml root node.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="graph"><a class="header" href="#graph">Graph</a></h1>
+<p>Extends <code>std::vector&lt;GraphNode&gt;</code> and provides some methods for calculation of subgraph and path searching. 
+Child classes <code>&lt;name&gt;Graph</code> provide constructors for the graph of given topology.</p>
+<h2 id="graphnode"><a class="header" href="#graphnode">GraphNode</a></h2>
+<p>Extends <code>std::vector&lt;std::int32_t&gt;</code>, stores indices of nodes, connected to it.</p>
+<h3 id="method-6"><a class="header" href="#method-6">Method</a></h3>
+<pre><code class="language-c++">void push_back(std::int32_t id, std::int32_t ch = 1)
+</code></pre>
+<ul>
+<li>Accepts node index and the number of required physical connections.</li>
+<li>Used to connect current node with node at specified index.</li>
+</ul>
+<h3 id="method-7"><a class="header" href="#method-7">Method</a></h3>
+<pre><code class="language-c++">std::vector&lt;std::int32_t&gt; links_to(std::int32_t id)
+</code></pre>
+<ul>
+<li>Accepts node index.</li>
+<li>Returns indices of the links (corresponding to router ports) to specified node.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="trafficmanager"><a class="header" href="#trafficmanager">TrafficManager</a></h1>
+<p>Abstract class, used as base class for traffic manager implementations.</p>
+<h3 id="abstract-method"><a class="header" href="#abstract-method">Abstract method</a></h3>
+<pre><code class="language-c++">bool FirePacket(std::int32_t from, double time)
+</code></pre>
+<p>Implementation must decide if packet should be fired from processor with given index at given time.</p>
+<h3 id="abstract-method-1"><a class="header" href="#abstract-method-1">Abstract method</a></h3>
+<pre><code class="language-c++">std::int32_t FindDestination(std::int32_t from)
+</code></pre>
+<p>Implementation must provide selection of the destination node index from the given node index.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="routingtable"><a class="header" href="#routingtable">RoutingTable</a></h1>
+<p>Stores routing table for the simulation as 3D array. 
+First index is a source node, second index is a destination node, third index is a variant of next node.</p>
+<h3 id="constructor-1"><a class="header" href="#constructor-1">Constructor</a></h3>
+<pre><code class="language-c++">RoutingTable()
+</code></pre>
+<p>Creates empty instance of routing table.</p>
+<h3 id="methods"><a class="header" href="#methods">Methods</a></h3>
+<pre><code class="language-c++">bool Load&lt;name&gt;(const Graph&amp; graph)
+</code></pre>
+<p>Generate routing table from graph with specified algorithm.</p>
+<h3 id="method-8"><a class="header" href="#method-8">Method</a></h3>
+<pre><code class="language-c++">void Adjust(const Graph &amp;src_graph, const Graph &amp;dst_graph)
+</code></pre>
+<p>Adjust routing table from src_graph to dst_graph. Can be used to make child 
+routing table from existing one for src_graph. Works only if dst_graph is subgraph for src_graph.</p>
+<h3 id="method-9"><a class="header" href="#method-9">Method</a></h3>
+<pre><code class="language-c++">void Promote(const Graph &amp;graph)
+</code></pre>
+<p>Promote routing table indices upper on size of each node from the given graph. 
+Can be used for combining routing tables of two merged graphs.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="factory"><a class="header" href="#factory">Factory</a></h1>
+<h3 id="constructor-2"><a class="header" href="#constructor-2">Constructor</a></h3>
+<pre><code class="language-c++">Factory(const Configuration&amp; cfg)
+</code></pre>
+<p>Accepts constant reference to configuration</p>
+<h3 id="method-10"><a class="header" href="#method-10">Method</a></h3>
+<pre><code class="language-c++">std::unique_ptr&lt;RoutingAlgorithm&gt; MakeAlgorithm() const
+</code></pre>
+<p>Returns instance of routing algorithm corresponding to the name specified in the configuration.</p>
+<h3 id="method-11"><a class="header" href="#method-11">Method</a></h3>
+<pre><code class="language-c++">std::unique_ptr&lt;SelectionStrategy&gt; MakeStrategy() const;
+</code></pre>
+<p>Returns instance of selection strategy corresponding to the name specified in the configuration.</p>
+<h3 id="method-12"><a class="header" href="#method-12">Method</a></h3>
+<pre><code class="language-c++">std::unique_ptr&lt;TrafficManager&gt; MakeTraffic() const;
+</code></pre>
+<p>Returns instance of traffic manager corresponding to the name specified in the configuration.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="data-classes"><a class="header" href="#data-classes">Data classes</a></h1>
+<p>Data classes provide some structures used in network. </p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="flittype"><a class="header" href="#flittype">FlitType</a></h1>
+<p>Enum representing the type of flit. It is used as flag, so each flit can have several types.</p>
+<h3 id="possible-values"><a class="header" href="#possible-values">Possible values</a></h3>
+<ul>
+<li><code>None</code> - should be never used</li>
+<li><code>Head</code> - leading flit of the packet</li>
+<li><code>Body</code> - body (or data) flit of the packet</li>
+<li><code>Tail</code> - closing flit of the packet</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="flit"><a class="header" href="#flit">Flit</a></h1>
+<p>Storage class (struct) used to represent flit instance for the simulation.</p>
+<h3 id="field"><a class="header" href="#field">Field</a></h3>
+<pre><code class="language-c++">std::uint64_t id
+</code></pre>
+<p>Global unique id of flit.</p>
+<h3 id="filed"><a class="header" href="#filed">Filed</a></h3>
+<pre><code class="language-c++">int src_id
+</code></pre>
+<p>Id of the source node.</p>
+<h3 id="field-1"><a class="header" href="#field-1">Field</a></h3>
+<pre><code class="language-c++">int dst_id
+</code></pre>
+<p>Id of the destination node.</p>
+<h3 id="field-2"><a class="header" href="#field-2">Field</a></h3>
+<pre><code class="language-c++">int port_in
+</code></pre>
+<p>Number of router port flit came in (changes on each hop).</p>
+<h3 id="field-3"><a class="header" href="#field-3">Field</a></h3>
+<pre><code class="language-c++">int port_out
+</code></pre>
+<p>Number of router port flit came from (changes on each hop).</p>
+<h3 id="field-4"><a class="header" href="#field-4">Field</a></h3>
+<pre><code class="language-c++">int vc_id
+</code></pre>
+<p>Id of current flit`s virtual channel.</p>
+<h3 id="field-5"><a class="header" href="#field-5">Field</a></h3>
+<pre><code class="language-c++">FlitType flit_type
+</code></pre>
+<p>Type of the flit. 
+Can be one or several of: <code>None</code>, <code>Head</code>, <code>Body</code>, <code>Tail</code></p>
+<h3 id="field-6"><a class="header" href="#field-6">Field</a></h3>
+<pre><code class="language-c++">int sequence_no
+</code></pre>
+<p>Sequence number of flit in packet.</p>
+<h3 id="field-7"><a class="header" href="#field-7">Field</a></h3>
+<pre><code class="language-c++">int sequence_length
+</code></pre>
+<p>Total number of flits in parent packet.</p>
+<h3 id="field-8"><a class="header" href="#field-8">Field</a></h3>
+<pre><code class="language-c++">double timestamp = -1
+</code></pre>
+<p>Timestamp of flit creation.</p>
+<h3 id="field-9"><a class="header" href="#field-9">Field</a></h3>
+<pre><code class="language-c++">double accept_timestamp
+</code></pre>
+<p>Timestamp of flit injection into network.</p>
+<h3 id="field-10"><a class="header" href="#field-10">Field</a></h3>
+<pre><code class="language-c++">int hop_no
+</code></pre>
+<p>Current number of hops (increments on each hop).</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="packet"><a class="header" href="#packet">Packet</a></h1>
+<p>Storage class (struct) used to represent packet instance for the simulation.</p>
+<h3 id="field-11"><a class="header" href="#field-11">Field</a></h3>
+<pre><code class="language-c++">std::int32_t src_id
+</code></pre>
+<p>ID of the source node</p>
+<h3 id="field-12"><a class="header" href="#field-12">Field</a></h3>
+<pre><code class="language-c++">std::int32_t dst_id
+</code></pre>
+<p>ID of the destination node</p>
+<h3 id="field-13"><a class="header" href="#field-13">Field</a></h3>
+<pre><code class="language-c++">std::int32_t vc_id
+</code></pre>
+<p>ID of the virtual channel</p>
+<h3 id="field-14"><a class="header" href="#field-14">Field</a></h3>
+<pre><code class="language-c++">double timestamp
+</code></pre>
+<p>Simulation time of packet creation</p>
+<h3 id="field-15"><a class="header" href="#field-15">Field</a></h3>
+<pre><code class="language-c++">std::int32_t size
+</code></pre>
+<p>Number of flits in packet</p>
+<h3 id="field-16"><a class="header" href="#field-16">Field</a></h3>
+<pre><code class="language-c++">std::int32_t flit_left
+</code></pre>
+<p>Flits in the packet that are left to send from <a href="developer_manual/class_description/data/../../class_description/hardware/processor.html"><code>Processor</code></a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hardware-classes"><a class="header" href="#hardware-classes">Hardware classes</a></h1>
+<p>Objects of hardware classes are used for simulation of real network-on-chip hardware components.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="network"><a class="header" href="#network">Network</a></h1>
+<p>Class is used to store all of the network components. 
+It includes instances of: 
+<a href="developer_manual/class_description/hardware/../configuration/configuration.html"><code>Configuration</code></a>, 
+<a href="developer_manual/class_description/hardware/../routing/routing_algorithm.html"><code>RoutingAlgorithm</code></a>, 
+<a href="developer_manual/class_description/hardware/../selection/selection_strategy.html"><code>SelectionStrategy</code></a>, 
+<a href="developer_manual/class_description/hardware/../configuration/traffic_manager.html"><code>TrafficManager</code></a>, 
+<a href="developer_manual/class_description/hardware/../metrics/flit_tracer.html"><code>FlitTracer</code></a>, 
+<a href="developer_manual/class_description/hardware/simulation_timer.html"><code>SimulationTimer</code></a>, 
+clock signal, reset signal, array of 
+<a href="developer_manual/class_description/hardware/tile.html"><code>Tile</code></a>s.</p>
+<h3 id="constructor-3"><a class="header" href="#constructor-3">Constructor</a></h3>
+<pre><code class="language-c++">Network(const Configuration&amp; config, const SimulationTimer&amp; timer, sc_module_name = &quot;NoC&quot;)
+</code></pre>
+<p>Initializes constant fields of class and calls InitBase meghod.</p>
+<h3 id="method-13"><a class="header" href="#method-13">Method</a></h3>
+<pre><code class="language-c++">void InitBase()
+</code></pre>
+<p>Used for initialization of non-constant class fields, 
+creation and configuration of <a href="developer_manual/class_description/hardware/tile.html"><code>Tile</code></a> instances and 
+connection of <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a> instances according 
+to the given network topology graph.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tile"><a class="header" href="#tile">Tile</a></h1>
+<p>Storage class representing couple of <a href="developer_manual/class_description/hardware/processor.html"><code>Processor</code></a> and <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a></p>
+<h3 id="field-17"><a class="header" href="#field-17">Field</a></h3>
+<pre><code class="language-c++">sc_in_clk clock
+</code></pre>
+<p>Clock signal</p>
+<h3 id="field-18"><a class="header" href="#field-18">Field</a></h3>
+<pre><code class="language-c++">sc_in&lt;bool&gt; reset
+</code></pre>
+<p>Reset signal</p>
+<h3 id="field-19"><a class="header" href="#field-19">Field</a></h3>
+<pre><code class="language-c++">std::unique_ptr&lt;Router&gt; RouterDevice
+</code></pre>
+<p>Unique pointer to <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a> instance</p>
+<h3 id="field-20"><a class="header" href="#field-20">Field</a></h3>
+<pre><code class="language-c++">std::unique_ptr&lt;Processor&gt; ProcessorDevice
+</code></pre>
+<p>Unique pointer to <a href="developer_manual/class_description/hardware/processor.html"><code>Processor</code></a> instance</p>
+<h3 id="method-14"><a class="header" href="#method-14">Method</a></h3>
+<pre><code class="language-c++">void SetRouter(std::unique_ptr&lt;Router&gt;&amp; router)
+</code></pre>
+<p>Assigns <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a> instance</p>
+<h3 id="method-15"><a class="header" href="#method-15">Method</a></h3>
+<pre><code class="language-c++">void SetProcessor(std::unique_ptr&lt;Processor&gt;&amp; processor)
+</code></pre>
+<p>Assigns <a href="developer_manual/class_description/hardware/processor.html"><code>Processor</code></a> instance</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="router-1"><a class="header" href="#router-1">Router</a></h1>
+<p>Represents main network unit, which is responsible for routing 
+<a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> s over the network.</p>
+<h3 id="method-16"><a class="header" href="#method-16">Method</a></h3>
+<pre><code class="language-c++">void Reservation(std::int32_t in_port)
+</code></pre>
+<p>Performs reservation process for given port if it has head 
+<a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>  in it.</p>
+<h3 id="method-17"><a class="header" href="#method-17">Method</a></h3>
+<pre><code class="language-c++">void Update()
+</code></pre>
+<p>Calls per-cycle update operations.</p>
+<h3 id="method-18"><a class="header" href="#method-18">Method</a></h3>
+<pre><code class="language-c++">Connection FindDestination(const Flit&amp; flit)
+</code></pre>
+<p>Computes target connection for given 
+<a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> 
+via routing algorithm and selection strategy.</p>
+<h3 id="method-19"><a class="header" href="#method-19">Method</a></h3>
+<pre><code class="language-c++">bool Route(std::int32_t in_port, Connection dst)
+</code></pre>
+<p>Sends packet from given input port to output port via specified virtual channel.</p>
+<h3 id="method-20"><a class="header" href="#method-20">Method</a></h3>
+<pre><code class="language-c++">virtual void TXProcess()
+</code></pre>
+<p>Performs per-cycle transmitting operations.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="processor-1"><a class="header" href="#processor-1">Processor</a></h1>
+<p>Represents processing element of the network. It is used as source or destination for packets.</p>
+<h3 id="method-21"><a class="header" href="#method-21">Method</a></h3>
+<pre><code class="language-c++">Packet&amp; GetQueueFront()
+</code></pre>
+<p>Updates first 
+<a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a> 
+if it is required and returns first packet from the 
+<a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a>. </p>
+<h3 id="method-22"><a class="header" href="#method-22">Method</a></h3>
+<pre><code class="language-c++">void ReceiveFlit(Flit flit)
+</code></pre>
+<p>Updates statistics for received <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>s.</p>
+<h3 id="method-23"><a class="header" href="#method-23">Method</a></h3>
+<pre><code class="language-c++">void SendFlit(Flit flit)
+</code></pre>
+<p>Updates statistics for sent <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>s.</p>
+<h3 id="method-24"><a class="header" href="#method-24">Method</a></h3>
+<pre><code class="language-c++">Flit NextFlit()
+</code></pre>
+<p>Returns next <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> of current front packet of the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a>.</p>
+<h3 id="method-25"><a class="header" href="#method-25">Method</a></h3>
+<pre><code class="language-c++">void PopFlit()
+</code></pre>
+<p>Removes 
+<a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> 
+from the current 
+<a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a>. 
+If there is no 
+<a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>s 
+left in the current <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a>, 
+removes <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a> from the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a>.</p>
+<h3 id="constructor-4"><a class="header" href="#constructor-4">Constructor</a></h3>
+<pre><code class="language-c++">Processor(const SimulationTimer&amp; timer, std::int32_t id,
+	std::int32_t min_packet_size, std::int32_t max_packet_size)
+</code></pre>
+<p>Creates new instance of the <a href="developer_manual/class_description/hardware/processor.html"><code>Processor</code></a>.</p>
+<h3 id="method-26"><a class="header" href="#method-26">Method</a></h3>
+<pre><code class="language-c++">void SetTrafficManager(const TrafficManager&amp; traffic)
+</code></pre>
+<p>Sets <a href="developer_manual/class_description/hardware/../configuration/traffic_manager.html"><code>TrafficManager</code></a> pointer to given instance.</p>
+<h3 id="method-27"><a class="header" href="#method-27">Method</a></h3>
+<pre><code class="language-c++">void SetFlitTracer(FlitTracer&amp; tracer)
+</code></pre>
+<p>Sets [<code>FlitTracer</code>] ponter to given tinstance.</p>
+<h3 id="method-28"><a class="header" href="#method-28">Method</a></h3>
+<pre><code class="language-c++">void Update()
+</code></pre>
+<p>Performs reset, receive and transmit operations.</p>
+<h3 id="method-29"><a class="header" href="#method-29">Method</a></h3>
+<pre><code class="language-c++">void TXProcess()
+</code></pre>
+<p>Performs transmitting operations for current cycle.</p>
+<h3 id="method-30"><a class="header" href="#method-30">Method</a></h3>
+<pre><code class="language-c++">void RXProcess()
+</code></pre>
+<p>Performs receiving operations for current cycle.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="relay-1"><a class="header" href="#relay-1">Relay</a></h1>
+<p>Represents port with flit buffers. Must be connected with another relay. Used for transmitting flits between routers and processors.</p>
+<h3 id="method-31"><a class="header" href="#method-31">Method</a></h3>
+<pre><code class="language-c++">void SetLocalID(std::int32_t id)
+</code></pre>
+<p>Sets owner <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a> id for the <a href="developer_manual/class_description/hardware/relay.html"><code>Relay</code></a></p>
+<h3 id="method-32"><a class="header" href="#method-32">Method</a></h3>
+<pre><code class="language-c++">void SetVirtualChannels(std::size_t vcs)	
+</code></pre>
+<p>Sets number of virtual channels</p>
+<h3 id="method-33"><a class="header" href="#method-33">Method</a></h3>
+<pre><code class="language-c++">std::size_t Size()
+</code></pre>
+<p>Returns number of virtual channels</p>
+<h3 id="method-34"><a class="header" href="#method-34">Method</a></h3>
+<pre><code class="language-c++">void Bind(Relay&amp; r)
+</code></pre>
+<p>Pairs current <a href="developer_manual/class_description/hardware/relay.html"><code>Relay</code></a> with provided one</p>
+<h3 id="method-35"><a class="header" href="#method-35">Method</a></h3>
+<pre><code class="language-c++">bool Bound()
+</code></pre>
+<p>Returns true if array is bound to another <a href="developer_manual/class_description/hardware/relay.html"><code>Relay</code></a></p>
+<h3 id="method-36"><a class="header" href="#method-36">Method</a></h3>
+<pre><code class="language-c++">void Disable()
+</code></pre>
+<p>Allows to leave <a href="developer_manual/class_description/hardware/relay.html"><code>Relay</code></a> unbound (binds it to itself)</p>
+<h3 id="method-37"><a class="header" href="#method-37">Method</a></h3>
+<pre><code class="language-c++">void Reset()
+</code></pre>
+<p>Performs reset</p>
+<h3 id="method-38"><a class="header" href="#method-38">Method</a></h3>
+<pre><code class="language-c++">void Update()
+</code></pre>
+<p>Performs per-cycle update</p>
+<h3 id="method-39"><a class="header" href="#method-39">Method</a></h3>
+<pre><code class="language-c++">bool CanSend(const Flit &amp;flit)
+</code></pre>
+<p>Returns true if <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> can be send</p>
+<h3 id="method-40"><a class="header" href="#method-40">Method</a></h3>
+<pre><code class="language-c++">bool CanSend(std::size_t vc)
+</code></pre>
+<p>Returns true if <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> can be send through specified virtual channel</p>
+<h3 id="method-41"><a class="header" href="#method-41">Method</a></h3>
+<pre><code class="language-c++">bool Send(Flit flit)
+</code></pre>
+<p>Tries to send <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>. Returns true on success</p>
+<h3 id="method-42"><a class="header" href="#method-42">Method</a></h3>
+<pre><code class="language-c++">bool CanReceive()
+</code></pre>
+<p>Returns true if <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> can be received</p>
+<h3 id="method-43"><a class="header" href="#method-43">Method</a></h3>
+<pre><code class="language-c++">Flit Receive()
+</code></pre>
+<p>Returns <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> if receive succeed, 
+otherwise returns invalid <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> instance</p>
+<h3 id="method-44"><a class="header" href="#method-44">Method</a></h3>
+<pre><code class="language-c++">std::size_t GetFreeSlots(std::size_t vc)
+</code></pre>
+<p>Returns number of free slots in the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a> for given virtual channel</p>
+<h3 id="method-45"><a class="header" href="#method-45">Method</a></h3>
+<pre><code class="language-c++">Flit Front()
+</code></pre>
+<p>Returns front <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> 
+from the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a> of current virtual channel</p>
+<h3 id="method-46"><a class="header" href="#method-46">Method</a></h3>
+<pre><code class="language-c++">void Skip()
+</code></pre>
+<p>Skips current virtual channel</p>
+<h3 id="method-47"><a class="header" href="#method-47">Method</a></h3>
+<pre><code class="language-c++">Flit Pop()
+</code></pre>
+<p>Removes <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> from the current virtual channel <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-48"><a class="header" href="#method-48">Method</a></h3>
+<pre><code class="language-c++">Buffer&amp; operator[](std::size_t i)
+</code></pre>
+<p>Overloaded operator for accessing <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a> of specified virtual channel</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="buffer"><a class="header" href="#buffer">Buffer</a></h1>
+<p>Buffer is used to store <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> s for one virtual channel.</p>
+<h3 id="method-49"><a class="header" href="#method-49">Method</a></h3>
+<pre><code class="language-c++">void Reserve(std::size_t bms)
+</code></pre>
+<p>Reserves capacity for the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-50"><a class="header" href="#method-50">Method</a></h3>
+<pre><code class="language-c++">std::size_t GetCapacity()
+</code></pre>
+<p>Returns capacity of the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-51"><a class="header" href="#method-51">Method</a></h3>
+<pre><code class="language-c++">std::size_t GetFreeSlots()
+</code></pre>
+<p>Returns current number of free slots</p>
+<h3 id="method-52"><a class="header" href="#method-52">Method</a></h3>
+<pre><code class="language-c++">bool Full()
+</code></pre>
+<p>Returns true if <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a> is full</p>
+<h3 id="method-53"><a class="header" href="#method-53">Method</a></h3>
+<pre><code class="language-c++">bool Empty()
+</code></pre>
+<p>Returns true if <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a> is empty</p>
+<h3 id="method-54"><a class="header" href="#method-54">Method</a></h3>
+<pre><code class="language-c++">void Clear()
+</code></pre>
+<p>Clears the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-55"><a class="header" href="#method-55">Method</a></h3>
+<pre><code class="language-c++">void Push(const Flit&amp; flit)
+</code></pre>
+<p>Appends <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>  to the end of the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-56"><a class="header" href="#method-56">Method</a></h3>
+<pre><code class="language-c++">Flit Pop()
+</code></pre>
+<p>Remove and return front <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>  from the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-57"><a class="header" href="#method-57">Method</a></h3>
+<pre><code class="language-c++">Flit Front()
+</code></pre>
+<p>Returns front <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>  from the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-58"><a class="header" href="#method-58">Method</a></h3>
+<pre><code class="language-c++">std::int32_t Size()
+</code></pre>
+<p>Returns number of the <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>s in the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-59"><a class="header" href="#method-59">Method</a></h3>
+<pre><code class="language-c++">double GetOldest()
+</code></pre>
+<p>Returns timestamp of the oldest <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> in the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-60"><a class="header" href="#method-60">Method</a></h3>
+<pre><code class="language-c++">double GetOldestAccepted()
+</code></pre>
+<p>Returns accepted timestamp of the oldest <a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a> in the <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-61"><a class="header" href="#method-61">Method</a></h3>
+<pre><code class="language-c++">double GetLoad()
+</code></pre>
+<p>Returns the share of <a href="developer_manual/class_description/hardware/buffer.html"><code>Buffer</code></a> load</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="processorqueue"><a class="header" href="#processorqueue">ProcessorQueue</a></h1>
+<p>This class objects are used as immitation of <a href="developer_manual/class_description/hardware/processor.html"><code>Processor</code></a> queue.
+Memory economy of it is achieved by not actually storing <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a>s.
+Instead, it just stores numbers, representing sizes, timestamps and 
+other parameters needed to estimate metrics of actual <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a>s.</p>
+<h3 id="method-62"><a class="header" href="#method-62">Method</a></h3>
+<pre><code class="language-c++">bool UpdateRequired() const
+</code></pre>
+<p>Returns true if update method call required</p>
+<h3 id="method-63"><a class="header" href="#method-63">Method</a></h3>
+<pre><code class="language-c++">void UpdateFrontPacket(std::int32_t src_id, std::int32_t dst_id, std::int32_t size)
+</code></pre>
+<p>Updates the front <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a> 
+of the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a></p>
+<h3 id="method-64"><a class="header" href="#method-64">Method</a></h3>
+<pre><code class="language-c++">void Push(double time_stamp)
+</code></pre>
+<p>Immitates push of <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a> 
+with specified timestamp to the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a></p>
+<h3 id="method-65"><a class="header" href="#method-65">Method</a></h3>
+<pre><code class="language-c++">void Pop()
+</code></pre>
+<p>Immitates pop of <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a> 
+from the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a></p>
+<h3 id="method-66"><a class="header" href="#method-66">Method</a></h3>
+<pre><code class="language-c++">Packet&amp; Front()
+</code></pre>
+<p>Returns the current <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a> of the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a></p>
+<h3 id="method-67"><a class="header" href="#method-67">Method</a></h3>
+<pre><code class="language-c++">bool Empty() const
+</code></pre>
+<p>Retuns true if the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a> is empty</p>
+<h3 id="method-68"><a class="header" href="#method-68">Method</a></h3>
+<pre><code class="language-c++">std::size_t Size() const
+</code></pre>
+<p>Returns number of the <a href="developer_manual/class_description/hardware/../data/packet.html"><code>Packet</code></a>s in the <a href="developer_manual/class_description/hardware/processor_queue.html"><code>ProcessorQueue</code></a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="reservationtable"><a class="header" href="#reservationtable">ReservationTable</a></h1>
+<p>Class objects are used as reservation table for <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a>s.</p>
+<h3 id="method-69"><a class="header" href="#method-69">Method</a></h3>
+<pre><code class="language-c++">void Reserve(Connection dest_in, Connection dest_out)
+</code></pre>
+<p>Reserves the given input to the given output</p>
+<h3 id="method-70"><a class="header" href="#method-70">Method</a></h3>
+<pre><code class="language-c++">void Release(Connection dest_in)
+</code></pre>
+<p>Removes bindings for the given input</p>
+<h3 id="method-71"><a class="header" href="#method-71">Method</a></h3>
+<pre><code class="language-c++">bool Reserved(Connection dest_in, Connection dest_out) const
+</code></pre>
+<p>Returns true if the given input is bound to the given output</p>
+<h3 id="method-72"><a class="header" href="#method-72">Method</a></h3>
+<pre><code class="language-c++">bool Reserved(Connection dest_out) const
+</code></pre>
+<p>Returns true if there is bound <a href="developer_manual/class_description/hardware/connection.html"><code>Connection</code></a> instance to the given output</p>
+<h3 id="method-73"><a class="header" href="#method-73">Method</a></h3>
+<pre><code class="language-c++">Connection operator[](Connection dest_in) const
+</code></pre>
+<p>Returns instance of the <a href="developer_manual/class_description/hardware/connection.html"><code>Connection</code></a> bound to the given input.
+If there is no bound <a href="developer_manual/class_description/hardware/connection.html"><code>Connection</code></a>, it returns invalid instance.</p>
+<h3 id="method-74"><a class="header" href="#method-74">Method</a></h3>
+<pre><code class="language-c++">friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const ReservationTable&amp; table)
+</code></pre>
+<p>Overloaded output operator to print formatted <a href="developer_manual/class_description/hardware/reservation_table.html"><code>ReservationTable</code></a> data</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="simulationtimer"><a class="header" href="#simulationtimer">SimulationTimer</a></h1>
+<p>Class object provides access to current timestamps in different systems.</p>
+<h3 id="method-75"><a class="header" href="#method-75">Method</a></h3>
+<pre><code class="language-c++">double ClockPeriod() const
+</code></pre>
+<p>Returns clock period</p>
+<h3 id="method-76"><a class="header" href="#method-76">Method</a></h3>
+<pre><code class="language-c++">double SystemTime() const
+</code></pre>
+<p>Returns timestamp from the start of the simulation including reset time</p>
+<h3 id="method-77"><a class="header" href="#method-77">Method</a></h3>
+<pre><code class="language-c++">double SimulationTime() const
+</code></pre>
+<p>Returns timestamp from the start of the simulation excluding reset time</p>
+<h3 id="method-78"><a class="header" href="#method-78">Method</a></h3>
+<pre><code class="language-c++">double StatisticsTime() const
+</code></pre>
+<p>Returns timestamp from the start statistics aggregation</p>
+<h3 id="method-79"><a class="header" href="#method-79">Method</a></h3>
+<pre><code class="language-c++">double ProductionTime() const
+</code></pre>
+<p>Returns timestamp when production of the 
+<a href="developer_manual/class_description/hardware/../data/flit.html"><code>Flit</code></a>s 
+in the <a href="developer_manual/class_description/hardware/processor.html"><code>Processor</code></a>s must be stopped</p>
+<h3 id="method-80"><a class="header" href="#method-80">Method</a></h3>
+<pre><code class="language-c++">double Progress() const
+</code></pre>
+<p>Returns current simulation progress</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="connection"><a class="header" href="#connection">Connection</a></h1>
+<p>Data class (struct) containing <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a> port index and virtual channel number.</p>
+<h3 id="field-21"><a class="header" href="#field-21">Field</a></h3>
+<pre><code class="language-c++">std::int32_t port = -1
+</code></pre>
+<p>Index of the <a href="developer_manual/class_description/hardware/router.html"><code>Router</code></a> port (<a href="developer_manual/class_description/hardware/relay.html"><code>Relay</code></a>)</p>
+<h3 id="field-22"><a class="header" href="#field-22">Field</a></h3>
+<pre><code class="language-c++">std::int32_t vc = -1
+</code></pre>
+<p>Number of the virtual channel</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="routing-classes"><a class="header" href="#routing-classes">Routing classes</a></h1>
+<p>Those classes are used as implementations of the routing algorithms.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="routingalgorithm"><a class="header" href="#routingalgorithm">RoutingAlgorithm</a></h1>
+<p>Abstract class used as base class for routing algorithm implementation.</p>
+<h3 id="method-81"><a class="header" href="#method-81">Method</a></h3>
+<pre><code class="language-c++">void Route(const Router&amp; router, const Flit&amp; flit, std::vector&lt;Connection&gt;&amp; result)
+</code></pre>
+<p>Implementation must provide an array of 
+<a href="developer_manual/class_description/routing/../hardware/connection.html"><code>Connection</code></a>s 
+based on given 
+<a href="developer_manual/class_description/routing/../hardware/router.html"><code>Router</code></a> 
+and 
+<a href="developer_manual/class_description/routing/../data/flit.html"><code>Flit</code></a>
+instances</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="selection-classes"><a class="header" href="#selection-classes">Selection classes</a></h1>
+<p>Those classes are used as implementations of the selection strategies.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="selectionstrategy"><a class="header" href="#selectionstrategy">SelectionStrategy</a></h1>
+<p>Abstract class used as base class for the selection strategy implementation.</p>
+<h3 id="method-82"><a class="header" href="#method-82">Method</a></h3>
+<pre><code class="language-c++">Connection Apply(const Router&amp; router, const Flit&amp; flit, const std::vector&lt;Connection&gt;&amp; directions)
+</code></pre>
+<p>Implementation must select one or none of the given 
+<a href="developer_manual/class_description/selection/../hardware/connection.html"><code>Connection</code></a>s 
+based on the 
+<a href="developer_manual/class_description/selection/../hardware/router.html"><code>Router</code></a> 
+and 
+<a href="developer_manual/class_description/selection/../data/flit.html"><code>Flit</code></a> 
+instances</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="metrics-classes"><a class="header" href="#metrics-classes">Metrics classes</a></h1>
+<p>Metrics classes are used to aggregate and output data during the whole simulation process.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="flittracer"><a class="header" href="#flittracer">FlitTracer</a></h1>
+<p>Class instance is used to trace <a href="developer_manual/class_description/metrics/../data/flit.html"><code>Flit</code></a>s paths through the network.</p>
+<h3 id="constructor-5"><a class="header" href="#constructor-5">Constructor</a></h3>
+<pre><code class="language-c++">FlitTracer(const SimulationTimer&amp; timer, double story_start, double story_end)
+</code></pre>
+<p>Initializes new <a href="developer_manual/class_description/metrics/flit_tracer.html"><code>FlitTracer</code></a> instance</p>
+<h3 id="method-83"><a class="header" href="#method-83">Method</a></h3>
+<pre><code class="language-c++">void Register(Flit&amp; flit)
+</code></pre>
+<p>Registers <a href="developer_manual/class_description/metrics/../data/flit.html"><code>Flit</code></a> in tracer</p>
+<h3 id="method-84"><a class="header" href="#method-84">Method</a></h3>
+<pre><code class="language-c++">void Remember(const Flit&amp; flit, std::int32_t id)
+</code></pre>
+<p>Remembers <a href="developer_manual/class_description/metrics/../data/flit.html"><code>Flit</code></a> location</p>
+<h3 id="method-85"><a class="header" href="#method-85">Method</a></h3>
+<pre><code class="language-c++">friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const FlitTracer&amp; tracer)
+</code></pre>
+<p>Overloaded operator to print traces to the output stream</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="stats"><a class="header" href="#stats">Stats</a></h1>
+<p>Class objects are used to local metrics aggregation inside 
+<a href="developer_manual/class_description/metrics/../hardware/router.html"><code>Router</code></a>s.</p>
+<h3 id="method-86"><a class="header" href="#method-86">Method</a></h3>
+<pre><code class="language-c++">void FlitRouted(const Flit&amp; flit);
+</code></pre>
+<p>Remembers stats for the routed <a href="developer_manual/class_description/metrics/../data/flit.html"><code>Flit</code></a></p>
+<h3 id="method-87"><a class="header" href="#method-87">Method</a></h3>
+<pre><code class="language-c++">void FlitReceived(std::int32_t relay, std::int32_t vc);
+</code></pre>
+<p>Remembers stats for the received <a href="developer_manual/class_description/metrics/../hardware/router.html"><code>Router</code></a></p>
+<h3 id="method-88"><a class="header" href="#method-88">Method</a></h3>
+<pre><code class="language-c++">void StartStuckTimer(std::int32_t relay, std::int32_t vc);
+</code></pre>
+<p>Starts timer for <a href="developer_manual/class_description/metrics/../hardware/buffer.html"><code>Buffer</code></a> stuck delay</p>
+<h3 id="method-89"><a class="header" href="#method-89">Method</a></h3>
+<pre><code class="language-c++">void StopStuckTimer(std::int32_t relay, std::int32_t vc);
+</code></pre>
+<p>Stops timer for <a href="developer_manual/class_description/metrics/../hardware/buffer.html"><code>Buffer</code></a> stuck delay</p>
+<h3 id="method-90"><a class="header" href="#method-90">Method</a></h3>
+<pre><code class="language-c++">void PushLoad(std::int32_t relay, std::int32_t vc, double load);
+</code></pre>
+<p>Remembers stats of buffer load</p>
+<h3 id="method-91"><a class="header" href="#method-91">Method</a></h3>
+<pre><code class="language-c++">double GetMaxBufferStuckDelay(std::int32_t relay, std::int32_t vc);
+</code></pre>
+<p>Returns maximum stuck delay of the specified <a href="developer_manual/class_description/metrics/../hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-92"><a class="header" href="#method-92">Method</a></h3>
+<pre><code class="language-c++">std::int32_t GetBufferFlitsReceived(std::int32_t relay, std::int32_t vc);
+</code></pre>
+<p>Returns number of flits received by specified <a href="developer_manual/class_description/metrics/../hardware/buffer.html"><code>Buffer</code></a> </p>
+<h3 id="method-93"><a class="header" href="#method-93">Method</a></h3>
+<pre><code class="language-c++">double GetMaxBufferStuckDelay();
+</code></pre>
+<p>Returns maximum stuck delay among all of the <a href="developer_manual/class_description/metrics/../hardware/buffer.html"><code>Buffer</code></a>s</p>
+<h3 id="method-94"><a class="header" href="#method-94">Method</a></h3>
+<pre><code class="language-c++">double GetAverageBufferLoad(std::int32_t relay, std::int32_t vc) const;
+</code></pre>
+<p>Returns average load of the specified <a href="developer_manual/class_description/metrics/../hardware/buffer.html"><code>Buffer</code></a></p>
+<h3 id="method-95"><a class="header" href="#method-95">Method</a></h3>
+<pre><code class="language-c++">double GetAverageBufferLoad() const;
+</code></pre>
+<p>Returns average load among all of the <a href="developer_manual/class_description/metrics/../hardware/buffer.html"><code>Buffer</code></a>s</p>
+<h3 id="method-96"><a class="header" href="#method-96">Method</a></h3>
+<pre><code class="language-c++">std::int32_t GetFlitsRouted() const;
+</code></pre>
+<p>Returns number of the routed <a href="developer_manual/class_description/metrics/../data/flit.html"><code>Flit</code></a>s</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="globalstats"><a class="header" href="#globalstats">GlobalStats</a></h1>
+<p>Class object is used for aggregation of simulation metrics, collected from network instance.</p>
+<h3 id="method-97"><a class="header" href="#method-97">Method</a></h3>
+<pre><code class="language-c++">friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, const GlobalStats&amp; gs)
+</code></pre>
+<p>Overloaded operator to print metrics to the output stream</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="progressbar"><a class="header" href="#progressbar">ProgressBar</a></h1>
+<p>Class object is used to print current progress of the simulation</p>
+<h3 id="method-98"><a class="header" href="#method-98">Method</a></h3>
+<pre><code class="language-c++">void Update()
+</code></pre>
+<p>Updates current progress and prints it to the output stream</p>
+<h3 id="constructor-6"><a class="header" href="#constructor-6">Constructor</a></h3>
+<pre><code class="language-c++">ProgressBar(sc_module_name, std::ostream&amp; os, const SimulationTimer&amp; network_timer, std::int32_t units, const sc_clock&amp; clk);
+</code></pre>
+<p>Creates new instance of progress bar and binds <code>Update</code> method to clock signal</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="modification-guide"><a class="header" href="#modification-guide">Modification guide</a></h1>
+<p>One of the main Newxim advantages is ease of modifications. 
+If you want to simulate any algorithm which is not implemented, 
+you need to provide it by yourself. <br>
+The same method is used when implementing selection strategy or traffic manager. Any custom module must implement one of base classes and then be registered in factory class.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="routing-algorithm-implementation"><a class="header" href="#routing-algorithm-implementation">Routing algorithm implementation</a></h1>
+<p>This section will give you an example of implementing XY routing algorithm for mesh.<br>
+First of all, you need to decide what data will be used by algorithm. 
+XY routing algorithm must know width and height of the mesh to calculate 
+node id from coordinates and vice versa. 
+Secondly, it need access to the graph of the network for extracting link 
+indices from it because each link index correlates with specific router port number.</p>
+<pre><code class="language-c++">class RoutingExampleMeshXY : public RoutingAlgorithm {
+private:
+	const std::int32_t mesh_w, mesh_h;
+	const Graph&amp; graph;
+
+public:
+	RoutingExampleMeshXY(std::int32_t w, std::int32_t h, const Graph&amp; g) :
+		mesh_w(w), mesh_h(h), graph(g) {
+	}
+};
+</code></pre>
+<p>Class <code>RoutingExampleMeshXY</code> have all required private fields for algorithm to operate 
+and constructor for initialization which will be used later.
+Next, we implement several helper methods:</p>
+<pre><code class="language-c++">std::int32_t GetXFromID(std::int32_t id) const {
+	return id % mesh_w;
+}
+std::int32_t GetYFromID(std::int32_t id) const {
+	return id / mesh_w;
+}
+std::int32_t GetIDFromXY(std::int32_t x, std::int32_t y) const {
+	if (x &gt;= mesh_w) {
+		x = 0;
+	} else if (x &lt; 0) {
+		x = mesh_w - 1;
+	}
+	if (y &gt;= mesh_h) {
+		y = 0;
+	} else if (y &lt; 0) {
+		y = mesh_h - 1;
+	}
+	return x + y * mesh_w;
+}
+std::vector&lt;std::int32_t&gt; GetLinksTo(std::int32_t id, std::int32_t x, std::int32_t y) const {
+	return graph[id].links_to(GetIDFromXY(x, y));
+}
+</code></pre>
+<p>Those methods will be used for conversions between coordinates and node id. <code>GetLinksTo(...)</code> method accepts id of current node and coordinates of the next node. It returns array of link indices in graph. Those indices can be used as target router ports.</p>
+<p>Now, it is time to implement routing method.</p>
+<pre><code class="language-c++">void Route(const Router&amp; router, const Flit&amp; flit, std::vector&lt;Connection&gt;&amp; result) const override {
+	std::int32_t id = router.LocalID;
+	std::int32_t x = GetXFromID(router.LocalID);
+	std::int32_t y = GetYFromID(router.LocalID);
+	std::int32_t dx = GetXFromID(flit.dst_id) - x;
+	std::int32_t dy = GetYFromID(flit.dst_id) - y;
+
+	if (dx &gt; 0) {
+		for (std::int32_t l : GetLinksTo(id, x + 1, y)) {
+			result.push_back({ l, flit.vc_id });
+		}
+	} else if (dx &lt; 0) {
+		for (std::int32_t l : GetLinksTo(id, x - 1, y)) {
+			result.push_back({ l, flit.vc_id });
+		}
+	} else if (dy &gt; 0) {
+		for (std::int32_t l : GetLinksTo(id, x, y + 1)) {
+			result.push_back({ l, flit.vc_id });
+		}
+	} else if (dy &lt; 0) {
+		for (std::int32_t l : GetLinksTo(id, x, y - 1)) {
+			result.push_back({ l, flit.vc_id });
+		}
+	}
+}
+</code></pre>
+<p><code>Route(...)</code> is marked as override because it implements abstract method of base 
+<a href="developer_manual/modification_guide/../class_description/routing/routing_algorithm.html"><code>RoutingAlgorithm</code></a> class. 
+It accepts references to router, flit and vector of result connections instances. 
+Reference to router can be used in more complex algorithms which relies on current network state. 
+For now, we only require <code>LocalID</code> as it represents the current node. Flit instance have some useful 
+information such as destination node id and current virtual channel id. Result vector consists of connections. 
+Each connection is just a pair of port number and virtual channel index. 
+At first step, all variables, required for algorithm to operate are calculated, then it chose direction based on dx and dy. 
+Links for the chosen direction are written in result vector along with current flit virtual channel id (XY algorithm have no reasons to change it).
+Now algorithm is fully functional, but it needs to be registered in the 
+<a href="developer_manual/modification_guide/../class_description/configuration/factory.html"><code>Factory</code></a>. 
+It is required because at configuration step, 
+<a href="developer_manual/modification_guide/../class_description/configuration/factory.html"><code>Factory</code></a> 
+needs to find specific algorithm implementation by its name. 
+Found algorithm implementation will then be injected into each router of the network.
+Function: </p>
+<pre><code class="language-c++">std::unique_ptr&lt;RoutingAlgorithm&gt; Factory::MakeAlgorithm()
+</code></pre>
+<p>is used to inject routing algorithm instance. 
+To register new routing algorithm only single line needs to be added in the function body.</p>
+<pre><code class="language-c++">std::unique_ptr&lt;RoutingAlgorithm&gt; Factory::MakeAlgorithm() const
+{
+	if (config.RoutingAlgorithm() == &quot;EXAMPLE_MESH_XY&quot;) return std::make_unique&lt;RoutingExampleMeshXY&gt;(config.DimX(), config.DimY(), config.TopologyGraph());
+    //...
+	throw std::runtime_error(&quot;Configuration error: Invalid routing algorithm [&quot; + config.RoutingAlgorithm() + &quot;].&quot;);
+}
+</code></pre>
+<p>It checks algorithm name, provided by configuration and if it equals to your algorithm name, returns unique instance of algorithm implementation.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="selection-strategy-implementation"><a class="header" href="#selection-strategy-implementation">Selection strategy implementation</a></h1>
+<p>This section describes implementation of custom selection strategy.<br></p>
+<pre><code class="language-c++">class SelectionExampleRandom : public SelectionStrategy 
+{
+public:
+	Connection Apply(const Router&amp; router, const Flit&amp; flit, const std::vector&lt;Connection&gt;&amp; directions) const override
+    {
+        if (directions.size() == 0) {
+            return Connection();
+        } else {
+            return directions[rand() % directions.size()];
+        }
+    }
+};
+</code></pre>
+<p><code>Apply(...)</code> is marked as override because it implements abstract method of base 
+<a href="developer_manual/modification_guide/../class_description/selection/selection_strategy.html"><code>SelectionStrategy</code></a>
+class. 
+It accepts references to router, flit and vector of direction instances. 
+References to router and flit can be used in more complex selection 
+strategies which relies on current network state. 
+Current example just selects random connection instance and returns it.
+If there is not connections passed to <code>Apply</code> function, it just returns invalid conneciton instace.
+Function: </p>
+<pre><code class="language-c++">std::unique_ptr&lt;SelectionStrategy&gt; Factory::MakeStrategy()
+</code></pre>
+<p>is used to inject routing algorithm instance. 
+To register new routing algorithm only single line needs to be added in the function body.</p>
+<pre><code class="language-c++">std::unique_ptr&lt;SelectionStrategy&gt; Factory::MakeStrategy() const
+{
+	if (config.RoutingAlgorithm() == &quot;EXAMPLE_RANDOM&quot;) return std::make_unique&lt;SelectionExampleRandom&gt;();
+    //...
+	throw std::runtime_error(&quot;Configuration error: Invalid selection strategy [&quot; + config.SelectionStrategy() + &quot;].&quot;);
+}
+</code></pre>
+<p>It checks selection strategy name, provided by configuration and if it equals to your selection 
+strategy name, returns unique instance of the selection strategy implementation.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+    </body>
+</html>
