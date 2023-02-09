@@ -1,10 +1,10 @@
 # Newxim
 Network-on-Chip Simulator. 
     
-#Reference    
+# Reference    
 Romanov, A.Y.; Myachin, N.M.; Lezhnev, E.V.; Ivannikov, A.D.; El-Mesady, A. Ring-Split: Deadlock-Free Routing Algorithm for Circulant Networks-on-Chip. Micromachines 2023, 14, 141. https://doi.org/10.3390/mi14010141
     
-#Description    
+# Description    
 This project is dedicated to cycle-accurate NoCs 
 simulation and is a part of NoC topologies study
 at HSE University. Main 
