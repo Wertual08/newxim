@@ -36,6 +36,6 @@ https://wertual08.github.io/newxim
 
 ### Contacts
 Developer: wertual08@gmail.com (Nikolay Myachin)    
-a.romanov@hse.ru (Aleksandr Romanov, PhD)   
+a.romanov@hse.ru (Aleksandr Romanov, Dr.Sc.)   
 https://www.hse.ru/en/staff/a.romanov#sci     
 https://www.researchgate.net/profile/Aleksandr-Romanov    
